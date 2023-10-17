@@ -46,20 +46,20 @@ subdirectory.  You will have the best luck reading the manual pages if
 you build this software and then install it, although you can read
 them directly out of the distribution if you need to.
 
-DHCP server documentation is in the dhcpd man page.  Information about
-the DHCP server lease database is in the dhcpd.leases man page.
-Server configuration documentation is in the dhcpd.conf man page as
+DHCP server documentation is in the ub-dhcpd man page.  Information about
+the DHCP server lease database is in the ub-dhcpd.leases man page.
+Server configuration documentation is in the ub-dhcpd.conf man page as
 well as the dhcp-options man page.   A sample DHCP server
-configuration is in the file server/dhcpd.conf.example.   The source for
-the dhcpd, dhcpd.leases and dhcpd.conf man pages is in the server/ sub-
+configuration is in the file server/ub-dhcpd.conf.example.   The source for
+the ub-dhcpd, ub-dhcpd.leases and ub-dhcpd.conf man pages is in the server/ sub-
 directory in the distribution.   The source for the dhcp-options.5
 man page is in the common/ subdirectory.
 
 DHCP Client documentation is in the dhclient man page.  DHCP client
-configuration documentation is in the dhclient.conf man page and the
+configuration documentation is in the ub-dhclient.conf man page and the
 dhcp-options man page.  The DHCP client configuration script is
-documented in the dhclient-script man page.   The format of the DHCP
-client lease database is documented in the dhclient.leases man page.
+documented in the ub-dhclient-script man page.   The format of the DHCP
+client lease database is documented in the ub-dhclient.leases man page.
 The source for all these man pages is in the client/ subdirectory in
 the distribution.   In addition, the dhcp-options man page should be
 referred to for information about DHCP options. The client component
@@ -163,7 +163,7 @@ as part of the make step.  In order to build the necessary libraries you
 will need to have "gmake" available on your build system.
 
 
-There is documentation for the DDNS support in the dhcpd.conf manual
+There is documentation for the DDNS support in the ub-dhcpd.conf manual
 page - see the beginning of this document for information on finding
 manual pages.
 
@@ -335,7 +335,7 @@ Linux Packet Filter.
 			     LINUX: OpenWrt
 
 DHCP 4.1 has been tested on OpenWrt 7.09 and 8.09.  In keeping with
-standard practice, client/scripts now includes a dhclient-script file
+standard practice, client/scripts now includes a ub-dhclient-script file
 for OpenWrt.  However, this is not sufficient by itself to run dhcp on
 OpenWrt; a full OpenWrt package for DHCP is available at
 ftp://ftp.isc.org/isc/dhcp/dhcp-4.1.0-openwrt.tar.gz
@@ -452,7 +452,7 @@ bug reports are more likely to get handled more quickly overall.
       5.  Please explain the problem carefully, thinking through what
 	  you're saying to ensure that you don't assume we know
 	  something about your situation that we don't know.
-      6.  Include your dhcpd.conf and dhcpd.leases file as MIME attachments
+      6.  Include your ub-dhcpd.conf and ub-dhcpd.leases file as MIME attachments
 	  if they're not over 100 kilobytes in size each.  If they are
 	  this large, please make them available to us, e.g., via a hidden
 	  http:// URL or FTP site.  If you're not comfortable releasing

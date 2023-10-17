@@ -89,7 +89,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-sbin_PROGRAMS = dhclient$(EXEEXT)
+sbin_PROGRAMS = ub-dhclient$(EXEEXT)
 subdir = client
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -107,7 +107,7 @@ PROGRAMS = $(sbin_PROGRAMS)
 am_dhclient_OBJECTS = client_tables.$(OBJEXT) clparse.$(OBJEXT) \
 	dhclient.$(OBJEXT) dhc6.$(OBJEXT)
 dhclient_OBJECTS = $(am_dhclient_OBJECTS)
-dhclient_DEPENDENCIES = ../common/libdhcp.@A@ ../omapip/libomapi.@A@
+dhclient_DEPENDENCIES = ../common/libub-dhcp.@A@ ../omapip/libub-omapi.@A@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -373,19 +373,17 @@ top_srcdir = @top_srcdir@
 SUBDIRS = . tests
 AM_CPPFLAGS = -DCLIENT_PATH='"PATH=$(sbindir):/sbin:/bin:/usr/sbin:/usr/bin"' \
 	-DLOCALSTATEDIR='"$(localstatedir)"'
-dist_sysconf_DATA = dhclient.conf.example
+dist_sysconf_DATA = ub-dhclient.conf.example
 dhclient_SOURCES = client_tables.c clparse.c dhclient.c dhc6.c \
-		   scripts/bsdos scripts/freebsd scripts/linux scripts/macos \
-		   scripts/netbsd scripts/nextstep scripts/openbsd \
-		   scripts/solaris scripts/openwrt
+		   scripts/linux
 
-dhclient_LDADD = ../common/libdhcp.@A@ ../omapip/libomapi.@A@ \
+dhclient_LDADD = ../common/libub-dhcp.@A@ ../omapip/libub-omapi.@A@ \
 		 @BINDLIBIRSDIR@/libirs.@A@ \
 		 @BINDLIBDNSDIR@/libdns.@A@ \
 		 @BINDLIBISCCFGDIR@/libisccfg.@A@ \
 		 @BINDLIBISCDIR@/libisc.@A@
 
-man_MANS = dhclient.8 dhclient-script.8 dhclient.conf.5 dhclient.leases.5
+man_MANS = ub-dhclient.8 ub-dhclient-script.8 ub-dhclient.conf.5 ub-dhclient.leases.5
 EXTRA_DIST = $(man_MANS)
 all: all-recursive
 
@@ -463,8 +461,8 @@ uninstall-sbinPROGRAMS:
 clean-sbinPROGRAMS:
 	-test -z "$(sbin_PROGRAMS)" || rm -f $(sbin_PROGRAMS)
 
-dhclient$(EXEEXT): $(dhclient_OBJECTS) $(dhclient_DEPENDENCIES) $(EXTRA_dhclient_DEPENDENCIES) 
-	@rm -f dhclient$(EXEEXT)
+ub-dhclient$(EXEEXT): $(dhclient_OBJECTS) $(dhclient_DEPENDENCIES) $(EXTRA_dhclient_DEPENDENCIES)
+	@rm -f ub-dhclient$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(dhclient_OBJECTS) $(dhclient_LDADD) $(LIBS)
 
 mostlyclean-compile:

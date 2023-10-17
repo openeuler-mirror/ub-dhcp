@@ -11,8 +11,8 @@
 
 /* Define this if you don't want dhcpd to run as a daemon and do want
    to see all its output printed to stdout instead of being logged via
-   syslog().   This also makes dhcpd use the dhcpd.conf in its working
-   directory and write the dhcpd.leases file there. */
+   syslog().   This also makes dhcpd use the ub-dhcpd.conf in its working
+   directory and write the ub-dhcpd.leases file there. */
 
 /* #define DEBUG */
 
@@ -25,6 +25,7 @@
    slows things down quite a bit... */
 
 /* #define DEBUG_PACKET */
+#define DEBUG_PACKET
 
 /* Define this if you want to see dumps of expression evaluation. */
 
@@ -133,22 +134,22 @@
    find a nameserver to use for DDNS updates. */
 #define DNS_ZONE_LOOKUP
 
-/* Define this if you want the dhcpd.pid file to go somewhere other than
+/* Define this if you want the ub-dhcpd.pid file to go somewhere other than
    the default (which varies from system to system, but is usually either
    /etc or /var/run. */
 
-/* #define _PATH_DHCPD_PID	"/var/run/dhcpd.pid" */
+/* #define _PATH_DHCPD_PID	"/var/run/ub-dhcpd.pid" */
 
-/* Define this if you want the dhcpd.leases file (the dynamic lease database)
+/* Define this if you want the ub-dhcpd.leases file (the dynamic lease database)
    to go somewhere other than the default location, which is normally
-   /etc/dhcpd.leases. */
+   /etc/ub-dhcpd.leases. */
 
-/* #define _PATH_DHCPD_DB	"/etc/dhcpd.leases" */
+/* #define _PATH_DHCPD_DB	"/etc/ub-dhcpd.leases" */
 
-/* Define this if you want the dhcpd.conf file to go somewhere other than
-   the default location.   By default, it goes in /etc/dhcpd.conf. */
+/* Define this if you want the ub-dhcpd.conf file to go somewhere other than
+   the default location.   By default, it goes in /etc/ub-dhcpd.conf. */
 
-/* #define _PATH_DHCPD_CONF	"/etc/dhcpd.conf" */
+/* #define _PATH_DHCPD_CONF	"/etc/ub-dhcpd.conf" */
 
 /* Network API definitions.   You do not need to choose one of these - if
    you don't choose, one will be chosen for you in your system's config
@@ -263,7 +264,7 @@
 
 /* NOTE:  SERVER_ID_CHECK switch has been removed. Enabling server id
  * checking is now done via the server-id-check statement. Please refer
- * to the dhcpd manpage (server/dhcpd.conf.5) */
+ * to the dhcpd manpage (server/ub-dhcpd.conf.5) */
 
 /* Include code to do a slow transition of DDNS records
    from the interim to the standard version, or backwards.

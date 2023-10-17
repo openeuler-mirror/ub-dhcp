@@ -1131,7 +1131,7 @@ void enter_lease (lease)
 	}
 
 	/* The only way a lease can get here without a subnet is if it's in
-	   the lease file, but not in the dhcpd.conf file.  In this case, we
+	   the lease file, but not in the ub-dhcpd.conf file.  In this case, we
 	   *should* keep it around until it's expired, but never reallocate it
 	   or renew it.  Currently, to maintain consistency, we are not doing
 	   this.

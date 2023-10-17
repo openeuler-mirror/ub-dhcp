@@ -648,9 +648,6 @@ ATF_TP_ADD_TCS(tp)
     ATF_TP_ADD_TC(tp, data_string_copy_nobuf);
     ATF_TP_ADD_TC(tp, data_string_new);
     ATF_TP_ADD_TC(tp, data_string_terminate);
-#if 0
-    ATF_TP_ADD_TC(tp, dmalloc_max32);
-#endif
     ATF_TP_ADD_TC(tp, dmalloc_med1);
     ATF_TP_ADD_TC(tp, dmalloc_med2);
     ATF_TP_ADD_TC(tp, dmalloc_med3);

@@ -3,6 +3,7 @@
    Turn data structures into printable text. */
 
 /*
+ * Copyright (c) 2023-2023 Hisilicon Limited.
  * Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1995-2003 by Internet Software Consortium
  *
@@ -27,6 +28,9 @@
  */
 
 #include "dhcpd.h"
+#include "includes/netinet/ip.h"
+#include "includes/netinet/udp.h"
+#include "includes/netinet/if_ether.h"
 
 int db_time_format = DEFAULT_TIME_FORMAT;
 
@@ -253,24 +257,22 @@ void dump_packet (tp)
 {
 	struct dhcp_packet *tdp = tp -> raw;
 
-	log_debug ("packet length %d", tp -> packet_length);
-	log_debug ("op = %d  htype = %d  hlen = %d  hops = %d",
-	       tdp -> op, tdp -> htype, tdp -> hlen, tdp -> hops);
-	log_debug ("xid = %x  secs = %ld  flags = %x",
-	       tdp -> xid, (unsigned long)tdp -> secs, tdp -> flags);
-	log_debug ("ciaddr = %s", inet_ntoa (tdp -> ciaddr));
-	log_debug ("yiaddr = %s", inet_ntoa (tdp -> yiaddr));
-	log_debug ("siaddr = %s", inet_ntoa (tdp -> siaddr));
-	log_debug ("giaddr = %s", inet_ntoa (tdp -> giaddr));
-	log_debug ("chaddr = %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x",
-	       ((unsigned char *)(tdp -> chaddr)) [0],
-	       ((unsigned char *)(tdp -> chaddr)) [1],
-	       ((unsigned char *)(tdp -> chaddr)) [2],
-	       ((unsigned char *)(tdp -> chaddr)) [3],
-	       ((unsigned char *)(tdp -> chaddr)) [4],
-	       ((unsigned char *)(tdp -> chaddr)) [5]);
-	log_debug ("filename = %s", tdp -> file);
-	log_debug ("server_name = %s", tdp -> sname);
+	log_debug ("\nStart to parse packets:");
+	log_debug ("op \t= %u", tdp -> op);
+	log_debug ("htype \t= %u", tdp -> htype);
+	log_debug ("hlen \t= %u", tdp -> hlen);
+	log_debug ("hops \t= %u", tdp -> hops);
+	log_debug ("xid \t= %u", ntohl (tdp -> xid));
+	log_debug ("secs \t= %u", ntohs (tdp -> secs));
+	log_debug ("flags \t= %u", ntohs (tdp -> flags));
+	log_debug ("ciaddr \t= %s", inet_ntoa (tdp -> ciaddr));
+	log_debug ("yiaddr \t= %s", inet_ntoa (tdp -> yiaddr));
+	log_debug ("siaddr \t= %s", inet_ntoa (tdp -> siaddr));
+	log_debug ("giaddr \t= %s", inet_ntoa (tdp -> giaddr));
+	dump_addr (tdp);
+	log_debug ("filename \t= %s", tdp -> file);
+	log_debug ("server_name \t= %s", tdp -> sname);
+
 	if (tp -> options_valid) {
 		int i;
 
@@ -288,7 +290,702 @@ void dump_packet (tp)
 	}
 	log_debug ("%s", "");
 }
+
+void dump_addr (tdp)
+	struct dhcp_packet *tdp;
+{
+	if (tdp -> htype == HTYPE_UB) {
+		log_debug ("chaddr \t= %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:"
+							   "%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x",
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR0],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR1],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR2],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR3],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR4],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR5],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR6],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR7],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR8],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR9],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR10],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR11],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR12],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR13],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR14],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR15]);
+	} else {
+		log_debug ("chaddr \t= %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x",
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR0],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR1],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR2],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR3],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR4],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR5]);
+	}
+}
+
+void dump_packet_send (tp_send)
+	struct dhcp_packet *tp_send;
+{
+	log_debug ("\nStart to parse packets:");
+	log_debug ("op \t= %u", tp_send -> op);
+	log_debug ("htype \t= %u", tp_send -> htype);
+	log_debug ("hlen \t= %u", tp_send->hlen);
+	log_debug ("hops \t= %u", tp_send -> hops);
+	log_debug ("xid \t= %u", ntohl(tp_send -> xid));
+	log_debug ("secs \t= %u", ntohs(tp_send -> secs));
+	log_debug ("flags \t= %u", ntohs(tp_send -> flags));
+	log_debug ("ciaddr \t= %s", inet_ntoa (tp_send -> ciaddr));
+	log_debug ("yiaddr \t= %s", inet_ntoa (tp_send -> yiaddr));
+	log_debug ("siaddr \t= %s", inet_ntoa (tp_send -> siaddr));
+	log_debug ("giaddr \t= %s", inet_ntoa (tp_send -> giaddr));
+	dump_addr (tp_send);
+	log_debug ("filename \t= %s", tp_send -> file);
+	log_debug ("server_name \t= %s", tp_send -> sname);
+	log_debug ("%s", "");
+}
 #endif
+
+void log_show(const char *cmd, ...)
+{
+	va_list args;
+
+	va_start(args, cmd);
+	vprintf(cmd, args);
+	va_end(args);
+	printf("\n");
+}
+
+void show_ub_hdr(struct ub_link_header *ubh)
+{
+	log_show("ub_protocol \t= 0x%x", ntohs(ubh->ub_protocol));
+	log_show("ub_dguid \t= "
+			 "%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:"
+			 "%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x",
+	    ubh->ub_dguid[UB_GUID0],
+	    ubh->ub_dguid[UB_GUID1],
+	    ubh->ub_dguid[UB_GUID2],
+	    ubh->ub_dguid[UB_GUID3],
+	    ubh->ub_dguid[UB_GUID4],
+	    ubh->ub_dguid[UB_GUID5],
+	    ubh->ub_dguid[UB_GUID6],
+	    ubh->ub_dguid[UB_GUID7],
+	    ubh->ub_dguid[UB_GUID8],
+	    ubh->ub_dguid[UB_GUID9],
+	    ubh->ub_dguid[UB_GUID10],
+	    ubh->ub_dguid[UB_GUID11],
+	    ubh->ub_dguid[UB_GUID12],
+	    ubh->ub_dguid[UB_GUID13],
+	    ubh->ub_dguid[UB_GUID14],
+	    ubh->ub_dguid[UB_GUID15]);
+	log_show("ub_sguid \t= "
+			 "%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:"
+			 "%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x",
+	    ubh->ub_sguid[UB_GUID0],
+	    ubh->ub_sguid[UB_GUID1],
+	    ubh->ub_sguid[UB_GUID2],
+	    ubh->ub_sguid[UB_GUID3],
+	    ubh->ub_sguid[UB_GUID4],
+	    ubh->ub_sguid[UB_GUID5],
+	    ubh->ub_sguid[UB_GUID6],
+	    ubh->ub_sguid[UB_GUID7],
+	    ubh->ub_sguid[UB_GUID8],
+	    ubh->ub_sguid[UB_GUID9],
+	    ubh->ub_sguid[UB_GUID10],
+	    ubh->ub_sguid[UB_GUID11],
+	    ubh->ub_sguid[UB_GUID12],
+	    ubh->ub_sguid[UB_GUID13],
+	    ubh->ub_sguid[UB_GUID14],
+	    ubh->ub_sguid[UB_GUID15]);
+}
+
+void show_ipv4_hdr(struct ip *iph)
+{
+	log_show("ip_fvhl \t= 0x%x", iph->ip_fvhl);
+	log_show("ip_tos \t= 0x%x", iph->ip_tos);
+	log_show("ip_len \t= 0x%x", ntohs(iph->ip_len));
+	log_show("ip_id \t= 0x%x", ntohs(iph->ip_id));
+	log_show("ip_off \t= 0x%x", ntohs(iph->ip_off));
+	log_show("ip_ttl \t= 0x%x", iph->ip_ttl);
+	log_show("ip_p \t= 0x%x", iph->ip_p);
+	log_show("ip_sum \t= 0x%x", ntohs(iph->ip_sum));
+	log_show("ip_src \t= %s", inet_ntoa(iph->ip_src));
+	log_show("ip_dst \t= %s", inet_ntoa(iph->ip_dst));
+}
+
+void show_ipv6_hdr(struct ipv6 *ipv6h)
+{
+	char addr_buf[sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255")];
+
+	log_show("ipv6_fvhl \t= 0x%x", ntohl(ipv6h->ipv6_fvhl));
+	log_show("ipv6_len \t= %u", ntohs(ipv6h->ipv6_len));
+	log_show("ipv6_nhea \t= %u", ipv6h->ipv6_nhea);
+	log_show("ipv6_hlim \t= %u", ipv6h->ipv6_hlim);
+
+	inet_ntop(AF_INET6, &ipv6h->ipv6_src, addr_buf, sizeof(addr_buf));
+	log_show("ipv6_src \t= %s", addr_buf);
+	inet_ntop(AF_INET6, &ipv6h->ipv6_dst, addr_buf, sizeof(addr_buf));
+	log_show("ipv6_dst \t= %s", addr_buf);
+}
+
+void show_udp_hdr(struct udphdr *udph)
+{
+	log_show("uh_sport \t= %u", ntohs(udph->uh_sport));
+	log_show("uh_dport \t= %u", ntohs(udph->uh_dport));
+	log_show("uh_ulen \t= %u", ntohs(udph->uh_ulen));
+	log_show("uh_sum \t= %u", ntohs(udph->uh_sum));
+}
+
+void show_raw_hdr(struct ub_link_header *ubh, struct ip *iph,
+				  struct udphdr *udph)
+{
+	show_ub_hdr(ubh);
+	show_ipv4_hdr(iph);
+	show_udp_hdr(udph);
+}
+
+void show_raw_hdr6(struct ub_link_header *ubh, struct ipv6 *ipv6h,
+				   struct udphdr *udph)
+{
+	show_ub_hdr(ubh);
+	show_ipv6_hdr(ipv6h);
+	show_udp_hdr(udph);
+}
+
+void show_raw_ub_pdu(struct dhcp_packet *tdp)
+{
+	log_show("op \t= %u", tdp -> op);
+	log_show("htype \t= %u", tdp -> htype);
+	log_show("hlen \t= %u", tdp -> hlen);
+	log_show("hops \t= %u", tdp -> hops);
+	log_show("xid \t= %u", ntohl(tdp -> xid));
+	log_show("secs \t= %u", ntohs(tdp -> secs));
+	log_show("flags \t= %u", ntohs(tdp -> flags));
+	log_show("ciaddr \t= %s", inet_ntoa(tdp -> ciaddr));
+	log_show("yiaddr \t= %s", inet_ntoa(tdp -> yiaddr));
+	log_show("siaddr \t= %s", inet_ntoa(tdp -> siaddr));
+	log_show("giaddr \t= %s", inet_ntoa(tdp -> giaddr));
+	log_show("chaddr \t= %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:"
+						"%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x",
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR0],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR1],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR2],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR3],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR4],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR5],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR6],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR7],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR8],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR9],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR10],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR11],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR12],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR13],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR14],
+			((unsigned char *)(tdp -> chaddr)) [UB_ADDR15]);
+	log_show("filename \t= %s", tdp -> file);
+	log_show("server_name \t= %s", tdp -> sname);
+	log_show("%s", "");
+}
+
+#define DATA_LEN_BYTES  2
+#define D6O_CLIENTID    1
+#define CHAR_BITS       8
+unsigned int get_option1_msg(unsigned char *option_start,
+							 unsigned int option_len,
+							 unsigned char *option1_data_start)
+{
+	unsigned short option1_data_len;
+	unsigned short option_data_len;
+	unsigned char char_bits;
+	int buf_index = 0;
+
+	char_bits = sizeof(char) * CHAR_BITS;
+
+	while (buf_index < option_len) {
+		unsigned short option_code = 0;
+
+		option_code =
+			option_start[buf_index] << char_bits | option_start[buf_index + 1];
+		if (option_code == D6O_CLIENTID) {
+			buf_index += DATA_LEN_BYTES;
+			memcpy(&option1_data_len, &option_start[buf_index], sizeof(option1_data_len));
+			option1_data_len = ntohs(option1_data_len);
+			buf_index += DATA_LEN_BYTES;
+			memcpy(option1_data_start, option_start + buf_index, option1_data_len);
+			return option1_data_len;
+		} else {
+			/* go to next option start */
+			buf_index++;
+			memcpy(&option_data_len, &option_start[buf_index], sizeof(option_data_len));
+			option_data_len = ntohs(option_data_len);
+			buf_index += DATA_LEN_BYTES;
+			buf_index += option_data_len;
+		}
+	}
+	return 0;
+}
+
+void show_client_id(unsigned char *client_id_start)
+{
+	log_show("client_id \t= %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:"
+						"%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x",
+			((unsigned char *)(client_id_start)) [UB_ADDR0],
+			((unsigned char *)(client_id_start)) [UB_ADDR1],
+			((unsigned char *)(client_id_start)) [UB_ADDR2],
+			((unsigned char *)(client_id_start)) [UB_ADDR3],
+			((unsigned char *)(client_id_start)) [UB_ADDR4],
+			((unsigned char *)(client_id_start)) [UB_ADDR5],
+			((unsigned char *)(client_id_start)) [UB_ADDR6],
+			((unsigned char *)(client_id_start)) [UB_ADDR7],
+			((unsigned char *)(client_id_start)) [UB_ADDR8],
+			((unsigned char *)(client_id_start)) [UB_ADDR9],
+			((unsigned char *)(client_id_start)) [UB_ADDR10],
+			((unsigned char *)(client_id_start)) [UB_ADDR11],
+			((unsigned char *)(client_id_start)) [UB_ADDR12],
+			((unsigned char *)(client_id_start)) [UB_ADDR13],
+			((unsigned char *)(client_id_start)) [UB_ADDR14],
+			((unsigned char *)(client_id_start)) [UB_ADDR15]);
+}
+
+void show_duid_llt_msg(unsigned char *client_id_start)
+{
+	unsigned short hardware_type = 0;
+	unsigned short type_field = 0;
+	unsigned char *index = NULL;
+	unsigned int time = 0;
+
+	index = client_id_start;
+	memcpy(&type_field, index, sizeof(type_field));
+	type_field = ntohs(type_field);
+
+	index += sizeof(type_field);
+	memcpy(&hardware_type, index, sizeof(hardware_type));
+	hardware_type = ntohs(hardware_type);
+
+	index += sizeof(hardware_type);
+	memcpy(&time, index, sizeof(time));
+	time = ntohl(time);
+	index += sizeof(time);
+
+	log_show("duid_type \t= %u", type_field);
+	log_show("hardware_type \t= %u", hardware_type);
+	log_show("time \t= %u", time);
+	show_client_id(index);
+}
+
+void show_duid_ll_msg(unsigned char *client_id_start)
+{
+	unsigned short hardware_type = 0;
+	unsigned short type_field = 0;
+	unsigned char *index = NULL;
+
+	index = client_id_start;
+	memcpy(&type_field, index, sizeof(type_field));
+	type_field = ntohs(type_field);
+
+	index += sizeof(type_field);
+	memcpy(&hardware_type, index, sizeof(hardware_type));
+	hardware_type = ntohs(type_field);
+
+	index += sizeof(hardware_type);
+
+	log_show("duid_type \t= %u", type_field);
+	log_show("hardware_type \t= %u", hardware_type);
+	show_client_id(index);
+}
+
+#define DUID_TYPE_OFFSET	5
+#define DUID_LLT_BYTES		24
+#define DUID_LL_BYTES		20
+void show_raw_ub_pdu6(struct dhcpv6_packet *tdp6, int len)
+{
+	unsigned char *option_start, *client_id_start, *p;
+	unsigned int option_len, option1_data_len;
+	unsigned int duid_bytes = 0;
+	unsigned char dhcp6_len;
+	int duid_type = 0;
+
+	p = (unsigned char *)&duid_type;
+	*p = tdp6->options[DUID_TYPE_OFFSET];
+	*(p + 1) = tdp6->options[DUID_TYPE_OFFSET + 1];
+
+	if (duid_type == DUID_LLT) {
+		duid_bytes = DUID_LLT_BYTES;
+	} else if (duid_type == DUID_LL) {
+		duid_bytes = DUID_LL_BYTES;
+	} else {
+		log_error("Not suit duid type : %d", duid_type);
+		return;
+	}
+
+	client_id_start = (unsigned char *)malloc(sizeof(unsigned char) * (duid_bytes + 1));
+	if (client_id_start == NULL) {
+		log_fatal("%s:%d failed to alloc memory.", MDL);
+		return;
+	}
+
+	dhcp6_len = sizeof(struct dhcpv6_packet);
+	option_start = (unsigned char *)tdp6 + dhcp6_len;
+	option_len = len - dhcp6_len;
+	option1_data_len =
+		get_option1_msg(option_start, option_len, client_id_start);
+	if (option1_data_len != duid_bytes) {
+		log_error("Wrong option1_data_len : %u, "
+				  "duid_type : %d"
+				  "duid_bytes : %u",
+				  option1_data_len,
+				  duid_type,
+				  duid_bytes);
+		free (client_id_start);
+		return;
+	}
+
+	log_show("msg_type \t= %u", tdp6->msg_type);
+	log_show("transaction_id \t= %u", (tdp6->transaction_id[T_INDEX0] << DELOCALIZE16) +
+		 (tdp6->transaction_id[T_INDEX1] << DELOCALIZE8) + (tdp6->transaction_id[T_INDEX2]));
+	log_show("option 1 message: ");
+	log_show("[ option-code \t= %d ]", D6O_CLIENTID);
+	log_show("[ option-len \t= %u ]", option1_data_len);
+	if (duid_type == DUID_LLT)
+		show_duid_llt_msg(client_id_start);
+	else
+		show_duid_ll_msg(client_id_start);
+	free (client_id_start);
+}
+
+void print_ub_packet (unsigned char *buff, u_int32_t buf_len, unsigned char print_level)
+{
+	int ubh_len = sizeof(struct ub_link_header);
+	int ip_len = sizeof(struct ip);
+	int udp_len = sizeof(struct udphdr);
+	int pkt_len = ubh_len + ip_len + udp_len + BOOTP_MIN_LEN;
+	struct dhcp_packet *tdp = (struct dhcp_packet *)(buff + pkt_len - BOOTP_MIN_LEN);
+	u_int8_t pkt_type = 0;
+	char *msg_type = " ";
+
+	if (print_level != PRINT_TXPKTS)
+		return;
+
+	if (buff == NULL) {
+		log_show("Ub packet buff is NULL.\n");
+		return;
+	}
+
+	pkt_type = get_message_type(tdp);
+	switch (pkt_type) {
+		case DHCPDISCOVER:
+			msg_type = "DHCPDISCOVER";
+			break;
+		case DHCPREQUEST:
+			msg_type = "DHCPREQUEST";
+			break;
+		case DHCPDECLINE:
+			msg_type = "DHCPDECLINE";
+			break;
+		case DHCPRELEASE:
+			msg_type = "DHCPRELEASE";
+			break;
+		case DHCPINFORM:
+			msg_type = "DHCPINFORM";
+			break;
+		default:
+			break;
+	}
+
+	log_show("\nstart parse %s \n", msg_type);
+	if (pkt_len > buf_len) {
+		log_show("Unable to parse complete ub packet: ");
+		log_show("pktlen[%d], buf_len[%u]\n", pkt_len, buf_len);
+		return;
+	}
+
+	struct ub_link_header *ubh = (struct ub_link_header *)buff;
+	struct ip *iph = (struct ip *)(buff + ubh_len);
+	struct udphdr *udph = (struct udphdr *)(buff + ubh_len + ip_len);
+
+	show_raw_hdr(ubh, iph, udph);
+	show_raw_ub_pdu(tdp);
+	log_show("end parse %s\n", msg_type);
+}
+
+void print_ub_packet6 (unsigned char *buff, u_int32_t buf_len, unsigned char print_level)
+{
+	int ubh_len = sizeof(struct ub_link_header);
+	int iph_len = sizeof(struct ipv6);
+	int udp_len = sizeof(struct udphdr);
+	int hdr_len = ubh_len + iph_len + udp_len;
+	unsigned char *dhcpv6_pkt = buff + hdr_len;
+	unsigned char dhcpv6_msg_type = 0;
+	int value;
+
+	if (print_level != PRINT_TXPKTS)
+		return;
+
+	if (buff == NULL) {
+		log_show("Ub packet buff is NULL.\n");
+		return;
+	}
+
+	if (!packet6_len_okay((const char *)(char *)dhcpv6_pkt, buf_len)) {
+		log_info("print_ub_packet6 : short packet len %u, dropped", buf_len);
+		return;
+	}
+
+	dhcpv6_msg_type = dhcpv6_pkt[0];
+	value = dhcpv6_message_values[dhcpv6_msg_type - 1].value;
+	if (dhcpv6_msg_type != value) {
+		log_error("Mismatching message type : %u,"
+					"which should be : %d.",
+					dhcpv6_msg_type, value);
+		return;
+	}
+
+	log_show("\nStart parse ub_packet6 %s.\n", dhcpv6_message_values[dhcpv6_msg_type - 1].name);
+
+	struct ub_link_header *ubh = (struct ub_link_header *)buff;
+	struct ipv6 *iph = (struct ipv6 *)(buff + ubh_len);
+	struct udphdr *udph = (struct udphdr *)(buff + ubh_len + iph_len);
+	struct dhcpv6_packet *tdp6 = (struct dhcpv6_packet *)(buff + hdr_len);
+
+	show_raw_hdr6(ubh, iph, udph);
+	show_raw_ub_pdu6(tdp6, buf_len);
+	log_show("\nEnd parse ub_packet6 %s\n", dhcpv6_message_values[dhcpv6_msg_type - 1].name);
+}
+
+unsigned char get_message_type (struct dhcp_packet *packet)
+{
+	unsigned char option_header_len = 4;
+	int dhcp_packet_len = sizeof(struct dhcp_packet);
+	int option_start = dhcp_packet_len - DHCP_MAX_OPTION_LEN;
+	unsigned char *buf = (unsigned char *)malloc(dhcp_packet_len);
+
+	if (buf == NULL) {
+		log_fatal("%s:%d failed to alloc memory.\n", MDL);
+		return 0;
+	}
+
+	if (packet == NULL) {
+		log_info("DHCP packet is NULL.\n");
+		free(buf);
+		return 0;
+	}
+
+	memcpy(buf, packet, dhcp_packet_len);
+	buf = (unsigned char *)((unsigned char *)buf + option_start);
+	if (buf[B_INDEX0] == 0x63 && buf[B_INDEX1] == 0x82 &&
+		buf[B_INDEX2] == 0x53 && buf[B_INDEX3] == 0x63) {
+		int max_option_len;
+		int buf_index;
+
+		buf += option_header_len;
+		buf_index = 0;
+		max_option_len = DHCP_MAX_OPTION_LEN - option_header_len;
+
+		while (buf_index < max_option_len) {
+			if (buf[buf_index] != DHO_DHCP_MESSAGE_TYPE) {
+				/* go to next option start */
+				buf_index = B_INDEX2 + buf[buf_index + B_INDEX1];
+				continue;
+			}
+			/* check option53 message len */
+			buf_index++;
+			if (buf[buf_index] == 1) {
+				return buf[buf_index + 1];
+			} else {
+				log_info("Wrong message type len : [%u]\n", buf[buf_index]);
+				free(buf);
+				return 0;
+			}
+		}
+	}
+	free(buf);
+	return 0;
+}
+
+void record_packet_info (struct packet_record *pkt_record_info,
+						 struct dhcp_packet *packet)
+{
+	struct send_receive_counter *tx_rx_cnt = NULL;
+	u_int8_t dhcp_packet_op = 0;
+	u_int8_t pkt_type = 0;
+	u_int32_t xid = 0;
+
+	pkt_type = get_message_type(packet);
+	if (pkt_type < DHCPDISCOVER || pkt_type > PACKET_TYPE_NUM) {
+		log_error("Packet type [%u] out of range\n", pkt_type);
+		return;
+	}
+	dhcp_packet_op = packet->op;
+	xid = ntohl(packet->xid);
+
+	if (dhcp_packet_op == BOOTREQUEST) {
+		pkt_record_info->last_sent_request_type = pkt_type;
+		pkt_record_info->last_sent_request_xid = xid;
+	} else {
+		pkt_record_info->new_recv_pkt_type = pkt_type;
+		pkt_record_info->new_recv_pkt_xid = xid;
+	}
+
+	tx_rx_cnt = pkt_record_info->pkt_record_list[pkt_type - 1];
+	if (tx_rx_cnt == NULL) {
+		log_error("error, tx_rx_cnt is NULL\n");
+		free(packet);
+		return;
+	}
+
+	tx_rx_cnt->packet_type = pkt_type;
+	if (dhcp_packet_op == BOOTREQUEST) {
+		tx_rx_cnt->last_sent_xid = xid;
+		tx_rx_cnt->total_sent_count++;
+	} else {
+		tx_rx_cnt->total_recv_count++;
+		tx_rx_cnt->new_recv_xid = xid;
+	}
+}
+
+void record_packet_info6 (struct packet_record *pkt_record_info,
+						  unsigned char *pkt)
+{
+	u_int32_t xid = 0;
+	u_int8_t msg_type = 0;
+	int ubh_len = sizeof(struct ub_link_header);
+	int iph_len = sizeof(struct ipv6);
+	int udp_len = sizeof(struct udphdr);
+	int hdr_len = ubh_len + iph_len + udp_len;
+	struct dhcpv6_packet *tdp6 = (struct dhcpv6_packet *)(pkt + hdr_len);
+	struct send_receive_counter *tx_rx_cnt = NULL;
+
+	msg_type = tdp6->msg_type;
+	if (msg_type < DHCPV6_SOLICIT || msg_type > PACKET_TYPE_NUM) {
+		log_error("Message type [%u] out of range\n", msg_type);
+		return;
+	}
+	xid = (tdp6->transaction_id[T_INDEX0] << DELOCALIZE16) \
+		+ (tdp6->transaction_id[T_INDEX1] << DELOCALIZE8) + (tdp6->transaction_id[T_INDEX2]);
+	tx_rx_cnt = pkt_record_info->pkt_record_list[msg_type - 1];
+	if (tx_rx_cnt == NULL) {
+		log_error("error, tx_rx_cnt6 is NULL\n");
+		return;
+	}
+	tx_rx_cnt->packet_type = msg_type;
+	if (msg_type == DHCPV6_ADVERTISE ||
+		msg_type == DHCPV6_REPLY ||
+		msg_type == DHCPV6_RECONFIGURE) {
+		pkt_record_info->new_recv_pkt_type = msg_type;
+		pkt_record_info->new_recv_pkt_xid = xid;
+		tx_rx_cnt->total_recv_count++;
+		tx_rx_cnt->new_recv_xid = xid;
+	} else {
+		pkt_record_info->last_sent_request_type = msg_type;
+		pkt_record_info->last_sent_request_xid = xid;
+		tx_rx_cnt->last_sent_xid = xid;
+		tx_rx_cnt->total_sent_count++;
+	}
+}
+
+void print_dhcpv4_pkt_type (u_int32_t pkt_type)
+{
+	switch (pkt_type) {
+		case DHCP_DISCOVER_IDX:
+			log_show("|*****Message type : [DHCPDISCOVER]*****|\n");
+			break;
+		case DHCP_OFFER_IDX:
+			log_show("|*******Message type : [DHCPOFFER]******|\n");
+			break;
+		case DHCP_REQUEST_IDX:
+			log_show("|******Message type : [DHCPREQUEST]*****|\n");
+			break;
+		case DHCP_DECLINE_IDX:
+			log_show("|*****Message type : [DHCPDECLINE]******|\n");
+			break;
+		case DHCP_ACK_IDX:
+			log_show("|********Message type : [DHCPACK]*******|\n");
+			break;
+		case DHCP_NAK_IDX:
+			log_show("|********Message type : [DHCPNAK]*******|\n");
+			break;
+		case DHCP_RELEASE_IDX:
+			log_show("|*****Message type : [DHCPRELEASE]******|\n");
+			break;
+		case DHCP_INFORM_IDX:
+			log_show("|******Message type : [DHCPINFORM]******|\n");
+			break;
+		default:
+			break;
+	}
+}
+
+void print_dhcpv6_pkt_type (u_int32_t pkt_type)
+{
+	log_show("|********* Message type : [%s] start**********|",
+		dhcpv6_message_values[pkt_type].name);
+}
+
+void print_packet_type (u_int32_t pkt_type)
+{
+	if (local_family == AF_INET) {
+		print_dhcpv4_pkt_type(pkt_type);
+	} else if (local_family == AF_INET6) {
+		print_dhcpv6_pkt_type(pkt_type);
+	} else {
+		log_show("No such message type [%u] for now.\n", pkt_type);
+	}
+}
+
+void print_record_info (struct packet_record *pkt_record_info, unsigned char print_level)
+{
+	u_int32_t i;
+
+	if (print_level != PRINT_UBPKT_INFO)
+		return;
+
+	log_show("|********packet record info*************|\n");
+	log_show("last_sent_request_xid \t= %u\n", pkt_record_info->last_sent_request_xid);
+	log_show("new_recv_pkt_xid \t= %u\n", pkt_record_info->new_recv_pkt_xid);
+	for (i = 0; i < PACKET_TYPE_NUM4; i++) {
+		struct send_receive_counter *tx_rx_cnt = NULL;
+
+		tx_rx_cnt = pkt_record_info->pkt_record_list[i];
+		print_packet_type(i);
+		if (tx_rx_cnt) {
+			log_show("packet_type \t= %u\n", tx_rx_cnt->packet_type);
+			log_show("total_sent_count \t= %u\n", tx_rx_cnt->total_sent_count);
+			log_show("last_sent_xid \t= %u\n", tx_rx_cnt->last_sent_xid);
+			log_show("total_recv_count \t= %u\n", tx_rx_cnt->total_recv_count);
+			log_show("new_recv_xid \t= %u\n", tx_rx_cnt->new_recv_xid);
+		}
+		log_show("|**********Message info end*************|\n\n");
+	}
+	log_show("|*********packet record info end********|\n\n");
+}
+
+void print_record_info6(struct packet_record *pkt_record_info, unsigned char print_level)
+{
+	u_int32_t i;
+
+	if (print_level != PRINT_UBPKT_INFO)
+		return;
+
+	log_show("|********packet dhcpv6 record info start*************|\n");
+	log_show("last_sent_request_transaction_id \t= %u", pkt_record_info->last_sent_request_xid);
+	log_show("new_recv_pkt_transaction_id \t= %u", pkt_record_info->new_recv_pkt_xid);
+	for (i = 0; i < PACKET_TYPE_NUM6; i++) {
+		struct send_receive_counter *tx_rx_cnt = NULL;
+
+		tx_rx_cnt = pkt_record_info->pkt_record_list[i];
+		print_packet_type(i);
+		if (tx_rx_cnt) {
+			log_show("packet_type \t= %u", tx_rx_cnt->packet_type);
+			log_show("total_sent_count \t= %u", tx_rx_cnt->total_sent_count);
+			log_show("last_sent_transaction_id \t= %u", tx_rx_cnt->last_sent_xid);
+			log_show("total_recv_count \t= %u", tx_rx_cnt->total_recv_count);
+			log_show("new_recv_transaction_id \t= %u", tx_rx_cnt->new_recv_xid);
+		}
+		log_show("|**********Message info end*************|\n");
+	}
+	log_show("|*********packet dhcpv6 record info end********|\n\n");
+}
 
 void dump_raw (buf, len)
 	const unsigned char *buf;

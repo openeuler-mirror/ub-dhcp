@@ -3,6 +3,7 @@
    Packet assembly code, originally contributed by Archie Cobbs. */
 
 /*
+ * Copyright (c) 2023-2023 Hisilicon Limited.
  * Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1996-2003 by Internet Software Consortium
  *
@@ -39,6 +40,7 @@
 #include "includes/netinet/if_ether.h"
 #endif /* PACKET_ASSEMBLY || PACKET_DECODING */
 
+#define IPV6_BASEHD_LEN 40
 /* Compute the easy part of the checksum on a range of bytes. */
 
 u_int32_t checksum (buf, nbytes, sum)
@@ -106,22 +108,11 @@ void assemble_hw_header (interface, buf, bufix, to)
 	struct hardware *to;
 {
 	switch (interface->hw_address.hbuf[0]) {
-#if defined(HAVE_TR_SUPPORT)
-	case HTYPE_IEEE802:
-		assemble_tr_header(interface, buf, bufix, to);
+	case HTYPE_UB:
+		assemble_ub_header(interface, buf, bufix, to);
 		break;
-#endif
-#if defined (DEC_FDDI)
-	case HTYPE_FDDI:
-		assemble_fddi_header(interface, buf, bufix, to);
-		break;
-#endif
-	case HTYPE_INFINIBAND:
-		log_error("Attempt to assemble hw header for infiniband");
-		break;
-	case HTYPE_ETHER:
 	default:
-		assemble_ethernet_header(interface, buf, bufix, to);
+		log_error("Attempt to assemble hw header for non-ub device");
 		break;
 	}
 }
@@ -195,6 +186,51 @@ void assemble_udp_ip_header (interface, buf, bufix,
 }
 #endif /* PACKET_ASSEMBLY */
 
+void assemble_udp_ipv6_header (interface, buf, bufix,
+				from, to, port, data, len)
+	struct interface_info *interface;
+	unsigned char *buf;
+	unsigned *bufix;
+	u_int8_t *from;
+	u_int8_t *to;
+	u_int32_t port;
+	unsigned char *data;
+	unsigned len;
+{
+	struct ipv6 ipv6;
+	struct udphdr udp;
+
+	memset(&ipv6, 0, sizeof(ipv6));
+	memset(&udp, 0, sizeof(udp));
+
+	/* Fill out the IP header */
+	IPV6_V_SET(&ipv6, IPV6);
+	IPV6_T_SET(&ipv6, 0);
+	IPV6_FLO(&ipv6, 0x9dc2a);
+	ipv6.ipv6_fvhl = htonl(ipv6.ipv6_fvhl);
+	ipv6.ipv6_len = htons(len + sizeof(struct udphdr));
+	ipv6.ipv6_nhea = 0x11;
+	ipv6.ipv6_hlim = 0x01;
+	memcpy(ipv6.ipv6_src.s6_addr, from, sizeof(ipv6.ipv6_src.s6_addr));
+	memcpy(ipv6.ipv6_dst.s6_addr, to, sizeof(ipv6.ipv6_dst.s6_addr));
+	/* Copy the ip header into the buffer */
+	memcpy(&buf[*bufix], &ipv6, sizeof(ipv6));
+	*bufix += sizeof(ipv6);
+
+	/* Fill out the UDP header */
+	udp.uh_sport = local_port;
+	udp.uh_dport = port;
+#if defined(RELAY_PORT)
+	/* Change to relay port defined if sending to server */
+	if (relay_port && (port == htons(546)))
+		udp.uh_sport = relay_port;
+#endif
+	udp.uh_ulen = htons(sizeof(udp) + len);
+	/* Copy the udp header into the buffer*/
+	memcpy(&buf [*bufix], &udp, sizeof(udp));
+	*bufix += sizeof(udp);
+}
+
 #ifdef PACKET_DECODING
 /* Decode a hardware header... */
 /* Support for ethernet, TR and FDDI
@@ -207,22 +243,51 @@ ssize_t decode_hw_header (interface, buf, bufix, from)
      unsigned bufix;
      struct hardware *from;
 {
-	switch(interface->hw_address.hbuf[0]) {
-#if defined (HAVE_TR_SUPPORT)
-	case HTYPE_IEEE802:
-		return (decode_tr_header(interface, buf, bufix, from));
-#endif
-#if defined (DEC_FDDI)
-	case HTYPE_FDDI:
-		return (decode_fddi_header(interface, buf, bufix, from));
-#endif
-	case HTYPE_INFINIBAND:
-		log_error("Attempt to decode hw header for infiniband");
-		return (0);
-	case HTYPE_ETHER:
+	switch (interface->hw_address.hbuf[0]) {
+	case HTYPE_UB:
+		return (decode_ub_header(interface, buf, bufix, from));
 	default:
-		return (decode_ethernet_header(interface, buf, bufix, from));
+		log_error("Attempt to decode hw header for non-ub device");
+		return (0);
 	}
+}
+
+ssize_t
+decode_udp_ipv6_header(struct interface_info *interface,
+			unsigned char *buf, unsigned bufix, unsigned buflen,
+			unsigned *rbuflen, struct sockaddr_in6 *from, struct in6_addr *to)
+{
+	struct ipv6 ipv6;
+	struct udphdr udp;
+	unsigned char *upp;
+	u_int32_t ulen;
+	unsigned len;
+
+	if (sizeof(ipv6) > buflen)
+		return -1;
+
+	upp = buf + bufix;
+	memcpy(&ipv6, upp, sizeof(ipv6));
+	memcpy(&from->sin6_addr, &ipv6.ipv6_src, sizeof(struct in6_addr));
+	memcpy(to, &ipv6.ipv6_dst, sizeof(struct in6_addr));
+	upp += IPV6_BASEHD_LEN;
+
+	/* Copy the UDP header into a stack aligned structure for inspection. */
+	memcpy(&udp, upp, sizeof(udp));
+	from->sin6_port = udp.uh_sport;
+
+	ulen = ntohs(udp.uh_ulen);
+	if (ulen < sizeof(udp))
+		return -1;
+
+	len = ulen - sizeof(udp);
+
+	/* Save the length of the UDP payload. */
+	if (rbuflen != NULL)
+		*rbuflen = len;
+
+	/* Return the index to the UDP payload. */
+	return (IPV6_BASEHD_LEN + sizeof(udp));
 }
 
 /*!
@@ -402,3 +467,74 @@ decode_udp_ip_header(struct interface_info *interface,
   return ip_len + sizeof udp;
 }
 #endif /* PACKET_DECODING */
+
+void assemble_ub_header (struct interface_info *interface,
+						 unsigned char *buf,
+						 unsigned *bufix,
+						 struct hardware *to)
+{
+	struct ub_link_header ub_header;
+	unsigned int proto = htons(DHCPV4_PROTO);
+	int ub_header_len = sizeof(struct ub_link_header);
+
+	memset(&ub_header, 0x0, sizeof(struct ub_link_header));
+	ub_header.ub_cfg = DHCP_CFG;
+	ub_header.ub_protocol = proto;
+	memset(ub_header.ub_dguid, 0xff, GUID_LEN);
+	if (interface->hw_address.hlen - 1 == sizeof(ub_header.ub_sguid)) {
+		memcpy(ub_header.ub_sguid, &interface->hw_address.hbuf[1],
+			interface->hw_address.hlen - 1);
+	}
+	memcpy(&buf [*bufix], &ub_header, ub_header_len);
+	*bufix += ub_header_len;
+}
+
+void assemble_ub_header6 (struct interface_info *interface,
+						  unsigned char *buf,
+						  unsigned *bufix)
+{
+	struct ub_link_header ub_header;
+	unsigned int proto = htons(DHCPV6_PROTO);
+	int ub_header_len = sizeof(struct ub_link_header);
+
+	memset(&ub_header, 0x0, sizeof(struct ub_link_header));
+	ub_header.ub_cfg = DHCP_CFG;
+	ub_header.ub_protocol = proto;
+	memset(ub_header.ub_dguid, 0xff, GUID_LEN);
+	if (interface->hw_address.hlen - 1 == sizeof(ub_header.ub_sguid)) {
+		memcpy(ub_header.ub_sguid, &interface->hw_address.hbuf[1],
+			interface->hw_address.hlen - 1);
+	}
+	memcpy(&buf[*bufix], &ub_header, ub_header_len);
+	*bufix += ub_header_len ;
+}
+
+ssize_t decode_ub_header (struct interface_info *interface,
+						  unsigned char *buf,
+						  unsigned bufix,
+						  struct hardware *from)
+{
+	struct ub_link_header *ub_header = NULL;
+	int ub_header_len  = sizeof(struct ub_link_header);
+
+	ub_header = (struct ub_link_header *)(buf + bufix);
+	memcpy(&from -> hbuf[1], ub_header->ub_sguid, sizeof (ub_header->ub_sguid));
+	from -> hbuf [0] = HTYPE_UB;
+	from -> hlen = sizeof (ub_header->ub_sguid) + 1;
+
+	return ub_header_len;
+}
+
+ssize_t decode_ub_header6 (interface, buf, bufix)
+						   struct interface_info *interface;
+						   unsigned char *buf;
+						   unsigned bufix;
+{
+	struct ub_link_header *ub_header = NULL;
+	int ub_header_len  = sizeof(struct ub_link_header);
+
+	ub_header = (struct ub_link_header *)(buf + bufix);
+	if (ntohs(ub_header->ub_protocol) != DHCPV6_PROTO)
+		return -1;
+	return ub_header_len;
+}

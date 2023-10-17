@@ -1413,7 +1413,7 @@ Fine tuning of the installation directories:
   --infodir=DIR           info documentation [DATAROOTDIR/info]
   --localedir=DIR         locale-dependent data [DATAROOTDIR/locale]
   --mandir=DIR            man documentation [DATAROOTDIR/man]
-  --docdir=DIR            documentation root [DATAROOTDIR/doc/dhcp]
+  --docdir=DIR            documentation root [DATAROOTDIR/doc/ub-dhcp]
   --htmldir=DIR           html documentation [DOCDIR]
   --dvidir=DIR            dvi documentation [DOCDIR]
   --pdfdir=DIR            pdf documentation [DOCDIR]
@@ -1485,49 +1485,49 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-atf=PATH         specify location where atf was installed
   --with-srv-conf-file=PATH
-                          Default file containing dhcpd configuration (default
-                          is typically /etc/dhcpd.conf)
+                          Default file containing ub-dhcpd configuration (default
+                          is typically /etc/ub-dhcpd.conf)
   --with-srv-lease-file=PATH
-                          File for dhcpd leases (default is
-                          LOCALSTATEDIR/db/dhcpd.leases)
+                          File for ub-dhcpd leases (default is
+                          LOCALSTATEDIR/db/ub-dhcpd.leases)
   --with-srv6-lease-file=PATH
                           File for dhcpd6 leases (default is
-                          LOCALSTATEDIR/db/dhcpd6.leases)
+                          LOCALSTATEDIR/db/ub-dhcpd6.leases)
   --with-cli-lease-file=PATH
-                          File for dhclient leases (default is
-                          LOCALSTATEDIR/db/dhclient.leases)
+                          File for ub-dhclient leases (default is
+                          LOCALSTATEDIR/db/ub-dhclient.leases)
   --with-cli6-lease-file=PATH
                           File for dhclient6 leases (default is
-                          LOCALSTATEDIR/db/dhclient6.leases)
+                          LOCALSTATEDIR/db/ub-dhclient6.leases)
   --with-srv-pid-file=PATH
-                          File for dhcpd process information (default is
-                          LOCALSTATEDIR/run/dhcpd.pid)
+                          File for ub-dhcpd process information (default is
+                          LOCALSTATEDIR/run/ub-dhcpd.pid)
   --with-srv6-pid-file=PATH
                           File for dhcpd6 process information (default is
-                          LOCALSTATEDIR/run/dhcpd6.pid)
+                          LOCALSTATEDIR/run/ub-dhcpd6.pid)
   --with-cli-pid-file=PATH
-                          File for dhclient process information (default is
-                          LOCALSTATEDIR/run/dhclient.pid)
+                          File for ub-dhclient process information (default is
+                          LOCALSTATEDIR/run/ub-dhclient.pid)
   --with-cli6-pid-file=PATH
                           File for dhclient6 process information (default is
-                          LOCALSTATEDIR/run/dhclient6.pid)
+                          LOCALSTATEDIR/run/ub-dhclient6.pid)
   --with-relay-pid-file=PATH
                           File for dhcrelay process information (default is
-                          LOCALSTATEDIR/run/dhcrelay.pid)
+                          LOCALSTATEDIR/run/ub-dhcrelay.pid)
   --with-relay6-pid-file=PATH
                           File for dhcrelay6 process information (default is
-                          LOCALSTATEDIR/run/dhcrelay6.pid)
+                          LOCALSTATEDIR/run/ub-dhcrelay6.pid)
   --with-randomdev=PATH   Path for random device (default is /dev/random)
   --with-bind-extra-config
                           configure bind librairies with some extra options
                           (default is none)
   --with-libbind=PATH     bind includes and libraries are in PATH
-  --with-ldap             enable OpenLDAP support in dhcpd (default is no)
-  --with-ldapcrypto       enable OpenLDAP crypto support in dhcpd (default is
+  --with-ldap             enable OpenLDAP support in ub-dhcpd (default is no)
+  --with-ldapcrypto       enable OpenLDAP crypto support in ub-dhcpd (default is
                           no)
   --with-ldap-gssapi      enable krb5/gssapi authentication for OpenLDAP in
-                          dhcpd (default is no)
-  --with-ldapcasa         enable LDAP CASA auth support in dhcpd (default is
+                          ub-dhcpd (default is no)
+  --with-ldapcasa         enable LDAP CASA auth support in ub-dhcpd (default is
                           no)
 
 Some influential environment variables:
@@ -5739,13 +5739,13 @@ fi
 ### the user configures an alternate value).  LOCALSTATEDIR is totally
 ### braindead.  No one uses /usr/local/var/db/ nor /usr/local/var/run, and
 ### they would be insane for suggesting it.  We need to look in /var/for
-### 'db' and 'state/dhcp' for db files, and /var/run for pid files by
+### 'db' and 'state/ub-dhcp' for db files, and /var/run for pid files by
 ### default.
 ###
 if test "x$prefix" = xNONE; then
   $as_echo_n "checking for prefix by " >&6
-  # Extract the first word of "dhcpd", so it can be a program name with args.
-set dummy dhcpd; ac_word=$2
+  # Extract the first word of "ub-dhcpd", so it can be a program name with args.
+set dummy ub-dhcpd; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
 if ${ac_cv_path_ac_prefix_program+:} false; then :
@@ -5867,27 +5867,27 @@ _ACEOF
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for dhcpd.leases location" >&5
-$as_echo_n "checking for dhcpd.leases location... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ub-dhcpd.leases location" >&5
+$as_echo_n "checking for ub-dhcpd.leases location... " >&6; }
 if [ "x$with_srv_lease_file" = "x" ] ; then
 	if [ -d "${localstatedir}/db" ] ; then
-		with_srv_lease_file="${localstatedir}/db/dhcpd.leases"
+		with_srv_lease_file="${localstatedir}/db/ub-dhcpd.leases"
 	elif [ -d "${localstatedir}/state" ] ; then
-		if [ -d "${localstatedir}/state/dhcp" ] ; then
-			with_srv_lease_file="${localstatedir}/state/dhcp/dhcpd.leases"
+		if [ -d "${localstatedir}/state/ub-dhcp" ] ; then
+			with_srv_lease_file="${localstatedir}/state/ub-dhcp/ub-dhcpd.leases"
 		else
-			with_srv_lease_file="${localstatedir}/state/dhcpd.leases"
+			with_srv_lease_file="${localstatedir}/state/ub-dhcpd.leases"
 		fi
 	elif [ -d "${localstatedir}/lib" ] ; then
-		if [ -d "${localstatedir}/lib/dhcp" ] ; then
-			with_srv_lease_file="${localstatedir}/lib/dhcp/dhcpd.leases"
+		if [ -d "${localstatedir}/lib/ub-dhcp" ] ; then
+			with_srv_lease_file="${localstatedir}/lib/ub-dhcp/ub-dhcpd.leases"
 		else
-			with_srv_lease_file="${localstatedir}/lib/dhcpd.leases"
+			with_srv_lease_file="${localstatedir}/lib/ub-dhcpd.leases"
 		fi
 	elif [ -d "${localstatedir}/etc" ] ; then
-		with_srv_lease_file="${localstatedir}/etc/dhcpd.leases"
+		with_srv_lease_file="${localstatedir}/etc/ub-dhcpd.leases"
 	else
-		with_srv_lease_file="/etc/dhcpd.leases"
+		with_srv_lease_file="/etc/ub-dhcpd.leases"
 	fi
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_srv_lease_file" >&5
@@ -5904,27 +5904,27 @@ _ACEOF
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for dhcpd6.leases location" >&5
-$as_echo_n "checking for dhcpd6.leases location... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ub-dhcpd6.leases location" >&5
+$as_echo_n "checking for ub-dhcpd6.leases location... " >&6; }
 if [ "x$with_srv6_lease_file" = "x" ] ; then
 	if [ -d "${localstatedir}/db" ] ; then
-		with_srv6_lease_file="${localstatedir}/db/dhcpd6.leases"
+		with_srv6_lease_file="${localstatedir}/db/ub-dhcpd6.leases"
 	elif [ -d "${localstatedir}/state" ] ; then
-		if [ -d "${localstatedir}/state/dhcp" ] ; then
-			with_srv6_lease_file="${localstatedir}/state/dhcp/dhcpd6.leases"
+		if [ -d "${localstatedir}/state/ub-dhcp" ] ; then
+			with_srv6_lease_file="${localstatedir}/state/ub-dhcp/ub-dhcpd6.leases"
 		else
-			with_srv6_lease_file="${localstatedir}/state/dhcpd6.leases"
+			with_srv6_lease_file="${localstatedir}/state/ub-dhcpd6.leases"
 		fi
 	elif [ -d "${localstatedir}/lib" ] ; then
-		if [ -d "${localstatedir}/lib/dhcp" ] ; then
-			with_srv6_lease_file="${localstatedir}/lib/dhcp/dhcpd6.leases"
+		if [ -d "${localstatedir}/lib/ub-dhcp" ] ; then
+			with_srv6_lease_file="${localstatedir}/lib/ub-dhcp/ub-dhcpd6.leases"
 		else
-			with_srv6_lease_file="${localstatedir}/lib/dhcpd6.leases"
+			with_srv6_lease_file="${localstatedir}/lib/ub-dhcpd6.leases"
 		fi
 	elif [ -d "${localstatedir}/etc" ] ; then
-		with_srv6_lease_file="${localstatedir}/etc/dhcpd6.leases"
+		with_srv6_lease_file="${localstatedir}/etc/ub-dhcpd6.leases"
 	else
-		with_srv6_lease_file="/etc/dhcpd6.leases"
+		with_srv6_lease_file="/etc/ub-dhcpd6.leases"
 	fi
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_srv6_lease_file" >&5
@@ -5941,27 +5941,27 @@ _ACEOF
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for dhclient.leases location" >&5
-$as_echo_n "checking for dhclient.leases location... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ub-dhclient.leases location" >&5
+$as_echo_n "checking for ub-dhclient.leases location... " >&6; }
 if [ "x$with_cli_lease_file" = "x" ] ; then
 	if [ -d "${localstatedir}/db" ] ; then
-		with_cli_lease_file="${localstatedir}/db/dhclient.leases"
+		with_cli_lease_file="${localstatedir}/db/ub-dhclient.leases"
 	elif [ -d "${localstatedir}/state" ] ; then
-		if [ -d "${localstatedir}/state/dhcp" ] ; then
-			with_cli_lease_file="${localstatedir}/state/dhcp/dhclient.leases"
+		if [ -d "${localstatedir}/state/ub-dhcp" ] ; then
+			with_cli_lease_file="${localstatedir}/state/ub-dhcp/ub-dhclient.leases"
 		else
-			with_cli_lease_file="${localstatedir}/state/dhclient.leases"
+			with_cli_lease_file="${localstatedir}/state/ub-dhclient.leases"
 		fi
 	elif [ -d "${localstatedir}/lib" ] ; then
-		if [ -d "${localstatedir}/lib/dhcp" ] ; then
-			with_cli_lease_file="${localstatedir}/lib/dhcp/dhclient.leases"
+		if [ -d "${localstatedir}/lib/ub-dhcp" ] ; then
+			with_cli_lease_file="${localstatedir}/lib/ub-dhcp/ub-dhclient.leases"
 		else
-			with_cli_lease_file="${localstatedir}/lib/dhclient.leases"
+			with_cli_lease_file="${localstatedir}/lib/ub-dhclient.leases"
 		fi
 	elif [ -d "${localstatedir}/etc" ] ; then
-		with_cli_lease_file="${localstatedir}/etc/dhclient.leases"
+		with_cli_lease_file="${localstatedir}/etc/ub-dhclient.leases"
 	else
-		with_cli_lease_file="/etc/dhclient.leases"
+		with_cli_lease_file="/etc/ub-dhclient.leases"
 	fi
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_cli_lease_file" >&5
@@ -5978,27 +5978,27 @@ _ACEOF
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for dhclient6.leases location" >&5
-$as_echo_n "checking for dhclient6.leases location... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ub-dhclient6.leases location" >&5
+$as_echo_n "checking for ub-dhclient6.leases location... " >&6; }
 if [ "x$with_cli6_lease_file" = "x" ] ; then
 	if [ -d "${localstatedir}/db" ] ; then
-		with_cli6_lease_file="${localstatedir}/db/dhclient6.leases"
+		with_cli6_lease_file="${localstatedir}/db/ub-dhclient6.leases"
 	elif [ -d "${localstatedir}/state" ] ; then
-		if [ -d "${localstatedir}/state/dhcp" ] ; then
-			with_cli6_lease_file="${localstatedir}/state/dhcp/dhclient6.leases"
+		if [ -d "${localstatedir}/state/ub-dhcp" ] ; then
+			with_cli6_lease_file="${localstatedir}/state/ub-dhcp/ub-dhclient6.leases"
 		else
-			with_cli6_lease_file="${localstatedir}/state/dhclient6.leases"
+			with_cli6_lease_file="${localstatedir}/state/ub-dhclient6.leases"
 		fi
 	elif [ -d "${localstatedir}/lib" ] ; then
-		if [ -d "${localstatedir}/lib/dhcp" ] ; then
-			with_cli6_lease_file="${localstatedir}/lib/dhcp/dhclient6.leases"
+		if [ -d "${localstatedir}/lib/ub-dhcp" ] ; then
+			with_cli6_lease_file="${localstatedir}/lib/ub-dhcp/ub-dhclient6.leases"
 		else
-			with_cli6_lease_file="${localstatedir}/lib/dhclient6.leases"
+			with_cli6_lease_file="${localstatedir}/lib/ub-dhclient6.leases"
 		fi
 	elif [ -d "${localstatedir}/etc" ] ; then
-		with_cli6_lease_file="${localstatedir}/etc/dhclient6.leases"
+		with_cli6_lease_file="${localstatedir}/etc/ub-dhclient6.leases"
 	else
-		with_cli6_lease_file="/etc/dhclient6.leases"
+		with_cli6_lease_file="/etc/ub-dhclient6.leases"
 	fi
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_cli6_lease_file" >&5

@@ -1,6 +1,7 @@
 /*	$NetBSD: ip.h,v 1.9 1995/05/15 01:22:44 cgd Exp $	*/
 
 /*
+ * Copyright (c) 2023-2023 Hisilicon Limited.
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -66,6 +67,19 @@ struct ip {
 			  ((iph)->ip_fvhl & 0xF0) | (((x) >> 2) & 0x0F))
 
 #define	IP_MAXPACKET	65535		/* maximum packet size */
+
+struct ipv6 {
+	u_int32_t ipv6_fvhl; /* version, Traffic class, Flow Label */
+	u_int16_t ipv6_len; /* payload length */
+	u_int8_t ipv6_nhea; /* next header */
+	u_int8_t ipv6_hlim; /* hop limit */
+	struct in6_addr ipv6_src; /* source address */
+	struct in6_addr ipv6_dst; /* dest address */
+};
+
+#define IPV6_V_SET(ipv6h,x)	((ipv6h)->ipv6_fvhl = ((ipv6h)->ipv6_fvhl & 0x0FFFFFFF) | ((x) << 28))
+#define IPV6_T_SET(ipv6h,x)	((ipv6h)->ipv6_fvhl = ((ipv6h)->ipv6_fvhl & 0xF0FFFFFF) | ((x) << 20))
+#define IPV6_FLO(ipv6h,x)	htons((ipv6h)->ipv6_fvhl = ((ipv6h)->ipv6_fvhl & 0xFF000000) | (x))
 
 /*
  * Definitions for IP type of service (ip_tos)

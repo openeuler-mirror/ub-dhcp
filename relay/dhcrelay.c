@@ -1505,6 +1505,7 @@ static struct stream_list *
 parse_downstream(char *arg) {
 	struct stream_list *dp, *up;
 	struct interface_info *ifp = NULL;
+	struct interface_info iface;
 	char *ifname, *addr, *iid;
 	isc_result_t status;
 
@@ -1529,6 +1530,11 @@ parse_downstream(char *arg) {
 		usage("Interface name '%s' too long", ifname);
 	}
 
+	memset(&iface, 0, sizeof(struct interface_info));
+	strcpy(iface.name, ifname);
+	get_hw_addr(&iface);
+	if (iface.hw_address.hbuf[0] != HTYPE_UB)
+		log_fatal("Unsupported non-ub device for \"%s\"", iface.name);
 	/* Don't declare twice. */
 	for (dp = downstreams; dp; dp = dp->next) {
 		if (strcmp(ifname, dp->ifp->name) == 0)
@@ -1585,6 +1591,7 @@ static struct stream_list *
 parse_upstream(char *arg) {
 	struct stream_list *up, *dp;
 	struct interface_info *ifp = NULL;
+	struct interface_info iface;
 	char *ifname, *addr;
 	isc_result_t status;
 
@@ -1601,6 +1608,11 @@ parse_upstream(char *arg) {
 		log_fatal("Interface name '%s' too long", ifname);
 	}
 
+	memset(&iface, 0, sizeof(struct interface_info));
+	strcpy(iface.name, ifname);
+	get_hw_addr(&iface);
+	if (iface.hw_address.hbuf[0] != HTYPE_UB)
+		log_fatal("Unsupported non-ub device for \"%s\"", iface.name);
 	/* Shared up interface? */
 	for (up = upstreams; up; up = up->next) {
 		if (strcmp(ifname, up->ifp->name) == 0) {
@@ -2209,6 +2221,10 @@ void request_v4_interface(const char* name, int flags) {
 		  (flags & INTERFACE_DOWNSTREAM ? 'Y' : 'N'));
 
         memcpy(tmp->name, name, len);
+	get_hw_addr(tmp);
+	if (tmp->hw_address.hbuf[0] != HTYPE_UB) {
+		log_fatal("Unsupported non-ub device for \"%s\"", tmp->name);
+	}
         interface_snorf(tmp, (INTERFACE_REQUESTED | flags));
         interface_dereference(&tmp, MDL);
 }

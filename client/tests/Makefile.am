@@ -16,9 +16,9 @@ info:
 
 DHCPSRC = ../clparse.c ../dhc6.c ../dhclient.c
 
-DHCPLIBS = $(top_builddir)/common/libdhcp.@A@ \
-	  $(top_builddir)/omapip/libomapi.@A@    \
-          $(top_builddir)/dhcpctl/libdhcpctl.@A@ \
+DHCPLIBS = $(top_builddir)/common/libub-dhcp.@A@ \
+	  $(top_builddir)/omapip/libub-omapi.@A@    \
+          $(top_builddir)/dhcpctl/libub-dhcpctl.@A@ \
 	  @BINDLIBIRSDIR@/libirs.@A@ \
 	  @BINDLIBDNSDIR@/libdns.@A@ \
 	  @BINDLIBISCCFGDIR@/libisccfg.@A@ \

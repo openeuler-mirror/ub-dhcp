@@ -148,7 +148,7 @@ am_libomapi_a_OBJECTS = protocol.$(OBJEXT) buffer.$(OBJEXT) \
 libomapi_a_OBJECTS = $(am_libomapi_a_OBJECTS)
 am_svtest_OBJECTS = test.$(OBJEXT)
 svtest_OBJECTS = $(am_svtest_OBJECTS)
-svtest_DEPENDENCIES = libomapi.a $(BINDLIBIRSDIR)/libirs.a \
+svtest_DEPENDENCIES = libub-omapi.a $(BINDLIBIRSDIR)/libirs.a \
 	$(BINDLIBDNSDIR)/libdns.a $(BINDLIBISCCFGDIR)/libisccfg.a \
 	$(BINDLIBISCDIR)/libisc.a
 AM_V_P = $(am__v_P_@AM_V@)
@@ -346,16 +346,16 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-lib_LIBRARIES = libomapi.a
+lib_LIBRARIES = libub-omapi.a
 libomapi_a_SOURCES = protocol.c buffer.c alloc.c result.c connection.c \
 		       errwarn.c listener.c dispatch.c generic.c support.c \
 		       handle.c message.c convert.c hash.c auth.c inet_addr.c \
 		       array.c trace.c toisc.c iscprint.c isclib.c
 
-man_MANS = omapi.3
+man_MANS = ub-omapi.3
 EXTRA_DIST = $(man_MANS)
 svtest_SOURCES = test.c
-svtest_LDADD = libomapi.a \
+svtest_LDADD = libub-omapi.a \
 	       $(BINDLIBIRSDIR)/libirs.a \
 	       $(BINDLIBDNSDIR)/libdns.a \
 	       $(BINDLIBISCCFGDIR)/libisccfg.a \
@@ -431,10 +431,10 @@ uninstall-libLIBRARIES:
 clean-libLIBRARIES:
 	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
 
-libomapi.a: $(libomapi_a_OBJECTS) $(libomapi_a_DEPENDENCIES) $(EXTRA_libomapi_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libomapi.a
-	$(AM_V_AR)$(libomapi_a_AR) libomapi.a $(libomapi_a_OBJECTS) $(libomapi_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libomapi.a
+libub-omapi.a: $(libomapi_a_OBJECTS) $(libomapi_a_DEPENDENCIES) $(EXTRA_libomapi_a_DEPENDENCIES)
+	$(AM_V_at)-rm -f libub-omapi.a
+	$(AM_V_AR)$(libomapi_a_AR) libub-omapi.a $(libomapi_a_OBJECTS) $(libomapi_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libub-omapi.a
 
 svtest$(EXEEXT): $(svtest_OBJECTS) $(svtest_DEPENDENCIES) $(EXTRA_svtest_DEPENDENCIES) 
 	@rm -f svtest$(EXEEXT)

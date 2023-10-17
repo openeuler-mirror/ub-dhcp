@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 
 # Brian Masney <masneyb@gftp.org>
-# To use this script, set your base DN below. Then run 
-# ./dhcpd-conf-to-ldap.pl < /path-to-dhcpd-conf/dhcpd.conf > output-file
+# To use this script, set your base DN below. Then run
+# ./ub-dhcpd-conf-to-ldap.pl < /path-to-dhcpd-conf/ub-dhcpd.conf > output-file
 # The output of this script will generate entries in LDIF format. You can use
 # the slapadd command to add these entries into your LDAP server. You will
 # definately want to double check that your LDAP entries are correct before
@@ -43,8 +43,8 @@ sub usage($;$)
 
   print STDERR "Error: $err\n\n" if(defined $err);
   print STDERR <<__EOF_USAGE__;
-usage: 
-  $0 [options] < dhcpd.conf > dhcpd.ldif
+usage:
+  $0 [options] < ub-dhcpd.conf > dhcpd.ldif
 
 options:
 
@@ -56,7 +56,7 @@ options:
 
   --second  "secondary server or DN"   ("$second")
 
-  --conf    "/path/to/dhcpd.conf"      (default is stdin)
+  --conf    "/path/to/ub-dhcpd.conf"      (default is stdin)
   --ldif    "/path/to/output.ldif"     (default is stdout)
 
   --use     "extended features"        (see source comments)
@@ -70,7 +70,7 @@ sub next_token
   local ($lowercase) = @_;
   local ($token, $newline);
 
-  do 
+  do
     {
       if (!defined ($line) || length ($line) == 0)
         {
@@ -224,7 +224,7 @@ print_entry
         {
           print "objectClass: dhcpOptions\n";
         }
-      
+
       print "dhcpNetMask: " . $curentry{'netmask'} . "\n";
       if (defined ($curentry{'ranges'}))
         {
@@ -366,7 +366,7 @@ sub parse_subnet
   local ($ip, $tmp, $netmask);
 
   new_entry ();
-    
+
   $ip = next_token (0);
   parse_error () if !defined ($ip);
 
@@ -511,7 +511,7 @@ sub parse_subclass
     $tmp = ";";
     $subclass = substr($subclass,0,-1);
   } else {
-    $tmp = next_token (0); 
+    $tmp = next_token (0);
     parse_error () if !defined ($tmp);
   }
   parse_error () if !($tmp eq '{' or $tmp eq ';');
@@ -541,7 +541,7 @@ sub parse_hwaddress
   $curentry{'hwaddress'} = "$type $hw";
 }
 
-    
+
 sub parse_range
 {
   local ($tmp, $str);

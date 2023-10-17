@@ -40,10 +40,10 @@
 # draft-ietf-dhc-timezone-option-04.txt.
 
 # this code is intended for use with ISC's dhclient.  it is to be called
-# either as, or by, dhclient-exit-hooks
+# either as, or by, ub-dhclient-exit-hooks
 #
 # As this is test code, in order for it to be called two changes
-# must be made to /etc/dhclient.conf.  First, dhclient.conf must be
+# must be made to /etc/ub-dhclient.conf.  First, ub-dhclient.conf must be
 # aware of the tzName option.  The IANA has assigned tzName option
 # code 101.  You may need to add this to your configuration file.
 #

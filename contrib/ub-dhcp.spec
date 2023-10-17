@@ -1,12 +1,12 @@
 Summary: The Internet Systems Consortium (ISC) DHCP server
-Name: dhcp
+Name: ub-dhcp
 %define version 3.0.2
 Version: %{version}
 Release: 2tac
 Group: System Environment/Daemons
-Source: /usr/local/src/RPM/SOURCES/dhcp-%{version}.tar.gz
+Source: /usr/local/src/RPM/SOURCES/ub-dhcp-%{version}.tar.gz
 Copyright: ISC
-BuildRoot: /var/tmp/dhcp-%{version}-root
+BuildRoot: /var/tmp/ub-dhcp-%{version}-root
 
 %description
 Dhcp includes the DHCP server which is used for dynamically configuring
@@ -42,16 +42,16 @@ Dhcp devel contains all of the libraries and headers for developing with
 the dhcpctl API.
 
 %prep
-%setup -q -n dhcp-%{version}
+%setup -q -n ub-dhcp-%{version}
 # do some file editing
 egrep "VARRUN
 ETC
 VARDB" site.conf | sed -e 's/ *=/=/g' -e 's/= */=/g' > vars
 . ./vars
 cat << EOF >> includes/site.h
-#define _PATH_DHCPD_PID		"$VARRUN/dhcpd.pid"
-#define _PATH_DHCPD_DB		"$ETC/dhcpd.leases"
-#define _PATH_DHCPD_CONF	"$ETC/dhcpd.conf"
+#define _PATH_DHCPD_PID		"$VARRUN/ub-dhcpd.pid"
+#define _PATH_DHCPD_DB		"$ETC/ub-dhcpd.leases"
+#define _PATH_DHCPD_CONF	"$ETC/ub-dhcpd.conf"
 EOF
 ./configure --with-nsupdate
 
@@ -66,12 +66,12 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 
 %ifos linux
 mkdir -p ${RPM_BUILD_ROOT}/etc/rc.d/{init,rc0,rc1,rc2,rc3,rc4,rc5,rc6}.d
-install -m 755 linux.init ${RPM_BUILD_ROOT}/etc/rc.d/init.d/dhcpd
+install -m 755 linux.init ${RPM_BUILD_ROOT}/etc/rc.d/init.d/ub-dhcpd
 %else
 %ifos solaris
 mkdir -p ${RPM_BUILD_ROOT}/etc/init.d
-sed -e s'|@PREFIX@|%{_prefix}|g' < contrib/solaris.init > ${RPM_BUILD_ROOT}/etc/init.d/dhcpd
-chmod 755 ${RPM_BUILD_ROOT}/etc/init.d/dhcpd
+sed -e s'|@PREFIX@|%{_prefix}|g' < contrib/solaris.init > ${RPM_BUILD_ROOT}/etc/init.d/ub-dhcpd
+chmod 755 ${RPM_BUILD_ROOT}/etc/init.d/ub-dhcpd
 %endif
 %endif
 
@@ -83,13 +83,13 @@ done
 
 %post
 %ifos linux
-    /sbin/chkconfig --add dhcpd
-    /etc/rc.d/init.d/dhcpd start
+    /sbin/chkconfig --add ub-dhcpd
+    /etc/rc.d/init.d/ub-dhcpd start
 %else
     %ifos solaris
-	ln /etc/init.d/dhcpd /etc/rc2.d/S90dhcpd
-	ln /etc/init.d/dhcpd /etc/rc0.d/K30dhcpd
-	/etc/init.d/dhcpd start
+	ln /etc/init.d/ub-dhcpd /etc/rc2.d/S90dhcpd
+	ln /etc/init.d/ub-dhcpd /etc/rc0.d/K30dhcpd
+	/etc/init.d/ub-dhcpd start
     %else
 	echo "Unknown O/S.  You will need to manually configure your\nsystem"
 	echo "to start the DHCP server on system startup."
@@ -99,11 +99,11 @@ done
 %preun
 if [ $1 = 0 ]; then
     %ifos linux
-	/etc/rc.d/init.d/dhcpd stop
-	/sbin/chkconfig --del dhcpd
+	/etc/rc.d/init.d/ub-dhcpd stop
+	/sbin/chkconfig --del ub-dhcpd
     %else
 	%ifos solaris
-	    /etc/init.d/dhcpd stop
+	    /etc/init.d/ub-dhcpd stop
 	    rm /etc/rc2.d/S90dhcpd
 	    rm /etc/rc0.d/K30dhcpd
 	%else
@@ -120,18 +120,18 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %doc COPYRIGHT DOCUMENTATION ISC-LICENSE CHANGES README RELNOTES doc/*
 
-%{_prefix}/sbin/dhcpd
-%{_prefix}/man/cat1m/dhcpd.1m
-%{_prefix}/man/cat4/dhcpd.conf.4
-%{_prefix}/man/cat4/dhcpd.leases.4
-%{_prefix}/man/cat4/dhcp-options.4
-%{_prefix}/man/cat4/dhcp-eval.4
-%{_prefix}/man/cat4/dhcp-contrib.4
+%{_prefix}/sbin/ub-dhcpd
+%{_prefix}/man/cat1m/ub-dhcpd.1m
+%{_prefix}/man/cat4/ub-dhcpd.conf.4
+%{_prefix}/man/cat4/ub-dhcpd.leases.4
+%{_prefix}/man/cat4/ub-dhcp-options.4
+%{_prefix}/man/cat4/ub-dhcp-eval.4
+%{_prefix}/man/cat4/ub-dhcp-contrib.4
 %ifos linux
-%config /etc/rc.d/init.d/dhcpd
+%config /etc/rc.d/init.d/ub-dhcpd
 %else
 %ifos solaris
-%config /etc/init.d/dhcpd
+%config /etc/init.d/ub-dhcpd
 %endif
 %endif
 
@@ -141,17 +141,18 @@ rm -rf $RPM_BUILD_ROOT
 %{_prefix}/include
 
 %files client
-%{_prefix}/etc/dhclient-script
-%{_prefix}/sbin/dhclient
-%{_prefix}/man/cat1m/dhclient.1m
-%{_prefix}/man/cat1m/dhclient-script.1m
-%{_prefix}/man/cat4/dhclient.conf.4
-%{_prefix}/man/cat4/dhclient.leases.4
+%{_prefix}/etc/ub-dhclient-script
+%{_prefix}/sbin/ub-dhclient
+%{_prefix}/man/cat1m/ub-dhclient.1m
+%{_prefix}/man/cat1m/ub-dhclient-script.1m
+%{_prefix}/man/cat4/ub-dhclient.conf.4
+%{_prefix}/man/cat4/ub-dhclient.leases.4
 
 %files relay
-%{_prefix}/sbin/dhcrelay
-%{_prefix}/man/cat1m/dhcrelay.1m
+%{_prefix}/sbin/ub-dhcrelay
+%{_prefix}/man/cat1m/ub-dhcrelay.1m
 
 %changelog
 * Fri Oct  1 1999 Brian J. Murrell <brian@interlinx.bc.ca>
-- write a spec file for dhcpd
+- write a spec file for ub-dhcpd
+

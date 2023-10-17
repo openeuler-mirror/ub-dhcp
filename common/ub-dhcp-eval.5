@@ -1,4 +1,4 @@
-.\"	$Id: dhcp-eval.5,v 1.33 2012/05/17 15:50:14 sar Exp $
+.\"	$Id: ub-dhcp-eval.5,v 1.33 2012/05/17 15:50:14 sar Exp $
 .\"
 .\" Copyright (C) 2009-2022 Internet Systems Consortium, Inc. ("ISC")
 .\" Copyright (c) 2004,2007 by Internet Systems Consortium, Inc. ("ISC")
@@ -25,9 +25,9 @@
 .\" Support and other services are available for ISC products - see
 .\" https://www.isc.org for more information or to learn more about ISC.
 .\"
-.TH dhcp-eval 5
+.TH ub-dhcp-eval 5
 .SH NAME
-dhcp-eval - ISC DHCP conditional evaluation
+ub-dhcp-eval - ISC DHCP conditional evaluation
 .SH DESCRIPTION
 The Internet Systems Consortium DHCP client and server both provide
 the ability to perform conditional behavior depending on the contents
@@ -303,7 +303,7 @@ The \fBgethostname()\fR function returns a data string whose contents are a
 character string, the results of calling gethostname() on the local
 system with a size limit of 255 bytes (not including NULL terminator).  This
 can be used for example to configure dhclient to send the local hostname
-without knowing the local hostname at the time dhclient.conf is written.
+without knowing the local hostname at the time ub-dhclient.conf is written.
 .RE
 .PP
 .B hardware
@@ -377,7 +377,7 @@ address.  In any context where the client whose request is being
 processed has not been assigned an ip address, if this data expression
 is found in executable statements executed on that client's behalf,
 a log message indicating "there is no lease associated with this client"
-is syslogged to the debug level (this is considered dhcpd.conf debugging
+is syslogged to the debug level (this is considered ub-dhcpd.conf debugging
 information).
 .RE
 .PP
@@ -543,13 +543,13 @@ arguments to the command.
 .PP
 \fBexecute\fR is synchronous; the program will block until the external
 command being run has finished.  Please note that lengthy program
-execution (for example, in an "on commit" in dhcpd.conf) may result in
+execution (for example, in an "on commit" in ub-dhcpd.conf) may result in
 bad performance and timeouts.  Only external applications with very short
 execution times are suitable for use.
 .PP
 Passing user-supplied data to an external application might be dangerous.
 Make sure the external application checks input buffers for validity.
-Non-printable ASCII characters will be converted into dhcpd.conf language
+Non-printable ASCII characters will be converted into ub-dhcpd.conf language
 octal escapes ("\\nnn"), make sure your external command handles them as
 such.
 .PP
@@ -574,11 +574,12 @@ choose the correct vendor space.
 .RE
 .SH REFERENCE: DYNAMIC DNS UPDATES
 .PP
-See the dhcpd.conf and dhclient.conf man pages for more information
+See the ub-dhcpd.conf and ub-dhclient.conf man pages for more information
 about DDNS.
 .SH SEE ALSO
-dhcpd.conf(5), dhcpd.leases(5), dhclient.conf(5), dhcp-options(5), dhcpd(8),
-dhclient(8), RFC2132, RFC2131.
+ub-dhcpd.conf(5), ub-dhcpd.leases(5), ub-dhclient.conf(5), ub-dhcp-options(5), ub-dhcpd(8),
+ub-dhclient(8), RFC2132, RFC2131.
 .SH AUTHOR
 Information about Internet Systems Consortium can be found at
 .B https://www.isc.org.
+

@@ -13,18 +13,18 @@ ACLOCAL_AMFLAGS = -I m4
 #
 EXTRA_DIST = RELNOTES LICENSE configure.ac+lt config+lt \
 	     contrib/3.0b1-lease-convert contrib/dhclient-tz-exithook.sh \
-	     contrib/dhcp.spec contrib/sethostname.sh contrib/solaris.init \
+	     contrib/ub-dhcp.spec contrib/sethostname.sh contrib/solaris.init \
 	     contrib/ms2isc/Registry.pm contrib/ms2isc/ms2isc.pl \
-	     contrib/ms2isc/readme.txt contrib/ldap/dhcpd-conf-to-ldap \
-	     contrib/ldap/dhcp.schema contrib/ldap/README.ldap \
-             contrib/dhcp-lease-list.pl \
+	     contrib/ms2isc/readme.txt contrib/ldap/ub-dhcpd-conf-to-ldap \
+	     contrib/ldap/ub-dhcp.schema contrib/ldap/README.ldap \
+             contrib/ub-dhcp-lease-list.pl \
 	     doc/BIND-libraries doc/DHCPv4-over-DHCPv6 \
 	     doc/IANA-arp-parameters doc/Makefile doc/References.html \
 	     doc/References.txt doc/References.xml doc/api+protocol \
-	     doc/ja_JP.eucJP/dhclient-script.8 doc/ja_JP.eucJP/dhclient.8 \
-	     doc/ja_JP.eucJP/dhclient.conf.5 doc/ja_JP.eucJP/dhclient.leases.5 \
-	     doc/ja_JP.eucJP/dhcp-eval.5 doc/ja_JP.eucJP/dhcp-options.5 \
-	     doc/examples/dhclient-dhcpv6.conf doc/examples/dhcpd-dhcpv6.conf \
+	     doc/ja_JP.eucJP/ub-dhclient-script.8 doc/ja_JP.eucJP/ub-dhclient.8 \
+	     doc/ja_JP.eucJP/ub-dhclient.conf.5 doc/ja_JP.eucJP/ub-dhclient.leases.5 \
+	     doc/ja_JP.eucJP/ub-dhcp-eval.5 doc/ja_JP.eucJP/ub-dhcp-options.5 \
+	     doc/examples/ub-dhclient-dhcpv6.conf doc/examples/ub-dhcpd-dhcpv6.conf \
 	     doc/devel/arch.dox doc/devel/atf.dox doc/devel/contrib.dox \
 	     doc/devel/debug.dox doc/devel/isc-logo.jpg doc/devel/libtool.dox \
 	     doc/devel/mainpage.dox doc/devel/omapi.dox doc/devel/qa.dox \

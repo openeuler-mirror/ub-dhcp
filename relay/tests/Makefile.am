@@ -14,8 +14,8 @@ info:
 
 DHCPSRC = ../dhcrelay.c
 
-DHCPLIBS = $(top_builddir)/common/libdhcp.@A@ \
-	  $(top_builddir)/omapip/libomapi.@A@    \
+DHCPLIBS = $(top_builddir)/common/libub-dhcp.@A@ \
+	  $(top_builddir)/omapip/libub-omapi.@A@    \
 	  @BINDLIBIRSDIR@/libirs.@A@ \
 	  @BINDLIBDNSDIR@/libdns.@A@ \
 	  @BINDLIBISCCFGDIR@/libisccfg.@A@ \

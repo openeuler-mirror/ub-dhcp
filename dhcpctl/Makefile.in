@@ -89,7 +89,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = omshell$(EXEEXT)
+bin_PROGRAMS = ub-omshell$(EXEEXT)
 noinst_PROGRAMS = cltest$(EXEEXT) cltest2$(EXEEXT)
 subdir = dhcpctl
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -144,20 +144,20 @@ am_libdhcpctl_a_OBJECTS = dhcpctl.$(OBJEXT) callback.$(OBJEXT) \
 libdhcpctl_a_OBJECTS = $(am_libdhcpctl_a_OBJECTS)
 am_cltest_OBJECTS = cltest.$(OBJEXT)
 cltest_OBJECTS = $(am_cltest_OBJECTS)
-cltest_DEPENDENCIES = libdhcpctl.a ../common/libdhcp.a \
-	../omapip/libomapi.a $(BINDLIBIRSDIR)/libirs.a \
+cltest_DEPENDENCIES = libub-dhcpctl.a ../common/libub-dhcp.a \
+	../omapip/libub-omapi.a $(BINDLIBIRSDIR)/libirs.a \
 	$(BINDLIBDNSDIR)/libdns.a $(BINDLIBISCCFGDIR)/libisccfg.a \
 	$(BINDLIBISCDIR)/libisc.a
 am_cltest2_OBJECTS = cltest2.$(OBJEXT)
 cltest2_OBJECTS = $(am_cltest2_OBJECTS)
-cltest2_DEPENDENCIES = libdhcpctl.a ../common/libdhcp.a \
-	../omapip/libomapi.a $(BINDLIBIRSDIR)/libirs.a \
+cltest2_DEPENDENCIES = libub-dhcpctl.a ../common/libub-dhcp.a \
+	../omapip/libub-omapi.a $(BINDLIBIRSDIR)/libirs.a \
 	$(BINDLIBDNSDIR)/libdns.a $(BINDLIBISCCFGDIR)/libisccfg.a \
 	$(BINDLIBISCDIR)/libisc.a
 am_omshell_OBJECTS = omshell.$(OBJEXT)
 omshell_OBJECTS = $(am_omshell_OBJECTS)
-omshell_DEPENDENCIES = libdhcpctl.a ../common/libdhcp.a \
-	../omapip/libomapi.a $(BINDLIBIRSDIR)/libirs.a \
+omshell_DEPENDENCIES = libub-dhcpctl.a ../common/libub-dhcp.a \
+	../omapip/libub-omapi.a $(BINDLIBIRSDIR)/libirs.a \
 	$(BINDLIBDNSDIR)/libdns.a $(BINDLIBISCCFGDIR)/libisccfg.a \
 	$(BINDLIBISCDIR)/libisc.a
 AM_V_P = $(am__v_P_@AM_V@)
@@ -350,11 +350,11 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-lib_LIBRARIES = libdhcpctl.a
-man_MANS = omshell.1 dhcpctl.3
+lib_LIBRARIES = libub-dhcpctl.a
+man_MANS = ub-omshell.1 ub-dhcpctl.3
 EXTRA_DIST = $(man_MANS)
 omshell_SOURCES = omshell.c
-omshell_LDADD = libdhcpctl.a ../common/libdhcp.a ../omapip/libomapi.a \
+omshell_LDADD = libub-dhcpctl.a ../common/libub-dhcp.a ../omapip/libub-omapi.a \
 		$(BINDLIBIRSDIR)/libirs.a \
 		$(BINDLIBDNSDIR)/libdns.a \
 	        $(BINDLIBISCCFGDIR)/libisccfg.a \
@@ -362,14 +362,14 @@ omshell_LDADD = libdhcpctl.a ../common/libdhcp.a ../omapip/libomapi.a \
 
 libdhcpctl_a_SOURCES = dhcpctl.c callback.c remote.c
 cltest_SOURCES = cltest.c
-cltest_LDADD = libdhcpctl.a ../common/libdhcp.a ../omapip/libomapi.a \
+cltest_LDADD = libub-dhcpctl.a ../common/libub-dhcp.a ../omapip/libub-omapi.a \
 	       $(BINDLIBIRSDIR)/libirs.a \
 	       $(BINDLIBDNSDIR)/libdns.a \
 	       $(BINDLIBISCCFGDIR)/libisccfg.a \
 	       $(BINDLIBISCDIR)/libisc.a
 
 cltest2_SOURCES = cltest2.c
-cltest2_LDADD = libdhcpctl.a ../common/libdhcp.a ../omapip/libomapi.a \
+cltest2_LDADD = libub-dhcpctl.a ../common/libub-dhcp.a ../omapip/libub-omapi.a \
 	       $(BINDLIBIRSDIR)/libirs.a \
 	       $(BINDLIBDNSDIR)/libdns.a \
 	       $(BINDLIBISCCFGDIR)/libisccfg.a \
@@ -487,10 +487,10 @@ uninstall-libLIBRARIES:
 clean-libLIBRARIES:
 	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
 
-libdhcpctl.a: $(libdhcpctl_a_OBJECTS) $(libdhcpctl_a_DEPENDENCIES) $(EXTRA_libdhcpctl_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libdhcpctl.a
-	$(AM_V_AR)$(libdhcpctl_a_AR) libdhcpctl.a $(libdhcpctl_a_OBJECTS) $(libdhcpctl_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libdhcpctl.a
+libub-dhcpctl.a: $(libdhcpctl_a_OBJECTS) $(libdhcpctl_a_DEPENDENCIES) $(EXTRA_libdhcpctl_a_DEPENDENCIES)
+	$(AM_V_at)-rm -f libub-dhcpctl.a
+	$(AM_V_AR)$(libdhcpctl_a_AR) libub-dhcpctl.a $(libdhcpctl_a_OBJECTS) $(libdhcpctl_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libub-dhcpctl.a
 
 cltest$(EXEEXT): $(cltest_OBJECTS) $(cltest_DEPENDENCIES) $(EXTRA_cltest_DEPENDENCIES) 
 	@rm -f cltest$(EXEEXT)
@@ -500,8 +500,8 @@ cltest2$(EXEEXT): $(cltest2_OBJECTS) $(cltest2_DEPENDENCIES) $(EXTRA_cltest2_DEP
 	@rm -f cltest2$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(cltest2_OBJECTS) $(cltest2_LDADD) $(LIBS)
 
-omshell$(EXEEXT): $(omshell_OBJECTS) $(omshell_DEPENDENCIES) $(EXTRA_omshell_DEPENDENCIES) 
-	@rm -f omshell$(EXEEXT)
+ub-omshell$(EXEEXT): $(omshell_OBJECTS) $(omshell_DEPENDENCIES) $(EXTRA_omshell_DEPENDENCIES)
+	@rm -f ub-omshell$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(omshell_OBJECTS) $(omshell_LDADD) $(LIBS)
 
 mostlyclean-compile:

@@ -62,18 +62,18 @@ void call_get_std_dhcid(int test, int type,
 			char *name, unsigned namelen,
 			u_int8_t *dhcid, unsigned dhcid_len)
 {
-  dhcp_ddns_cb_t ddns_cb;
-  struct data_string *id;
+    dhcp_ddns_cb_t ddns_cb;
+    struct data_string *id;
 
-  memset(&ddns_cb, 0, sizeof(ddns_cb));
-  ddns_cb.dhcid_class = dns_rdatatype_dhcid;;
+    memset(&ddns_cb, 0, sizeof(ddns_cb));
+    ddns_cb.dhcid_class = dns_rdatatype_dhcid;;
 
-  id = &ddns_cb.fwd_name;
-  if (!buffer_allocate(&id->buffer, namelen, MDL))
+    id = &ddns_cb.fwd_name;
+    if (!buffer_allocate(&id->buffer, namelen, MDL))
     atf_tc_fail("Unable to allocate buffer for std test %d", test);
-  id->data = id->buffer->data;
-  memcpy(id->buffer->data, name, namelen);
-  id->len = namelen;
+    id->data = id->buffer->data;
+    memcpy(id->buffer->data, name, namelen);
+    id->len = namelen;
 
     if (get_dhcid(&ddns_cb, type, clid, clidlen) != 1) {
         atf_tc_fail("Unable to get std dhcid for %d", test);

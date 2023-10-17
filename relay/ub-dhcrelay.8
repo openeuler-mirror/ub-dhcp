@@ -1,4 +1,4 @@
-.\"	dhcrelay.8
+.\"	ub-dhcrelay.8
 .\"
 .\" Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
 .\" Copyright (c) 1997-2003 by Internet Software Consortium
@@ -27,13 +27,13 @@
 .\" Support and other services are available for ISC products - see
 .\" https://www.isc.org for more information or to learn more about ISC.
 .\"
-.\" $Id: dhcrelay.8,v 1.20 2012/05/14 23:17:43 sar Exp $
+.\" $Id: ub-dhcrelay.8,v 1.20 2012/05/14 23:17:43 sar Exp $
 .\"
-.TH dhcrelay 8
+.TH ub-dhcrelay 8
 .SH NAME
-dhcrelay - Dynamic Host Configuration Protocol Relay Agent
+ub-dhcrelay - Dynamic Host Configuration Protocol Relay Agent
 .SH SYNOPSIS
-.B dhcrelay
+.B ub-dhcrelay
 [
 .B -4
 ]
@@ -112,7 +112,7 @@ dhcrelay - Dynamic Host Configuration Protocol Relay Agent
 .I ...serverN
 ]
 .PP
-.B dhcrelay -6
+.B ub-dhcrelay -6
 [
 .B -dqI
 ]
@@ -153,7 +153,7 @@ dhcrelay - Dynamic Host Configuration Protocol Relay Agent
 .I upperN
 ]
 .SH DESCRIPTION
-The Internet Systems Consortium DHCP Relay Agent, dhcrelay, provides a
+The Internet Systems Consortium DHCP Relay Agent, ub-dhcrelay, provides a
 means for relaying DHCP and BOOTP requests from a subnet to which
 no DHCP server is directly connected to one or more DHCP servers on
 other subnets.  It supports both DHCPv4/BOOTP and DHCPv6 protocols.
@@ -169,11 +169,11 @@ downstream to the source of the original request.
 \fIProtocol selection options:\fR
 .TP
 -6
-Run dhcrelay as a DHCPv6 relay agent.  Incompatible with the \fB-4\fR
+Run ub-dhcrelay as a DHCPv6 relay agent.  Incompatible with the \fB-4\fR
 option.
 .TP
 -4
-Run dhcrelay as a DHCPv4/BOOTP relay agent.  This is the default mode of
+Run ub-dhcrelay as a DHCPv4/BOOTP relay agent.  This is the default mode of
 operation, so the argument is not necessary, but may be specified for
 clarity.  Incompatible with \fB-6\fR.
 .PP
@@ -185,12 +185,12 @@ the command line, to which DHCP/BOOTP queries should be relayed.
 \fIOptions available for both DHCPv4 and DHCPv6:\fR
 .TP
 -c \fIcount\fR
-Maximum hop count.  When forwarding packets, dhcrelay discards packets
+Maximum hop count.  When forwarding packets, ub-dhcrelay discards packets
 which have reached a hop count of COUNT.  Default is 10.  Maximum is 255.
 .TP
 -d
-Force dhcrelay to run as a foreground process.  Useful when running
-dhcrelay under a debugger, or running out of inittab on System V systems.
+Force ub-dhcrelay to run as a foreground process.  Useful when running
+ub-dhcrelay under a debugger, or running out of inittab on System V systems.
 .TP
 -p \fIport\fR
 Listen and transmit on port PORT.  This is mostly useful for debugging
@@ -247,7 +247,7 @@ instead of the announced router (3) to setup its default route.
 -i \fIifname\fR
 Listen for DHCPv4/BOOTP traffic on interface \fIifname\fR.  Multiple
 interfaces may be specified by using more than one \fB-i\fR option.  If
-no interfaces are specified on the command line, dhcrelay will identify
+no interfaces are specified on the command line, ub-dhcrelay will identify
 all network interfaces, eliminating non-broadcast interfaces if possible,
 and attempt to listen on all of them.
 .TP
@@ -281,7 +281,7 @@ communicating with the relay (giaddr) the other for choosing the subnet
 for the client (the suboption).  This can be useful if the server is
 unable to send packets to the relay via the address used for the subnet.
 
-When enabled, dhcrelay will add an agent option (as per \fB-a\fR above) that
+When enabled, ub-dhcrelay will add an agent option (as per \fB-a\fR above) that
 includes the link selection suboption to the forwarded packet.  This will only
 be done to packets received from clients that are directly connected to the
 relay (i.e. giaddr is zero).  The address used in the suboption will be that
@@ -310,7 +310,7 @@ astray.
 Force use of the DHCPv6 Interface-ID option.  This option is
 automatically sent when there are two or more downstream interfaces
 in use, to disambiguate between them.  The \fB-I\fR option causes
-dhcrelay to send the option even if there is only one downstream
+ub-dhcrelay to send the option even if there is only one downstream
 interface.
 .TP
 -s subscriber-id
@@ -324,7 +324,7 @@ interface on which queries will be received from clients or from other
 relay agents.  At least one \fB-l\fR option must be included in the command
 line when running in DHCPv6 mode.  The interface name \fIifname\fR is a
 mandatory parameter.  The link address can be specified by \fIaddress%\fR;
-if it isn't, dhcrelay will use the first non-link-local address configured
+if it isn't, ub-dhcrelay will use the first non-link-local address configured
 on the interface.  The optional \fI#index\fR parameter specifies the
 interface index.
 .TP
@@ -350,6 +350,7 @@ to a low value.
 .PP
 The loopback interface is not (yet) recognized as a valid interface.
 .SH AUTHOR
-.B dhcrelay(8)
+.B ub-dhcrelay(8)
 To learn more about Internet Systems Consortium, see
 .B https://www.isc.org
+

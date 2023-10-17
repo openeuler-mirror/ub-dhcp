@@ -3,6 +3,7 @@
    BSD socket interface code... */
 
 /*
+ * Copyright (c) 2023-2023 Hisilicon Limited.
  * Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1995-2003 by Internet Software Consortium
  *
@@ -594,6 +595,40 @@ if_register6(struct interface_info *info, int do_multicast) {
 	}
 }
 
+int if_register_ub6(struct interface_info *info) {
+	int ret;
+
+	get_hw_addr(info);
+	if (info->hw_address.hbuf[0] != HTYPE_UB)
+		return -1;
+
+	ret = if_register_lpf (info);
+	if (ret > 0) {
+		info -> rfdesc = ret;
+		setup_ub_filter (info);
+		info->wfdesc = info->rfdesc;
+		if (!quiet_interface_discovery) {
+			log_info ("Listening on LPF/%s/%s%s%s",
+				info -> name,
+				print_hw_addr (info -> hw_address.hbuf [0],
+					info -> hw_address.hlen - 1,
+					&info -> hw_address.hbuf [1]),
+				(info -> shared_network ? "/" : ""),
+				(info -> shared_network ?
+				info -> shared_network -> name : ""));
+			log_info ("Sending on LPF/%s/%s%s%s",
+				info -> name,
+				print_hw_addr (info -> hw_address.hbuf [0],
+					info -> hw_address.hlen - 1,
+					&info -> hw_address.hbuf [1]),
+				(info -> shared_network ? "/" : ""),
+				(info -> shared_network ?
+				info -> shared_network -> name : ""));
+		}
+	}
+	return ret;
+}
+
 /*
  * Register an IPv6 socket bound to the link-local address of
  * the argument interface (used by clients on a multiple interface box,
@@ -831,6 +866,75 @@ allocate_cmsg_cbuf(void) {
 #endif /* DHCPv6, IP_PKTINFO ... */
 
 #ifdef DHCPv6
+#define IPV6_ADDR_LEN	16
+void get_source_address6(struct in6_addr *from, struct interface_info *info) {
+	if (info->v6address_count > 0)
+		memcpy(&from->s6_addr, &info->v6addresses[0], IPV6_ADDR_LEN);
+}
+
+#define PACKET_LEN	1536
+#define HEADER_LEN	256
+int send_ub_packet(struct interface_info *interface,
+	const unsigned char *raw, size_t len,
+	struct sockaddr_in6 *to) {
+	unsigned char *buf, *header;
+	struct sockaddr_in6 from;
+	unsigned hbufp = 0;
+	unsigned ibufp = 0;
+	int result;
+	int fudge;
+
+	memset(&from, 0, sizeof(struct sockaddr_in6));
+
+	if (interface->client == NULL) {
+		get_source_address6(&from.sin6_addr, interface);
+	} else {
+		if (interface->client->active_lease != NULL &&
+			interface->client->active_lease->released != ISC_TRUE) {
+			unsigned char *iabuf =
+					interface->client->active_lease->bindings->addrs->address.iabuf;
+
+			memcpy(&from.sin6_addr.s6_addr, iabuf, IPV6_ADDR_LEN);
+		} else
+			get_source_address6(&from.sin6_addr, interface);
+	}
+	buf = (unsigned char *)malloc(PACKET_LEN);
+	if (buf == NULL) {
+		log_fatal("%s:%d failed to alloc memory.", MDL);
+		return -1;
+	}
+	header = (unsigned char *)malloc(HEADER_LEN);
+	if (header == NULL) {
+		free(buf);
+		log_fatal("%s:%d failed to alloc memory.", MDL);
+		return -1;
+	}
+	assemble_ub_header6(interface, (unsigned char *)header, &hbufp);
+	/* IP header must be word-aligned. */
+	fudge = hbufp % ALIGN4;
+	memcpy (buf + fudge, (unsigned char *)header, hbufp);
+	ibufp = hbufp + fudge;
+	assemble_udp_ipv6_header (interface, buf, &ibufp, from.sin6_addr.s6_addr,
+		to -> sin6_addr.s6_addr, to -> sin6_port, (unsigned char *)raw, len);
+
+	memcpy (buf + ibufp, raw, len);
+	result = write(interface->wfdesc, buf + fudge, ibufp + len - fudge);
+	if (result < 0) {
+		log_error ("send_packet: %m");
+	} else {
+		if (local_port == htons(DHCPV6_PORT)) {
+			print_ub_packet6((unsigned char *)(buf + fudge), len, print_level);
+			record_packet_info6(&dhcp_pkt_rcd, (unsigned char *)(buf + fudge));
+			print_record_info6(&dhcp_pkt_rcd, print_level);
+		}
+
+		result -= ibufp - fudge;
+	}
+	free(buf);
+	free(header);
+	return result;
+}
+
 /*
  * For both send_packet6() and receive_packet6() we need to use the
  * sendmsg()/recvmsg() functions rather than the simpler send()/recv()
@@ -860,6 +964,13 @@ ssize_t send_packet6(struct interface_info *interface,
 	struct in6_pktinfo *pktinfo;
 	struct cmsghdr *cmsg;
 	unsigned int ifindex;
+
+	if (interface->hw_address.hbuf[0] == HTYPE_UB) {
+		result = send_ub_packet(interface, raw, len, to);
+		if (result < 0)
+			log_error ("send_packet: %m");
+		return result;
+	}
 
 	/*
 	 * If necessary allocate space for the control message header.
@@ -1062,6 +1173,33 @@ ssize_t receive_packet (interface, buf, len, from, hfrom)
 #endif /* USE_SOCKET_RECEIVE */
 
 #ifdef DHCPv6
+int receive_ub_packet6(struct interface_info *interface,
+		unsigned char *buf, int length,  struct sockaddr_in6 *from, struct in6_addr *to)
+{
+	unsigned paylen = 0;
+	unsigned bufix = 0;
+	int offset = 0;
+
+	/* Decode the physical header... */
+	offset = decode_ub_header6(interface, buf, bufix);
+	if (offset == -1)
+		return -1;
+
+	bufix += offset;
+	length -= offset;
+	/* Decode the IP and UDP headers... */
+	offset = decode_udp_ipv6_header(interface, buf, bufix,
+				       (unsigned)length, &paylen, from, to);
+	bufix += offset;
+	length -= offset;
+	if (length < paylen)
+		log_fatal("Length inconsistency at %s:%d.", MDL);
+
+	memcpy(buf, &buf[bufix], paylen);
+
+	return paylen;
+}
+
 ssize_t
 receive_packet6(struct interface_info *interface,
 		unsigned char *buf, size_t len,
@@ -1073,6 +1211,7 @@ receive_packet6(struct interface_info *interface,
 	int result;
 	struct cmsghdr *cmsg;
 	struct in6_pktinfo *pktinfo;
+	int paylen;
 
 	/*
 	 * If necessary allocate space for the control message header.
@@ -1123,6 +1262,16 @@ receive_packet6(struct interface_info *interface,
 	result = recvmsg(interface->rfdesc, &m, 0);
 
 	if (result >= 0) {
+		if (interface->hw_address.hbuf[0] == HTYPE_UB) {
+			if (local_port == htons(DHCPV6_PORT)) {
+				record_packet_info6(&dhcp_pkt_rcd, (unsigned char *)buf);
+				print_record_info6(&dhcp_pkt_rcd, print_level);
+			}
+			paylen = receive_ub_packet6(interface, buf, result, from, to_addr);
+			*if_idx = if_nametoindex(interface->name);
+			return paylen;
+		}
+
 		/*
 		 * If we did read successfully, then we need to loop
 		 * through the control messages we received and

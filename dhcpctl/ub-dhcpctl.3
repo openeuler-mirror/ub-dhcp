@@ -1,8 +1,8 @@
 .\" -*- nroff -*-
 .\"
 .\" Project:      DHCP
-.\" File:         dhcpctl.3
-.\" RCSId:        $Id: dhcpctl.3,v 1.9 2011/04/25 23:43:16 sar Exp $
+.\" File:         ub-dhcpctl.3
+.\" RCSId:        $Id: ub-dhcpctl.3,v 1.9 2011/04/25 23:43:16 sar Exp $
 .\"
 .\" Copyright (c) 2004-2022 by Internet Systems Consortium, Inc. ("ISC")
 .\" Copyright (c) 2000-2003 by Internet Software Consortium
@@ -26,7 +26,7 @@
 .\"   <info@isc.org>
 .\"   https://www.isc.org/
 .\"
-.\" Description:	dhcpctl man page.
+.\" Description:	ub-dhcpctl man page.
 .\"
 .\"
 .Dd Nov 15, 2000
@@ -38,12 +38,12 @@
 .\"
 .Sh NAME
 .Nm dhcpctl_initialize
-.Nd dhcpctl library initialization.
+.Nd ub-dhcpctl library initialization.
 .\"
 .\"
 .\"
 .Sh SYNOPSIS
-.Fd #include <dhcpctl/dhcpctl.h>
+.Fd #include <ub-dhcpctl/dhcpctl.h>
 .Ft dhcpctl_status
 .Fo dhcpctl_initialize
 .Fa void
@@ -228,7 +228,7 @@
 .Fa "int"
 .Fc
 .Sh DESCRIPTION
-The dhcpctl set of functions provide an API that can be used to communicate
+The ub-dhcpctl set of functions provide an API that can be used to communicate
 with and manipulate a running ISC DHCP server. All functions return a value of
 .Dv isc_result_t .
 The return values reflects the result of operations to local data
@@ -457,7 +457,7 @@ configuration file. The created object is returned through the first parameter
 and must be used as the 4th parameter to
 .Fn dhcpctl_connect .
 Note that the 'secret' value must not be base64 encoded, which is different
-from how the value appears in the dhcpd.conf file.
+from how the value appears in the ub-dhcpd.conf file.
 .\"
 .\"
 .\"
@@ -597,9 +597,10 @@ int main (int argc, char **argv) {
 }
 .Ed
 .Sh SEE ALSO
-omapi(3), omshell(1), dhcpd(8), dhclient(8), dhcpd.conf(5), dhclient.conf(5).
+omapi(3), ub-omshell(1), ub-dhcpd(8), ub-dhclient(8), ub-dhcpd.conf(5), ub-dhclient.conf(5).
 .Sh AUTHOR
 .Em dhcpctl
 is maintained by ISC.  To learn more about Internet Systems Consortium,
 see
 .B https://www.isc.org
+

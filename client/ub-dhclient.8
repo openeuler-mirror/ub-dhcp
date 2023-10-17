@@ -1,4 +1,4 @@
-.\"	$Id: dhclient.8,v 1.36 2011/04/15 21:58:12 sar Exp $
+.\"	$Id: ub-dhclient.8,v 1.36 2011/04/15 21:58:12 sar Exp $
 .\"
 .\" Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
 .\" Copyright (c) 1996-2003 by Internet Software Consortium
@@ -24,11 +24,11 @@
 .\" Support and other services are available for ISC products - see
 .\" https://www.isc.org for more information or to learn more about ISC.
 .\"
-.TH dhclient 8
+.TH ub-dhclient 8
 .SH NAME
-dhclient - Dynamic Host Configuration Protocol Client
+ub-dhclient - Dynamic Host Configuration Protocol Client
 .SH SYNOPSIS
-.B dhclient
+.B ub-dhclient
 [
 .B -4
 |
@@ -211,7 +211,7 @@ or
 .B -6
 options.
 .PP
-On startup, \fBdhclient\fR reads the dhclient.conf
+On startup, \fBdhclient\fR reads the ub-dhclient.conf
 for configuration instructions.  It then gets a list of all the
 network interfaces that are configured in the current system.  For
 each interface, it attempts to configure the interface using the DHCP
@@ -219,21 +219,21 @@ protocol.
 .PP
 In order to keep track of leases across system reboots and server
 restarts, \fBdhclient\fR keeps a list of leases it has been assigned in the
-dhclient.leases file.  On startup, after reading the dhclient.conf
-file, \fBdhclient\fR reads the dhclient.leases file to refresh its memory
+ub-dhclient.leases file.  On startup, after reading the ub-dhclient.conf
+file, \fBdhclient\fR reads the ub-dhclient.leases file to refresh its memory
 about what leases it has been assigned.
 .PP
 When a new lease is acquired, it is appended to the end of the
-dhclient.leases file.  In order to prevent the file from becoming
+ub-dhclient.leases file.  In order to prevent the file from becoming
 arbitrarily large, from time to time \fBdhclient\fR creates a new
-dhclient.leases file from its in-core lease database.  The old version
-of the dhclient.leases file is retained under the name
-.IR dhclient.leases~
+ub-dhclient.leases file from its in-core lease database.  The old version
+of the ub-dhclient.leases file is retained under the name
+.IR ub-dhclient.leases~
 until the next time \fBdhclient\fR rewrites the database.
 .PP
 Old leases are kept around in case the DHCP server is unavailable when
 \fBdhclient\fR is first invoked (generally during the initial system boot
-process).  In that event, old leases from the dhclient.leases file
+process).  In that event, old leases from the ub-dhclient.leases file
 which have not yet expired are tested, and if they are determined to
 be valid, they are used until either they expire or the DHCP server
 becomes available.
@@ -257,7 +257,7 @@ are specified on the command line \fBdhclient\fR will normally identify all
 network interfaces, eliminating non-broadcast interfaces if
 possible, and attempt to configure each interface.
 .PP
-It is also possible to specify interfaces by name in the dhclient.conf
+It is also possible to specify interfaces by name in the ub-dhclient.conf
 file.  If interfaces are specified in this way, then the client will
 only configure interfaces that are either specified in the
 configuration file or on the command line, and will ignore all other
@@ -298,12 +298,12 @@ be launched using the same \fIport\fR argument.
 Try to get a lease once.  On failure exit with code 2.  In DHCPv6 this
 sets the maximum duration of the initial exchange to
 .I timeout
-(from dhclient.conf with a default of sixty seconds).
+(from ub-dhclient.conf with a default of sixty seconds).
 .TP
 .BI \-d
 .\" This is not intuitive.
 Force
-.B dhclient
+.B ub-dhclient
 to run as a foreground process.  Normally the DHCP client will run
 in the foreground until is has configured an interface at which time
 it will revert to running in the background.  This option is useful
@@ -328,7 +328,7 @@ to configure.  On laptop computers and other computers with
 hot-swappable I/O buses, it is possible that a broadcast interface may
 be added after system startup.  This flag can be used to cause the client
 not to exit when it doesn't find any such interfaces.  The
-.B omshell(1)
+.B ub-omshell(1)
 program can then be used to notify the client when a network interface
 has been added or removed, so that the client can attempt to configure an IP
 address on that interface.
@@ -337,25 +337,25 @@ address on that interface.
 Do not drop capabilities.
 
 Normally, if
-.B dhclient
+.B ub-dhclient
 was compiled with libcap-ng support,
-.B dhclient
+.B ub-dhclient
 drops most capabilities immediately upon startup.  While more secure,
 this greatly restricts the additional actions that hooks in
-.B dhclient-script (8)
-can take.  (For example, any daemons that 
-.B dhclient-script (8)
+.B ub-dhclient-script (8)
+can take.  (For example, any daemons that
+.B ub-dhclient-script (8)
 starts or restarts will inherit the restricted capabilities as well,
 which may interfere with their correct operation.)  Thus, the
 .BI \-nc
 option can be used to prevent
-.B dhclient
+.B ub-dhclient
 from dropping capabilities.
 
 The
 .BI \-nc
 option is ignored if
-.B dhclient
+.B ub-dhclient
 was not compiled with libcap-ng support.
 
 .TP
@@ -367,7 +367,7 @@ flag.
 .TP
 .BI \-e \ VAR=value
 Define additional environment variables for the environment where
-.B dhclient-script
+.B ub-dhclient-script
 executes.  You may specify multiple
 .B \-e
 options on the command line.
@@ -375,25 +375,25 @@ options on the command line.
 .BI \-r
 Release the current lease and stop the running DHCP client as previously
 recorded in the PID file.  When shutdown via this method
-.B dhclient-script
+.B ub-dhclient-script
 will be executed with the specific reason for calling the script set.
 The client normally doesn't release the current lease as this is not
 required by the DHCP protocol but some cable ISPs require their clients
 to notify the server if they wish to release an assigned IP address.
-.\" TODO what dhclient-script argument?
+.\" TODO what ub-dhclient-script argument?
 .\" When released,
 .TP
 .BI \-x
 Stop the running DHCP client without releasing the current lease.
 Kills existing \fBdhclient\fR process as previously recorded in the
 PID file.  When shutdown via this method
-.B dhclient-script
+.B ub-dhclient-script
 will be executed with the specific reason for calling the script set.
 .TP
 .BI \-p \ port-number
 The UDP port number on which the DHCP client should listen and transmit.
 If unspecified,
-.B dhclient
+.B ub-dhclient
 uses the default port of 68.  This is mostly useful for debugging purposes.
 If a different port is specified on which the client should listen and
 transmit, the client will also use a different destination port -
@@ -402,9 +402,9 @@ one less than the specified port.
 .BI \-s \ server-addr
 Specify the server IP address or fully qualified domain name to use as
 a destination for DHCP protocol messages before
-.B dhclient
+.B ub-dhclient
 has acquired an IP address.  Normally,
-.B dhclient
+.B ub-dhclient
 transmits these messages to 255.255.255.255 (the IP limited broadcast
 address).  Overriding this is mostly useful for debugging purposes.  This
 feature is not supported in DHCPv6 (\fB-6\fR) mode.
@@ -481,14 +481,14 @@ a DUID-LLT.  \fB\-D\fR
 overrides these default, with a value of either \fILL\fR or \fILLT\fR.
 .TP
 .BI \-N
-.\" TODO: is this for telling an already running dhclient?
+.\" TODO: is this for telling an already running ub-dhclient?
 Restore normal address query for IPv6. This implies \fB-6\fR.
 It is used to restore normal operation after using \fB-T\fR or \fB-P\fR.
 Multiple addresses can be requested with multiple \fB\-N\fR flags.
 .TP
 .BI \--address-prefix-len \ length
 Specify the length of the prefix for IPv6 addresses. This value is passed by
-dhclient into the client script via the environment variable, ip6_prefixlen,
+ub-dhclient into the client script via the environment variable, ip6_prefixlen,
 when binding IPv6 addresses.  The default value is 128.  Alternatively you may
 change the default at compile time by setting DHCLIENT_DEFAULT_PREFIX_LEN in
 includes/site.h.
@@ -497,7 +497,7 @@ includes/site.h.
 .BI \--dad-wait-time \ seconds
 Specify maximum time (in seconds) that the client should wait for the
 duplicate address detection (DAD) to complete on an interface. This
-value is propagated to the dhclient script in a dad_wait_time environment
+value is propagated to the ub-dhclient script in a dad_wait_time environment
 variable. If any of the IPv6 addresses on the interface are tentative
 (DAD is in progress), the script will wait for the specified number of
 seconds for DAD to complete. If the script ignores this variable the
@@ -518,7 +518,7 @@ have not been mounted when the DHCP client is started.
 .TP
 .BI \-cf \ config-file
 Path to the client configuration file.  If unspecified, the default
-.B ETCDIR/dhclient.conf
+.B ETCDIR/ub-dhclient.conf
 is used.  See \fBdhclient.conf(5)\fR for a description of this file.
 .TP
 .BI \-df \ duid-lease-file
@@ -533,12 +533,12 @@ lease file.
 .TP
 .BI \-lf \ lease-file
 Path to the lease database file.  If unspecified, the default
-.B DBDIR/dhclient.leases
+.B DBDIR/ub-dhclient.leases
 is used.  See \fBdhclient.leases(5)\fR for a description of this file.
 .TP
 .BI \-pf \ pid-file
 Path to the process ID file.  If unspecified, the default
-.B RUNDIR/dhclient.pid
+.B RUNDIR/ub-dhclient.pid
 is used.
 .TP
 .BI \--no-pid
@@ -549,15 +549,15 @@ even if invoked with \fB-r\fR or \fB-x\fR.
 .TP
 .BI \-sf \ script-file
 Path to the network configuration script invoked by
-.B dhclient
+.B ub-dhclient
 when it gets a lease.  If unspecified, the default
-.B CLIENTBINDIR/dhclient-script
+.B CLIENTBINDIR/ub-dhclient-script
 is used.  See \fBdhclient-script(8)\fR for a description of this file.
 .TP
 .BI \-B
 Always set the bootp broadcast flag in request packets, so that
 servers will always broadcast replies. This option is provided as
-an extension to enable dhclient to work on IBM s390 Linux guests.
+an extension to enable ub-dhclient to work on IBM s390 Linux guests.
 .PP
 .SH PORTS
 During operations the client may use multiple UDP ports
@@ -597,7 +597,7 @@ client using TCP/IP, authenticate, and can then examine the client's
 current status and make changes to it.
 .PP
 Rather than implementing the underlying OMAPI protocol directly, user
-programs should use the dhcpctl API or OMAPI itself.  Dhcpctl is a
+programs should use the ub-dhcpctl API or OMAPI itself.  Dhcpctl is a
 wrapper that handles some of the housekeeping chores that OMAPI does
 not do automatically.  Dhcpctl and OMAPI are documented in
 \fBdhcpctl(3)\fR
@@ -629,26 +629,26 @@ Note that use of the related command-line options
 will ignore the corresponding environment variable settings.
 .TP
 .B PATH_DHCLIENT_CONF
-The dhclient.conf configuration file.
+The ub-dhclient.conf configuration file.
 .TP
 .B PATH_DHCLIENT_DB
-The dhclient.leases database.
+The ub-dhclient.leases database.
 .TP
 .B PATH_DHCLIENT_PID
-The dhclient PID file.
+The ub-dhclient PID file.
 .TP
 .B PATH_DHCLIENT_SCRIPT
-The dhclient-script file.
+The ub-dhclient-script file.
 .PP
 .SH FILES
-.B CLIENTBINDIR/dhclient-script,
-.B ETCDIR/dhclient.conf, DBDIR/dhclient.leases, RUNDIR/dhclient.pid,
-.B DBDIR/dhclient.leases~.
+.B CLIENTBINDIR/ub-dhclient-script,
+.B ETCDIR/ub-dhclient.conf, DBDIR/ub-dhclient.leases, RUNDIR/ub-dhclient.pid,
+.B DBDIR/ub-dhclient.leases~.
 .SH SEE ALSO
-dhcpd(8), dhcrelay(8), dhclient-script(8), dhclient.conf(5),
-dhclient.leases(5), dhcp-eval(5).
+ub-dhcpd(8), ub-dhcrelay(8), ub-dhclient-script(8), ub-dhclient.conf(5),
+ub-dhclient.leases(5), ub-dhcp-eval(5).
 .SH AUTHOR
-.B dhclient(8)
+.B ub-dhclient(8)
 To learn more about Internet Systems Consortium,
 see
 .B https://www.isc.org
@@ -667,3 +667,4 @@ system-specific configuration code to these operating systems - instead,
 the shell script can invoke the native tools to accomplish the same
 purpose.
 .PP
+

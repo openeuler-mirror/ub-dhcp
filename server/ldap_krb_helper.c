@@ -47,7 +47,7 @@
 #include <unistd.h>
 #include <time.h>
 
-#define KRB_DEFAULT_KEYTAB "FILE:/etc/dhcp/dhcp.keytab"
+#define KRB_DEFAULT_KEYTAB "FILE:/etc/ub-dhcp/ub-dhcp.keytab"
 #define KRB_MIN_TIME 300
 
 #define CHECK_KRB5(ctx, err, msg, ...) \

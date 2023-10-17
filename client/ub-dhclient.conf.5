@@ -1,4 +1,4 @@
-.\"	$Id: dhclient.conf.5,v 1.34 2012/01/24 22:23:39 sar Exp $
+.\"	$Id: ub-dhclient.conf.5,v 1.34 2012/01/24 22:23:39 sar Exp $
 .\"
 .\" Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
 .\" Copyright (c) 1996-2003 by Internet Software Consortium
@@ -24,22 +24,22 @@
 .\" Support and other services are available for ISC products - see
 .\" https://www.isc.org for more information or to learn more about ISC.
 .\"
-.TH dhclient.conf 5
+.TH ub-dhclient.conf 5
 .SH NAME
-dhclient.conf - DHCP client configuration file
+ub-dhclient.conf - DHCP client configuration file
 .SH DESCRIPTION
-The dhclient.conf file contains configuration information for
-.IR dhclient,
+The ub-dhclient.conf file contains configuration information for
+.IR ub-dhclient,
 the Internet Systems Consortium DHCP Client.
 .PP
-The dhclient.conf file is a free-form ASCII text file.  It is parsed by
-the recursive-descent parser built into dhclient.  The file may contain
+The ub-dhclient.conf file is a free-form ASCII text file.  It is parsed by
+the recursive-descent parser built into ub-dhclient.  The file may contain
 extra tabs and newlines for formatting purposes.  Keywords in the file
 are case-insensitive.  Comments may be placed anywhere within the
 file (except within quotes).  Comments begin with the # character and
 end at the end of the line.
 .PP
-The dhclient.conf file can be used to configure the behaviour of the
+The ub-dhclient.conf file can be used to configure the behaviour of the
 client in a wide variety of ways: protocol timing, information
 requested from the server, information required of the server,
 defaults to use if the server does not provide certain information,
@@ -293,7 +293,7 @@ Note that everything in this section is true whether you are using DHCPv4
 or DHCPv6.  The exact same syntax is used for both.
 .PP
 To make it work, you have to declare a key and zone as in the DHCP
-server (see \fBdhcpd.conf\fR(5) for details).  You also need to
+server (see \fBub-dhcpd.conf\fR(5) for details).  You also need to
 configure the \fIfqdn\fR option on the client, as follows:
 .PP
 .nf
@@ -406,10 +406,10 @@ with the
 .B lease
 statement.
 .PP
-NOTE: the lease statement is also used in the dhclient.leases file in
+NOTE: the lease statement is also used in the ub-dhclient.leases file in
 order to record leases that have been received from DHCP servers.
 Some of the syntax for leases as described below is only needed in the
-dhclient.leases file.  Such syntax is documented here for
+ub-dhclient.leases file.  Such syntax is documented here for
 completeness.
 .PP
 A lease statement consists of the lease keyword, followed by a left
@@ -434,7 +434,7 @@ lease statement is used to indicate the interface on which the lease
 is valid.  If set, this lease will only be tried on a particular
 interface.  When the client receives a lease from a server, it always
 records the interface number on which it received that lease.
-If predefined leases are specified in the dhclient.conf file, the
+If predefined leases are specified in the ub-dhclient.conf file, the
 interface should also be specified, although this is not required.
 .PP
  \fBfixed-address\fR \fIip-address\fR\fB;\fR
@@ -466,7 +466,7 @@ The
 .B option
 statement is used to specify the value of an option supplied by the
 server, or, in the case of predefined leases declared in
-dhclient.conf, the value that the user wishes the client configuration
+ub-dhclient.conf, the value that the user wishes the client configuration
 script to use if the predefined lease is used.
 .PP
  \fBscript "\fIscript-name\fB";\fR
@@ -481,7 +481,7 @@ interface's final configuration once a lease has been acquired.  If
 no lease is acquired, the script is used to test predefined leases, if
 any, and also called once if no valid lease can be identified.  For
 more information, see
-.B dhclient-script(8).
+.B ub-dhclient-script(8).
 .PP
  \fBvendor option space "\fIname\fB";\fR
 .PP
@@ -655,7 +655,7 @@ declaration will use the parameters declared outside of any interface
 declaration, or the default settings.
 .PP
 .B Note well:
-ISC dhclient only maintains one list of interfaces, which is either
+ISC ub-dhclient only maintains one list of interfaces, which is either
 determined at startup from command line arguments, or otherwise is
 autodetected.  If you supplied the list of interfaces on the command
 line, this configuration clause will add the named interface to the
@@ -719,7 +719,7 @@ cycling through media types.
 The
 .B hardware
 statement defines the hardware MAC address to use for this interface,
-for DHCP servers or relays to direct their replies.  dhclient will determine
+for DHCP servers or relays to direct their replies.  ub-dhclient will determine
 the interface's MAC address automatically, so use of this parameter
 is not recommended.  The \fIlink-type\fR corresponds to the interface's
 link layer type (example: \'ethernet\'), while the \fImac-address\fR is
@@ -729,7 +729,7 @@ a string of colon-separated hexadecimal values for octets.
 .PP
 The
 .B anycast-mac
-statement over-rides the all-ones broadcast MAC address dhclient will use
+statement over-rides the all-ones broadcast MAC address ub-dhclient will use
 when it is transmitting packets to the all-ones limited broadcast IPv4
 address.  This configuration parameter is useful to reduce the number of
 broadcast packets transmitted by DHCP clients, but is only useful if you
@@ -741,11 +741,11 @@ in a similar manner to the \fBhardware\fR statement.
 .PP
 The
 .B bootp-broadcast-always
-statement instructs dhclient to always set the bootp broadcast flag in
+statement instructs ub-dhclient to always set the bootp broadcast flag in
 request packets, so that servers will always broadcast replies.
-This is equivalent to supplying the dhclient -B argument, and has
-the same effect as specifying 'always-broadcast' in the server's dhcpd.conf.
-This option is provided as an extension to enable dhclient to work
+This is equivalent to supplying the ub-dhclient -B argument, and has
+the same effect as specifying 'always-broadcast' in the server's ub-dhcpd.conf.
+This option is provided as an extension to enable ub-dhclient to work
 on IBM s390 Linux guests.
 .PP
 .SH SAMPLE
@@ -776,7 +776,7 @@ interface "ep0" {
     request subnet-mask, broadcast-address, time-offset, routers,
 	    domain-name, domain-name-servers, host-name;
     require subnet-mask, domain-name-servers;
-    script "CLIENTBINDIR/dhclient-script";
+    script "CLIENTBINDIR/ub-dhclient-script";
     media "media 10baseT/UTP", "media 10base2/BNC";
 }
 
@@ -786,13 +786,14 @@ alias {
   option subnet-mask 255.255.255.255;
 }
 .fi
-This is a very complicated dhclient.conf file - in general, yours
+This is a very complicated ub-dhclient.conf file - in general, yours
 should be much simpler.  In many cases, it's sufficient to just
-create an empty dhclient.conf file - the defaults are usually fine.
+create an empty ub-dhclient.conf file - the defaults are usually fine.
 .SH SEE ALSO
-dhcp-options(5), dhcp-eval(5), dhclient.leases(5), dhcpd(8), dhcpd.conf(5),
+ub-dhcp-options(5), ub-dhcp-eval(5), ub-dhclient.leases(5), ub-dhcpd(8), ub-dhcpd.conf(5),
 RFC2132, RFC2131.
 .SH AUTHOR
-.B dhclient(8)
+.B ub-dhclient(8)
 Information about Internet Systems Consortium can be found at
 .B https://www.isc.org.
+

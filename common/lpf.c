@@ -46,16 +46,23 @@
 #include <sys/socket.h>
 #include <net/if.h>
 #include <ifaddrs.h>
+#endif
 
-/* Default broadcast address for IPoIB */
-static unsigned char default_ib_bcast_addr[20] = {
- 	0x00, 0xff, 0xff, 0xff,
-	0xff, 0x12, 0x40, 0x1b,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0xff, 0xff, 0xff, 0xff
-};
-
+#if defined (USE_LPF_SEND) || defined (USE_LPF_RECEIVE)
+#include <linux/types.h>
+#include <inttypes.h>
+#include <sys/file.h>
+#include <sys/user.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <linux/if.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <errno.h>
+#include <arpa/inet.h>
 #endif
 
 #if defined (USE_LPF_SEND) || defined (USE_LPF_RECEIVE)
@@ -63,6 +70,20 @@ static unsigned char default_ib_bcast_addr[20] = {
    is not required for packet-filter APIs. */
 
 #ifdef USE_LPF_SEND
+#define NL_GO_ON 2
+
+static struct nlsock {
+	int sock;
+	int seq;
+	struct sockaddr_nl snl;
+	char *name;
+} nl_cmd = { -1, 0, {0}, "netlink-cmd" };
+
+struct nl_if_info {
+	u_int32_t addr;
+	char *name;
+};
+
 void if_reinitialize_send (info)
 	struct interface_info *info;
 {
@@ -75,6 +96,9 @@ void if_reinitialize_receive (info)
 {
 }
 #endif
+
+unsigned char print_level;
+struct packet_record dhcp_pkt_rcd;
 
 /* Called by get_interface_list for each interface that's discovered.
    Opens a packet filter for each interface and adds it to the select
@@ -89,20 +113,9 @@ int if_register_lpf (info)
 		struct sockaddr common;
 		} sa;
 	struct ifreq ifr;
-	int type;
-	int protocol;
-
-	get_hw_addr(info);
-	if (info->hw_address.hbuf[0] == HTYPE_INFINIBAND) {
-		type = SOCK_DGRAM;
-		protocol = ETHERTYPE_IP;
-	} else {
-		type = SOCK_RAW;
-		protocol = ETH_P_ALL;
-	}
 
 	/* Make an LPF socket. */
-	if ((sock = socket(PF_PACKET, type, htons((short)protocol))) < 0) {
+	if ((sock = socket(PF_PACKET, SOCK_RAW, htons((short)ETH_P_ALL))) < 0) {
 		if (errno == ENOPROTOOPT || errno == EPROTONOSUPPORT ||
 		    errno == ESOCKTNOSUPPORT || errno == EPFNOSUPPORT ||
 		    errno == EAFNOSUPPORT || errno == EINVAL) {
@@ -124,9 +137,15 @@ int if_register_lpf (info)
 
 	/* Bind to the interface name */
 	memset (&sa, 0, sizeof sa);
+
+	/* Get hardware address of the interface */
+	if (local_family == AF_INET)
+		get_hw_addr(info);
+
+	/* Set UB raw socket protocol */
 	sa.ll.sll_family = AF_PACKET;
-	sa.ll.sll_protocol = htons(protocol);
 	sa.ll.sll_ifindex = ifr.ifr_ifindex;
+	sa.ll.sll_protocol = htons(ETH_P_UB);
 	if (bind (sock, &sa.common, sizeof sa)) {
 		if (errno == ENOPROTOOPT || errno == EPROTONOSUPPORT ||
 		    errno == ESOCKTNOSUPPORT || errno == EPFNOSUPPORT ||
@@ -196,27 +215,43 @@ void if_deregister_send (info)
    in bpf includes... */
 extern struct sock_filter dhcp_bpf_filter [];
 extern int dhcp_bpf_filter_len;
-extern struct sock_filter dhcp_ib_bpf_filter [];
-extern int dhcp_ib_bpf_filter_len;
 
 #if defined(RELAY_PORT)
 extern struct sock_filter dhcp_bpf_relay_filter [];
 extern int dhcp_bpf_relay_filter_len;
 #endif
 
-#if defined (HAVE_TR_SUPPORT)
-extern struct sock_filter dhcp_bpf_tr_filter [];
-extern int dhcp_bpf_tr_filter_len;
-static void lpf_tr_filter_setup (struct interface_info *);
-#endif
-
 static void lpf_gen_filter_setup (struct interface_info *);
+
+void setup_ub_filter (struct interface_info *info)
+{
+	struct sock_filter code[] = {
+		{ 0x28,  0,  0, 0x00000001 },
+		{ 0x15,  2,  0, 0x00000100 },
+		{ 0x28,  0,  0, 0x00000001 },
+		{ 0x15,  0,  1, 0x00000101 },
+		{ 0x6,   0,  0, 0xffffffff },
+		{ 0x6,   0,  0, 0x00000000 },
+	};
+	struct sock_fprog bpf = {
+		.len = sizeof(code)/sizeof(code[0]),
+		.filter = code,
+	};
+
+	if (setsockopt(info->rfdesc, SOL_SOCKET, SO_ATTACH_FILTER, &bpf, sizeof(bpf)) < 0) {
+		if (errno != ENOPROTOOPT)
+			log_fatal ("Failed to setup_ub_filter6 packet data: %m");
+	}
+}
 
 void if_register_receive (info)
 	struct interface_info *info;
 {
 	/* Open a LPF device and hang it on this interface... */
 	info -> rfdesc = if_register_lpf (info);
+	if (info->hw_address.hbuf[0] == HTYPE_UB) {
+		goto out;
+	}
 
 #ifdef PACKET_AUXDATA
 	{
@@ -233,13 +268,9 @@ void if_register_receive (info)
 #endif
 
 
-#if defined (HAVE_TR_SUPPORT)
-	if (info -> hw_address.hbuf [0] == HTYPE_IEEE802)
-		lpf_tr_filter_setup (info);
-	else
-#endif
-		lpf_gen_filter_setup (info);
+	lpf_gen_filter_setup (info);
 
+out:
 	if (!quiet_interface_discovery)
 		log_info ("Listening on LPF/%s/%s%s%s",
 			  info -> name,
@@ -276,18 +307,6 @@ static void lpf_gen_filter_setup (info)
 
 	memset(&p, 0, sizeof(p));
 
-	if (info->hw_address.hbuf[0] == HTYPE_INFINIBAND) {
-		p.len = dhcp_ib_bpf_filter_len;
-		p.filter = dhcp_ib_bpf_filter;
-
-		/* Patch the server port into the LPF program...
-		   XXX
-		   changes to filter program may require changes
-		   to the insn number(s) used below!
-		   XXX */
-		dhcp_ib_bpf_filter[6].k = ntohs (local_port);
-	} else {
-
 	/* Set up the bpf filter program structure.    This is defined in
 	   bpf.c */
 	p.len = dhcp_bpf_filter_len;
@@ -310,8 +329,6 @@ static void lpf_gen_filter_setup (info)
 #endif
 	dhcp_bpf_filter [8].k = ntohs (local_port);
 
-	}
-
 	if (setsockopt (info -> rfdesc, SOL_SOCKET, SO_ATTACH_FILTER, &p,
 			sizeof p) < 0) {
 		if (errno == ENOPROTOOPT || errno == EPROTONOSUPPORT ||
@@ -328,93 +345,9 @@ static void lpf_gen_filter_setup (info)
 	}
 }
 
-#if defined (HAVE_TR_SUPPORT)
-static void lpf_tr_filter_setup (info)
-	struct interface_info *info;
-{
-	struct sock_fprog p;
-
-	memset(&p, 0, sizeof(p));
-
-	/* Set up the bpf filter program structure.    This is defined in
-	   bpf.c */
-	p.len = dhcp_bpf_tr_filter_len;
-	p.filter = dhcp_bpf_tr_filter;
-
-        /* Patch the server port into the LPF  program...
-	   XXX changes to filter program may require changes
-	   XXX to the insn number(s) used below!
-	   XXX Token ring filter is null - when/if we have a filter
-	   XXX that's not, we'll need this code.
-	   XXX dhcp_bpf_filter [?].k = ntohs (local_port); */
-
-	if (setsockopt (info -> rfdesc, SOL_SOCKET, SO_ATTACH_FILTER, &p,
-			sizeof p) < 0) {
-		if (errno == ENOPROTOOPT || errno == EPROTONOSUPPORT ||
-		    errno == ESOCKTNOSUPPORT || errno == EPFNOSUPPORT ||
-		    errno == EAFNOSUPPORT) {
-			log_error ("socket: %m - make sure");
-			log_error ("CONFIG_PACKET (Packet socket) %s",
-				   "and CONFIG_FILTER");
-			log_error ("(Socket Filtering) are enabled %s",
-				   "in your kernel");
-			log_fatal ("configuration!");
-		}
-		log_fatal ("Can't install packet filter program: %m");
-	}
-}
-#endif /* HAVE_TR_SUPPORT */
 #endif /* USE_LPF_RECEIVE */
 
 #ifdef USE_LPF_SEND
-ssize_t send_packet_ib(interface, packet, raw, len, from, to, hto)
-	struct interface_info *interface;
-	struct packet *packet;
-	struct dhcp_packet *raw;
-	size_t len;
-	struct in_addr from;
-	struct sockaddr_in *to;
-	struct hardware *hto;
-{
-	unsigned ibufp = 0;
-	double ih [1536 / sizeof (double)];
-	unsigned char *buf = (unsigned char *)ih;
-	ssize_t result;
-
-	union sockunion {
-		struct sockaddr sa;
-		struct sockaddr_ll sll;
-		struct sockaddr_storage ss;
-	} su;
-
-	assemble_udp_ip_header (interface, buf, &ibufp, from.s_addr,
-				to->sin_addr.s_addr, to->sin_port,
-				(unsigned char *)raw, len);
-	memcpy (buf + ibufp, raw, len);
-
-	memset(&su, 0, sizeof(su));
-	su.sll.sll_family = AF_PACKET;
-	su.sll.sll_protocol = htons(ETHERTYPE_IP);
-
-	if (!(su.sll.sll_ifindex = if_nametoindex(interface->name))) {
-		errno = ENOENT;
-		log_error ("send_packet_ib: %m - failed to get if index");
-		return -1;
-	}
-
-	su.sll.sll_hatype = htons(HTYPE_INFINIBAND);
-	su.sll.sll_halen = sizeof(interface->bcast_addr);
-	memcpy(&su.sll.sll_addr, interface->bcast_addr, 20);
-
-	result = sendto(interface->wfdesc, buf, ibufp + len, 0,
-			&su.sa, sizeof(su));
-
-	if (result < 0)
-		log_error ("send_packet_ib: %m");
-
-	return result;
-}
-
 ssize_t send_packet (interface, packet, raw, len, from, to, hto)
 	struct interface_info *interface;
 	struct packet *packet;
@@ -435,11 +368,7 @@ ssize_t send_packet (interface, packet, raw, len, from, to, hto)
 		return send_fallback (interface, packet, raw,
 				      len, from, to, hto);
 
-	if (interface->hw_address.hbuf[0] == HTYPE_INFINIBAND) {
-		return send_packet_ib(interface, packet, raw, len, from,
-				      to, hto);
-	}
-
+	/* update packet info */
 	if (hto == NULL && interface->anycast_mac_addr.hlen)
 		hto = &interface->anycast_mac_addr;
 
@@ -452,6 +381,8 @@ ssize_t send_packet (interface, packet, raw, len, from, to, hto)
 				to -> sin_addr.s_addr, to -> sin_port,
 				(unsigned char *)raw, len);
 	memcpy (buf + ibufp, raw, len);
+	/* ubh + iph + udph + dhcpPDU */
+	print_ub_packet((unsigned char *)(buf + fudge), ibufp - fudge + len, print_level);
 	result = write(interface->wfdesc, buf + fudge, ibufp + len - fudge);
 	if (result < 0)
 		log_error ("send_packet: %m");
@@ -460,42 +391,6 @@ ssize_t send_packet (interface, packet, raw, len, from, to, hto)
 #endif /* USE_LPF_SEND */
 
 #ifdef USE_LPF_RECEIVE
-ssize_t receive_packet_ib (interface, buf, len, from, hfrom)
-	struct interface_info *interface;
-	unsigned char *buf;
-	size_t len;
-	struct sockaddr_in *from;
-	struct hardware *hfrom;
-{
-	int length = 0;
-	int offset = 0;
-	unsigned char ibuf [1536];
-	unsigned bufix = 0;
-	unsigned paylen;
-
-	length = read(interface->rfdesc, ibuf, sizeof(ibuf));
-
-	if (length <= 0)
-		return length;
-
-	offset = decode_udp_ip_header(interface, ibuf, bufix, from,
-				       (unsigned)length, &paylen, 0);
-
-	if (offset < 0)
-		return 0;
-
-	bufix += offset;
-	length -= offset;
-
-	if (length < paylen)
-		log_fatal("Internal inconsistency at %s:%d.", MDL);
-
-	/* Copy out the data in the packet... */
-	memcpy(buf, &ibuf[bufix], paylen);
-
-	return (ssize_t)paylen;
-}
-
 ssize_t receive_packet (interface, buf, len, from, hfrom)
 	struct interface_info *interface;
 	unsigned char *buf;
@@ -533,10 +428,6 @@ ssize_t receive_packet (interface, buf, len, from, hfrom)
 		.msg_controllen = 0,
 	};
 #endif /* PACKET_AUXDATA */
-
-	if (interface->hw_address.hbuf[0] == HTYPE_INFINIBAND) {
-		return receive_packet_ib(interface, buf, len, from, hfrom);
-	}
 
 	length = recvmsg (interface->rfdesc, &msg, 0);
 	if (length <= 0)
@@ -650,6 +541,192 @@ void maybe_setup_fallback ()
 }
 #endif
 
+static int nl_socket(struct nlsock *nl, unsigned long groups)
+{
+	struct sockaddr_nl snl;
+	unsigned int namelen;
+	int sock;
+	int ret;
+
+	sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+	if (sock < 0) {
+		log_fatal("Can't open %s socket: %s", nl->name, strerror(errno));
+		return -1;
+	}
+
+	ret = fcntl(sock, F_SETFL, O_NONBLOCK);
+	if (ret < 0) {
+		log_fatal("Can't set %s socket flags: %s", nl->name, strerror(errno));
+		close(sock);
+		return -1;
+	}
+	memset(&snl, 0, sizeof snl);
+	snl.nl_family = AF_NETLINK;
+	snl.nl_groups = groups;
+	/* Bind the socket to the netlink structure for anything. */
+	ret = bind(sock, (struct sockaddr *)&snl, sizeof snl);
+	if (ret < 0) {
+		log_fatal("Can't bind %s socket to group 0x%x: %s", nl->name, snl.nl_groups, strerror(errno));
+		close(sock);
+		return -1;
+	}
+
+	/* multiple netlink sockets will have different nl_pid */
+	namelen = sizeof snl;
+	ret = getsockname(sock, (struct sockaddr *)&snl, &namelen);
+	if (ret < 0 || namelen != sizeof snl) {
+		log_fatal("Can't get %s socket name: %s", nl->name, strerror(errno));
+		close(sock);
+		return -1;
+	}
+
+	nl->snl = snl;
+	nl->sock = sock;
+
+	return ret;
+}
+
+static int nl_request(int family, int type, struct nlsock *nl)
+{
+	struct sockaddr_nl snl;
+	struct {
+		struct nlmsghdr nlh;
+		struct rtgenmsg g;
+	} req;
+
+	if (nl->sock < 0)
+		return -1;
+
+	memset(&snl, 0, sizeof snl);
+	snl.nl_family = AF_NETLINK;
+	req.nlh.nlmsg_len = sizeof req;
+	req.nlh.nlmsg_type = type;
+	req.nlh.nlmsg_flags = (NLM_F_ROOT | NLM_F_MATCH | NLM_F_REQUEST);
+	req.nlh.nlmsg_pid = 0;
+	req.nlh.nlmsg_seq = ++nl->seq;
+	req.g.rtgen_family = family;
+
+	if (sendto(nl->sock, (void *)&req, sizeof req, 0,
+			   (struct sockaddr *)&snl, sizeof snl) < 0) {
+		return -1;
+	}
+	return 0;
+}
+
+int nl_msg_error(struct nlmsghdr *h)
+{
+	if (h->nlmsg_type != NLMSG_ERROR)
+		return NL_GO_ON;
+
+	struct nlmsgerr *err = (struct nlmsgerr *)NLMSG_DATA(h);
+
+	if (err->error)
+		return -1;
+
+	if (!(h->nlmsg_flags & NLM_F_MULTI))
+		return 0;
+
+	return 1;
+}
+
+static int nl_parse_info(int (*filter)(struct sockaddr_nl *, struct nlmsghdr *, void *, unsigned char *hw_addr),
+				struct nlsock *nl, void *arg, unsigned char *hw_addr)
+{
+	int status, ret = 0, error;
+
+	while (1) {
+		char buf[4096];
+		struct iovec iov = {buf, sizeof buf};
+		struct sockaddr_nl snl;
+		struct msghdr msg = {(void *)&snl, sizeof snl, &iov, 1, NULL, 0, 0};
+		struct nlmsghdr *h;
+
+		status = recvmsg(nl->sock, &msg, 0);
+		if (status < 0) {
+			if (errno == EWOULDBLOCK || errno == EAGAIN)
+				break;
+			continue;
+		}
+
+		if (snl.nl_pid != 0)
+			continue;
+		if (status == 0 || msg.msg_namelen != sizeof snl)
+			return -1;
+		for (h = (struct nlmsghdr *)buf; NLMSG_OK(h, status); h = NLMSG_NEXT(h, status)) {
+			if (h->nlmsg_type == NLMSG_DONE)
+				return ret;
+			ret = nl_msg_error(h);
+			if (ret == 1)
+				continue;
+			else if (ret <= 0)
+				return ret;
+			if (nl != &nl_cmd && h->nlmsg_pid == nl_cmd.snl.nl_pid)
+				continue;
+			error = (*filter)(&snl, h, arg, hw_addr);
+			if (error < 0)
+				ret = error;
+		}
+
+		if (msg.msg_flags & MSG_TRUNC)
+			continue;
+		if (status)
+			return -1;
+	}
+	return ret;
+}
+
+static void nl_parse_rtattr(struct rtattr **tb, int max, struct rtattr *rta, int len)
+{
+	while (RTA_OK(rta, len)) {
+		if (rta->rta_type <= max)
+			tb[rta->rta_type] = rta;
+		rta = RTA_NEXT(rta, len);
+	}
+}
+
+static int nl_get_if_addr(struct sockaddr_nl *snl, struct nlmsghdr *h, void *arg, unsigned char *hw_addr)
+{
+	struct rtattr *tb[IFLA_MAX + 1];
+	int msg_len;
+
+	msg_len = h->nlmsg_len - NLMSG_LENGTH(sizeof(struct ifinfomsg));
+	if (msg_len < 0)
+		return -1;
+
+	memset(tb, 0, sizeof tb);
+	nl_parse_rtattr(tb, IFLA_MAX, IFLA_RTA(NLMSG_DATA(h)), msg_len);
+	if (tb[IFLA_IFNAME] == NULL)
+		return -1;
+
+	if (strcmp(RTA_DATA(tb[IFLA_IFNAME]), (char *)arg))
+		return 0;
+
+	if (tb[IFLA_ADDRESS] != NULL)
+		memcpy(hw_addr, RTA_DATA(tb[IFLA_ADDRESS]), RTA_PAYLOAD(tb[IFLA_ADDRESS]));
+
+	return 0;
+}
+
+int get_addr(const char *name, unsigned char *hw_addr)
+{
+	if (nl_socket(&nl_cmd, 0) < 0)
+		return -1;
+
+	if (nl_request(AF_INET, RTM_GETLINK, &nl_cmd) < 0) {
+		close(nl_cmd.sock);
+		return -1;
+	}
+
+	if (nl_parse_info(nl_get_if_addr, &nl_cmd, (void *)name, hw_addr) < 0) {
+		close(nl_cmd.sock);
+		return -1;
+	}
+
+	close(nl_cmd.sock);
+	return 0;
+}
+
+
 #if defined (USE_LPF_RECEIVE) || defined (USE_LPF_HWADDR)
 struct sockaddr_ll *
 get_ll (struct ifaddrs *ifaddrs, struct ifaddrs **ifa, char *name)
@@ -722,8 +799,6 @@ get_hw_addr3(struct interface_info *info, struct ifaddrs *ifaddrs_start)
 	struct ifaddrs *ifa = NULL;
 	struct sockaddr_ll *sll = NULL;
 	int sll_allocated = 0;
-	char *dup = NULL;
-	char *colon = NULL;
         isc_result_t result = ISC_R_SUCCESS;
         
 	if (ifaddrs == NULL)
@@ -742,88 +817,17 @@ get_hw_addr3(struct interface_info *info, struct ifaddrs *ifaddrs_start)
 			log_fatal("Unexpected internal error");
 	}
 
-	switch (sll->sll_hatype) {
-		case ARPHRD_ETHER:
-			hw->hlen = 7;
-			hw->hbuf[0] = HTYPE_ETHER;
-			memcpy(&hw->hbuf[1], sll->sll_addr, 6);
-			break;
-		case ARPHRD_IEEE802:
-#ifdef ARPHRD_IEEE802_TR
-		case ARPHRD_IEEE802_TR:
-#endif /* ARPHRD_IEEE802_TR */
-			hw->hlen = 7;
-			hw->hbuf[0] = HTYPE_IEEE802;
-			memcpy(&hw->hbuf[1], sll->sll_addr, 6);
-			break;
-		case ARPHRD_FDDI:
-			hw->hlen = 7;
-			hw->hbuf[0] = HTYPE_FDDI;
-			memcpy(&hw->hbuf[1], sll->sll_addr, 6);
-			break;
-		case ARPHRD_INFINIBAND:
-			dup = strdup(name);
-			/* Aliased infiniband interface is special case where
-			 * neither get_ll() nor ioctl_get_ll() get's correct hw
-			 * address, so we have to truncate the :0 and run
-			 * get_ll() again for the rest.
-			*/
-			if ((colon = strchr(dup, ':')) != NULL) {
-				*colon = '\0';
-
-				if (sll_allocated) {
-					dfree(sll, MDL);
-					sll_allocated = 0;
-				}
-				if ((sll = get_ll(ifaddrs, &ifa, dup)) == NULL)
-					log_fatal("Error getting hardware address for \"%s\": %m", name);
-			}
-			free (dup);
-			/* For Infiniband, save the broadcast address and store
-			 * the port GUID into the hardware address.
-			 */
-			if (ifa && (ifa->ifa_flags & IFF_BROADCAST)) {
-				struct sockaddr_ll *bll;
-
-				bll = (struct sockaddr_ll *)ifa->ifa_broadaddr;
-				memcpy(&info->bcast_addr, bll->sll_addr, 20);
-			} else {
-				memcpy(&info->bcast_addr, default_ib_bcast_addr,
-				       20);
-			}
-
-			hw->hlen = HARDWARE_ADDR_LEN_IOCTL + 1;
-			hw->hbuf[0] = HTYPE_INFINIBAND;
-			memcpy(&hw->hbuf[1],
-			       &sll->sll_addr[sll->sll_halen - HARDWARE_ADDR_LEN_IOCTL],
-			       HARDWARE_ADDR_LEN_IOCTL);
-			break;
-#if defined(ARPHRD_PPP)
-		case ARPHRD_PPP:
-			if (local_family != AF_INET6)
-				log_fatal("local_family != AF_INET6 for \"%s\"",
-					  name);
-			hw->hlen = 0;
-			hw->hbuf[0] = HTYPE_RESERVED;
-			/* 0xdeadbeef should never occur on the wire,
-			 * and is a signature that something went wrong.
-			 */
-			hw->hbuf[1] = 0xde;
-			hw->hbuf[2] = 0xad;
-			hw->hbuf[3] = 0xbe;
-			hw->hbuf[4] = 0xef;
-			break;
-#endif
-        default:
-          log_error("Unsupported device type %hu for \"%s\"",
-                      sll->sll_hatype, name);
-          result = ISC_R_NOTFOUND;
-
+	if (sll->sll_hatype != HTYPE_UB)
+		result = ISC_R_UNEXPECTED;
+	else {
+		hw->hlen = GUID_LEN + 1;
+		hw->hbuf[0] = HTYPE_UB;
+		get_addr(name, &hw->hbuf[1]);
 	}
 
 	if (sll_allocated)
 		dfree(sll, MDL);
-        return result;
+	return result;
 }
 
 void try_hw_addr2(struct interface_info *info, struct ifaddrs *ifaddrs_start){
@@ -853,8 +857,6 @@ get_hw_addr2(struct interface_info *info)
 	struct ifaddrs *ifa = NULL;
 	struct sockaddr_ll *sll = NULL;
 	int sll_allocated = 0;
-	char *dup = NULL;
-	char *colon = NULL;
         isc_result_t result = ISC_R_SUCCESS;
         
 	if (getifaddrs(&ifaddrs) == -1)
@@ -873,83 +875,17 @@ get_hw_addr2(struct interface_info *info)
 			log_fatal("Unexpected internal error");
 	}
 
-	switch (sll->sll_hatype) {
-		case ARPHRD_ETHER:
-			hw->hlen = 7;
-			hw->hbuf[0] = HTYPE_ETHER;
-			memcpy(&hw->hbuf[1], sll->sll_addr, 6);
-			break;
-		case ARPHRD_IEEE802:
-#ifdef ARPHRD_IEEE802_TR
-		case ARPHRD_IEEE802_TR:
-#endif /* ARPHRD_IEEE802_TR */
-			hw->hlen = 7;
-			hw->hbuf[0] = HTYPE_IEEE802;
-			memcpy(&hw->hbuf[1], sll->sll_addr, 6);
-			break;
-		case ARPHRD_FDDI:
-			hw->hlen = 7;
-			hw->hbuf[0] = HTYPE_FDDI;
-			memcpy(&hw->hbuf[1], sll->sll_addr, 6);
-			break;
-		case ARPHRD_INFINIBAND:
-			dup = strdup(name);
-			/* Aliased infiniband interface is special case where
-			 * neither get_ll() nor ioctl_get_ll() get's correct hw
-			 * address, so we have to truncate the :0 and run
-			 * get_ll() again for the rest.
-			*/
-			if ((colon = strchr(dup, ':')) != NULL) {
-				*colon = '\0';
-				if ((sll = get_ll(ifaddrs, &ifa, dup)) == NULL)
-					log_fatal("Error getting hardware address for \"%s\": %m", name);
-			}
-			free (dup);
-			/* For Infiniband, save the broadcast address and store
-			 * the port GUID into the hardware address.
-			 */
-			if (ifa && (ifa->ifa_flags & IFF_BROADCAST)) {
-				struct sockaddr_ll *bll;
-
-				bll = (struct sockaddr_ll *)ifa->ifa_broadaddr;
-				memcpy(&info->bcast_addr, bll->sll_addr, 20);
-			} else {
-				memcpy(&info->bcast_addr, default_ib_bcast_addr,
-				       20);
-			}
-
-			hw->hlen = HARDWARE_ADDR_LEN_IOCTL + 1;
-			hw->hbuf[0] = HTYPE_INFINIBAND;
-			memcpy(&hw->hbuf[1],
-			       &sll->sll_addr[sll->sll_halen - HARDWARE_ADDR_LEN_IOCTL],
-			       HARDWARE_ADDR_LEN_IOCTL);
-			break;
-#if defined(ARPHRD_PPP)
-		case ARPHRD_PPP:
-			if (local_family != AF_INET6)
-				log_fatal("local_family != AF_INET6 for \"%s\"",
-					  name);
-			hw->hlen = 0;
-			hw->hbuf[0] = HTYPE_RESERVED;
-			/* 0xdeadbeef should never occur on the wire,
-			 * and is a signature that something went wrong.
-			 */
-			hw->hbuf[1] = 0xde;
-			hw->hbuf[2] = 0xad;
-			hw->hbuf[3] = 0xbe;
-			hw->hbuf[4] = 0xef;
-			break;
-#endif
-        default:
-          log_error("Unsupported device type %hu for \"%s\"",
-                      sll->sll_hatype, name);
-          result = ISC_R_NOTFOUND;
-
+	if (sll->sll_hatype != HTYPE_UB)
+		result = ISC_R_UNEXPECTED;
+	else {
+		hw->hlen = GUID_LEN + 1;
+		hw->hbuf[0] = HTYPE_UB;
+		get_addr(name, &hw->hbuf[1]);
 	}
 
 	if (sll_allocated)
 		dfree(sll, MDL);
 	freeifaddrs(ifaddrs);
-        return result;
+	return result;
 }
 #endif

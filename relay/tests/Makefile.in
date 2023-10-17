@@ -107,8 +107,8 @@ am__objects_1 = dhcrelay.$(OBJEXT)
 @HAVE_ATF_TRUE@	relay_unittests.$(OBJEXT)
 relay_unittests_OBJECTS = $(am_relay_unittests_OBJECTS)
 am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 = $(top_builddir)/common/libdhcp.@A@ \
-	$(top_builddir)/omapip/libomapi.@A@
+am__DEPENDENCIES_2 = $(top_builddir)/common/libub-dhcp.@A@ \
+	$(top_builddir)/omapip/libub-omapi.@A@
 @HAVE_ATF_TRUE@relay_unittests_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 @HAVE_ATF_TRUE@	$(am__DEPENDENCIES_2)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -344,8 +344,8 @@ AM_CPPFLAGS = $(ATF_CFLAGS) -DUNIT_TEST -I$(top_srcdir)/includes \
 	-I@BINDDIR@/include -I$(top_srcdir) -DLOCALSTATEDIR='"."'
 EXTRA_DIST = Atffile Kyuafile
 DHCPSRC = ../dhcrelay.c
-DHCPLIBS = $(top_builddir)/common/libdhcp.@A@ \
-	  $(top_builddir)/omapip/libomapi.@A@    \
+DHCPLIBS = $(top_builddir)/common/libub-dhcp.@A@ \
+	  $(top_builddir)/omapip/libub-omapi.@A@    \
 	  @BINDLIBIRSDIR@/libirs.@A@ \
 	  @BINDLIBDNSDIR@/libdns.@A@ \
 	  @BINDLIBISCCFGDIR@/libisccfg.@A@ \

@@ -130,7 +130,7 @@ int buf_size = 128;
 extern struct option *default_requested_options[];
 
 void run_stateless(int exit_mode, u_int16_t port);
-
+static void show_ubpkt(int argc, int *index, char **argv);
 static isc_result_t write_duid(struct data_string *duid);
 static void add_reject(struct packet *packet);
 
@@ -214,8 +214,6 @@ static const char use_v6command[] = "Command not used for DHCPv4: %s";
   
 #define DHCLIENT_USAGEH "{--version|--help|-h}"
 
-static void setup_ib_interface(struct interface_info *ip);
-
 static void
 usage(const char *sfmt, const char *sarg)
 {
@@ -239,6 +237,29 @@ usage(const char *sfmt, const char *sarg)
 }
 
 extern void initialize_client_option_spaces();
+
+static void init_packet_record(struct packet_record *pkt_rcd)
+{
+	int i, j;
+
+	memset(pkt_rcd, 0, sizeof(struct packet_record));
+
+	for (i = 0; i < PACKET_TYPE_NUM; i++) {
+		pkt_rcd->pkt_record_list[i] =
+			(struct send_receive_counter *)malloc(sizeof(struct send_receive_counter));
+		if (pkt_rcd->pkt_record_list[i] == NULL) {
+			log_fatal("%s:%d failed to alloc pkt_record_list[%d]'s memory.\n", MDL, i);
+			goto alloc_mem_err;
+		}
+		memset(pkt_rcd->pkt_record_list[i], 0, sizeof(struct send_receive_counter));
+	}
+	return;
+alloc_mem_err:
+	for (j = i - 1; j >= 0; j--) {
+		free(pkt_rcd->pkt_record_list[j]);
+		pkt_rcd->pkt_record_list[j] = NULL;
+	}
+}
 
 int
 main(int argc, char **argv) {
@@ -287,6 +308,8 @@ main(int argc, char **argv) {
 
 	/* Initialize client globals. */
 	memset(&default_duid, 0, sizeof(default_duid));
+
+	init_packet_record(&dhcp_pkt_rcd);
 
 	/* Make sure that file descriptors 0 (stdin), 1, (stdout), and
 	   2 (stderr) are open. To do this, we assume that when we
@@ -598,6 +621,16 @@ main(int argc, char **argv) {
 		} else if (!strcmp(argv[i], "-I")) {
 			/* enable standard DHCID support for DDNS updates */
 			std_dhcid = 1;
+		} else if (!strcmp(argv[i], "-show")) {
+			if (++i == argc)
+				usage(use_noarg, argv[i-1]);
+			if (!strcasecmp(argv[i], "txpkts")) {
+				print_level = PRINT_TXPKTS;
+			} else if (!strcasecmp(argv[i], "ubpkt")) {
+				show_ubpkt(argc, &i, argv);
+			} else {
+				usage("Unknown argument to ?: %s", argv[i]);
+			}
 		} else if (!strcmp(argv[i], "-v")) {
 			quiet = 0;
 		} else if (!strcmp(argv[i], "-C")) {
@@ -693,24 +726,26 @@ main(int argc, char **argv) {
 			usage("No interfaces command -n and "
 			      " requested interface %s", argv[i]);
 		} else {
-		    struct interface_info *tmp = NULL;
+			struct interface_info *tmp = NULL;
 
-		    status = interface_allocate(&tmp, MDL);
-		    if (status != ISC_R_SUCCESS)
-			log_fatal("Can't record interface %s:%s",
-				  argv[i], isc_result_totext(status));
-		    if (strlen(argv[i]) >= sizeof(tmp->name))
-			    log_fatal("%s: interface name too long (is %ld)",
-				      argv[i], (long)strlen(argv[i]));
-		    strcpy(tmp->name, argv[i]);
-		    if (interfaces) {
-			    interface_reference(&tmp->next,
-						interfaces, MDL);
-			    interface_dereference(&interfaces, MDL);
-		    }
-		    interface_reference(&interfaces, tmp, MDL);
-		    tmp->flags = INTERFACE_REQUESTED;
-		    interfaces_requested++;
+			status = interface_allocate(&tmp, MDL);
+			if (status != ISC_R_SUCCESS)
+				log_fatal("Can't record interface %s:%s",
+					argv[i], isc_result_totext(status));
+			if (strlen(argv[i]) >= sizeof(tmp->name))
+				log_fatal("%s: interface name too long (is %ld)",
+					argv[i], (long)strlen(argv[i]));
+			strcpy(tmp->name, argv[i]);
+			get_hw_addr(tmp);
+			if (tmp->hw_address.hbuf[0] != HTYPE_UB)
+				log_fatal("Unsupported non-ub device for \"%s\"", tmp->name);
+			if (interfaces) {
+				interface_reference(&tmp->next, interfaces, MDL);
+				interface_dereference(&interfaces, MDL);
+			}
+			interface_reference(&interfaces, tmp, MDL);
+			tmp->flags = INTERFACE_REQUESTED;
+			interfaces_requested++;
 		}
 	}
 
@@ -826,11 +861,11 @@ main(int argc, char **argv) {
 			fclose(pidfd);
 		} else {
 			/* handle release for interfaces requested with Red Hat
-			 * /sbin/ifup - pidfile will be /var/run/dhclient-$interface.pid
+			 * /sbin/ifup - pidfile will be /var/run/ub-dhclient-$interface.pid
 			 */
 
 			if ((path_dhclient_pid == NULL) || (*path_dhclient_pid == '\0'))
-				path_dhclient_pid = "/var/run/dhclient.pid";
+				path_dhclient_pid = "/var/run/ub-dhclient.pid";
 
 			char *new_path_dhclient_pid;
 			struct interface_info *ip;
@@ -962,7 +997,7 @@ main(int argc, char **argv) {
 	/* Discover all the network interfaces. */
 	discover_interfaces(DISCOVER_UNCONFIGURED);
 
-	/* Parse the dhclient.conf file. */
+	/* Parse the ub-dhclient.conf file. */
 	read_client_conf();
 
 	/* Stateless special case. */
@@ -1085,7 +1120,7 @@ main(int argc, char **argv) {
 				/* huh ? cannot happen ! */
 				log_fatal("Unable to process -C/-H/-F/--timeout/-V/--request-options configuration arguments");
 
-		/* parse the extra dhclient.conf configuration arguments
+		/* parse the extra ub-dhclient.conf configuration arguments
 		 * into top level config: */
 		struct parse *cfile = (struct parse *)0;
 		const char *val = NULL;
@@ -1151,7 +1186,7 @@ main(int argc, char **argv) {
 	 */
 	if (!interfaces) {
 		/*
-		 * Call dhclient-script with the NBI flag,
+		 * Call ub-dhclient-script with the NBI flag,
 		 * in case somebody cares.
 		 */
 		script_init(NULL, "NBI", NULL);
@@ -1163,7 +1198,7 @@ main(int argc, char **argv) {
 		 */
 		if (!persist) {
 			/* Nothing more to do. */
-			log_info("No broadcast interfaces found - exiting.");
+			log_info("No ub interfaces found - exiting.");
 			finish(0);
 		}
 	} else if (!release_mode && !exit_mode) {
@@ -1270,14 +1305,6 @@ main(int argc, char **argv) {
 		seed += ((unsigned)(cur_tv.tv_usec * 1000000)) + (unsigned)getpid();
 	}
 	srandom(seed);
-
-	/* Setup specific Infiniband options */
-	for (ip = interfaces; ip; ip = ip->next) {
-		if (ip->client &&
-		    (ip->hw_address.hbuf[0] == HTYPE_INFINIBAND)) {
-			setup_ib_interface(ip);
-		}
-	}
 
 	/*
 	 * Establish a default DUID.  We always do so for v6 and
@@ -1553,6 +1580,15 @@ void run_stateless(int exit_mode, u_int16_t port)
 #endif /* DHCPv6 */
 	return;
 }
+
+static void show_ubpkt(int argc, int *index, char **argv)
+{
+	if (++(*index) == argc)
+		usage(use_noarg, *(argv + *index - 1));
+	if (!strcasecmp(*(argv + *index), "info")) {
+		print_level = PRINT_UBPKT_INFO;
+	}
+}
 #endif /* !UNIT_TEST */
 
 isc_result_t find_class (struct class **c,
@@ -1584,29 +1620,6 @@ int find_subnet (struct subnet **sp,
 		 struct iaddr addr, const char *file, int line)
 {
 	return 0;
-}
-
-static void setup_ib_interface(struct interface_info *ip)
-{
-	struct group *g;
-
-	/* Set the broadcast flag */
-	ip->client->config->bootp_broadcast_always = 1;
-
-	/*
-	 * Find out if a dhcp-client-identifier option was specified either
-	 * in the config file or on the command line
-	 */
-	for (g = ip->client->config->on_transmission; g != NULL; g = g->next) {
-		if ((g->statements != NULL) &&
-		    (strcmp(g->statements->data.option->option->name,
-			    "dhcp-client-identifier") == 0)) {
-			return;
-		}
-	}
-
-	/* No client ID specified */
-	log_fatal("dhcp-client-identifier must be specified for InfiniBand");
 }
 
 /* Individual States:
@@ -1938,6 +1951,10 @@ void dhcpack (packet)
 		return;
 	}
 
+#ifdef DEBUG_PACKET
+	dump_raw((unsigned char *)packet -> raw, packet -> packet_length);
+#endif
+
 	log_info ("DHCPACK of %s from %s (xid=0x%x)",
 		  inet_ntoa(packet->raw->yiaddr),
 		  piaddr (packet -> client_addr),
@@ -2080,6 +2097,10 @@ void dhcpack (packet)
 	client -> new -> rebind += cur_time;
 	if (client -> new -> rebind < cur_time)
 		client -> new -> rebind = TIME_MAX;
+
+#ifdef DEBUG_PACKET
+	dump_packet (packet);
+#endif
 
 	bind_lease (client);
 }
@@ -2328,6 +2349,9 @@ void dhcp (packet)
 	const char *type;
 	char addrbuf[4*16];
 	char maskbuf[4*16];
+
+	record_packet_info(&dhcp_pkt_rcd, packet->raw);
+	print_record_info(&dhcp_pkt_rcd, print_level);
 
 	switch (packet -> packet_type) {
 	      case DHCPOFFER:
@@ -2621,10 +2645,6 @@ void dhcpoffer (packet)
 	char obuf [1024];
 	struct timeval tv;
 
-#ifdef DEBUG_PACKET
-	dump_packet (packet);
-#endif
-
 	/* Find a client state that matches the xid... */
 	for (client = ip -> client; client; client = client -> next)
 		if (client -> xid == packet -> raw -> xid)
@@ -2643,6 +2663,10 @@ void dhcpoffer (packet)
 #endif
 		return;
 	}
+
+#ifdef DEBUG_PACKET
+	dump_raw ((unsigned char *)packet -> raw, packet -> packet_length);
+#endif
 
 	sprintf (obuf, "%s of %s from %s", name,
 		 inet_ntoa(packet->raw->yiaddr),
@@ -2706,6 +2730,10 @@ void dhcpoffer (packet)
 
 	/* log it now, so it emits before the request goes out */
 	log_info("%s", obuf);
+
+#ifdef DEBUG_PACKET
+	dump_packet (packet);
+#endif
 
 	/* If this lease was acquired through a BOOTREPLY, record that
 	   fact. */
@@ -2913,6 +2941,10 @@ void dhcpnak (packet)
 		return;
 	}
 
+#ifdef DEBUG_PACKET
+	dump_raw((unsigned char *)packet -> raw, packet -> packet_length);
+#endif
+
 	log_info ("DHCPNAK from %s (xid=0x%x)", piaddr (packet -> client_addr), ntohl(client -> xid));
 
 	if (!client -> active) {
@@ -2922,7 +2954,11 @@ void dhcpnak (packet)
 		return;
 	}
 
-	/* If we get a DHCPNAK, we use the EXPIRE dhclient-script state
+#ifdef DEBUG_PACKET
+	dump_packet(packet);
+#endif
+
+	/* If we get a DHCPNAK, we use the EXPIRE ub-dhclient-script state
 	 * to indicate that we want all old bindings to be removed.  (It
 	 * is possible that we may get a NAK while in the RENEW state,
 	 * so we might have bindings active at that time)
@@ -3070,6 +3106,9 @@ void send_discover (cpp)
 		log_error("%s:%d: Failed to send %d byte long packet over %s "
 			  "interface.", MDL, client->packet_length,
 			  client->interface->name);
+	} else {
+		record_packet_info(&dhcp_pkt_rcd, &client->packet);
+		print_record_info (&dhcp_pkt_rcd, print_level);
 	}
 
 	/*
@@ -3081,6 +3120,10 @@ void send_discover (cpp)
 	tv.tv_sec = cur_tv.tv_sec + client->interval;
 	tv.tv_usec = client->interval > 1 ? random() % 1000000 : cur_tv.tv_usec;
 	add_timeout(&tv, send_discover, client, 0, 0);
+
+#ifdef DEBUG_PACKET
+	dump_packet_send (&client->packet);
+#endif
 }
 
 
@@ -3468,6 +3511,9 @@ void send_request (cpp)
 		  inet_ntoa(destination.sin_addr),
 		  ntohs (destination.sin_port),
                   ntohl(client -> xid));
+#ifdef DEBUG_PACKET
+	dump_packet_send (&client->packet);
+#endif
 
 #if defined(DHCPv6) && defined(DHCP4o6)
 	if (dhcpv4_over_dhcpv6) {
@@ -3481,7 +3527,8 @@ void send_request (cpp)
 		}
 	} else
 #endif
-	if (destination.sin_addr.s_addr != INADDR_BROADCAST &&
+	if (client->interface->hw_address.hbuf[0] != HTYPE_UB &&
+		destination.sin_addr.s_addr != INADDR_BROADCAST &&
 	    fallback_interface) {
 #if defined(SO_BINDTODEVICE)
 		if (setsockopt(fallback_interface -> wfdesc, SOL_SOCKET,
@@ -3520,6 +3567,11 @@ void send_request (cpp)
 				  client->interface->name);
 		}
         }
+
+	if (result >= 0) {
+		record_packet_info(&dhcp_pkt_rcd, &client->packet);
+		print_record_info (&dhcp_pkt_rcd, print_level);
+	}
 
 	tv.tv_sec = cur_tv.tv_sec + client->interval;
 	tv.tv_usec = ((tv.tv_sec - cur_tv.tv_sec) > 1) ?
@@ -3566,7 +3618,14 @@ void send_decline (cpp)
 		log_error("%s:%d: Failed to send %d byte long packet over %s"
 			  " interface.", MDL, client->packet_length,
 			  client->interface->name);
+	} else {
+		record_packet_info(&dhcp_pkt_rcd, &client->packet);
+		print_record_info (&dhcp_pkt_rcd, print_level);
 	}
+
+#ifdef DEBUG_PACKET
+	dump_packet_send (&client->packet);
+#endif
 }
 
 void send_release (cpp)
@@ -3623,7 +3682,7 @@ void send_release (cpp)
 		}
 	} else
 #endif
-	if (fallback_interface) {
+	if (client->interface->hw_address.hbuf[0] != HTYPE_UB && fallback_interface) {
 #if defined(SO_BINDTODEVICE)
 		if (setsockopt(fallback_interface -> wfdesc, SOL_SOCKET,
 			       SO_BINDTODEVICE, client->interface->name,
@@ -3661,6 +3720,15 @@ void send_release (cpp)
 		}
 
         }
+
+	if (result >= 0) {
+		record_packet_info(&dhcp_pkt_rcd, &client->packet);
+		print_record_info (&dhcp_pkt_rcd, print_level);
+	}
+
+#ifdef DEBUG_PACKET
+	dump_packet_send (&client->packet);
+#endif
 }
 
 #if defined(DHCPv6) && defined(DHCP4o6)
@@ -5165,7 +5233,7 @@ int script_go(struct client_state *client)
 		}
 	} else {
 		/* We don't want to pass an open file descriptor for
-		 * dhclient.leases when executing dhclient-script.
+		 * ub-dhclient.leases when executing ub-dhclient-script.
 		 */
 		if (leaseFile != NULL)
 			fclose(leaseFile);

@@ -9,7 +9,7 @@ ISC DHCP is currently licensed under the MPL2.0 license.
 
 **NOTE**: The client (dhclient) and relay (dhcrelay) component maintenance is coming to an end.
 The 4.4.3 release is the last one that included those components and they are now considered EOL.
-The 4.5.0 release will feature server (dhcpd) only. You may still submit bugs for a client or
+The 4.5.0 release will feature server (ub-dhcpd) only. You may still submit bugs for a client or
 relay, but those will be kept for informational purposes only. There will not be any action
 taken by ISC team on those.
 

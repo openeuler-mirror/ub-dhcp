@@ -56,7 +56,6 @@
     !defined (USE_SOCKET_RECEIVE) && \
     !defined (USE_RAW_SOCKETS) && \
     !defined (USE_RAW_SEND) && \
-    !defined (USE_SOCKET_RECEIVE) && \
     !defined (USE_BPF) && \
     !defined (USE_BPF_SEND) && \
     !defined (USE_BPF_RECEIVE) && \
@@ -69,12 +68,8 @@
     !defined (USE_DLPI_SEND) && \
     !defined (USE_DLPI_RECEIVE)
 /* Determine default socket API to USE. */
-# if defined(HAVE_BPF)
-#  define USE_BPF 1
-# elif defined(HAVE_LPF)
+# if defined(HAVE_LPF)
 #  define USE_LPF 1
-# elif defined(HAVE_DLPI)
-#  define USE_DLPI 1
 # endif
 #endif
 
@@ -103,8 +98,6 @@
 #    define USE_DLPI_HWADDR
 #  elif defined(HAVE_LPF)
 #    define USE_LPF_HWADDR
-#  elif defined(HAVE_BPF)
-#    define USE_BPF_HWADDR
 #  endif
 #endif
 
@@ -113,29 +106,9 @@
 #  define USE_SOCKET_RECEIVE
 #endif
 
-#ifdef USE_BPF
-#  define USE_BPF_SEND
-#  define USE_BPF_RECEIVE
-#endif
-
 #ifdef USE_LPF
 #  define USE_LPF_SEND
 #  define USE_LPF_RECEIVE
-#endif
-
-#ifdef USE_NIT
-#  define USE_NIT_SEND
-#  define USE_NIT_RECEIVE
-#endif
-
-#ifdef USE_DLPI
-#  define USE_DLPI_SEND
-#  define USE_DLPI_RECEIVE
-#endif
-
-#ifdef USE_UPF
-#  define USE_UPF_SEND
-#  define USE_UPF_RECEIVE
 #endif
 
 #if defined (SO_BINDTODEVICE) && !defined (HAVE_SO_BINDTODEVICE)

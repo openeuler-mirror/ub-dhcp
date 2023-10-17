@@ -11,14 +11,14 @@ case $state in
 	then
 		exit
 	fi
-	if [ -f @PREFIX@/sbin/dhcpd ]; then
+	if [ -f @PREFIX@/sbin/ub-dhcpd ]; then
 		echo "Starting the ISC DHCP server"
-		@PREFIX@/sbin/dhcpd
+		@PREFIX@/sbin/ub-dhcpd
 	fi
 	;;
 'stop')
-	if [ -f @PREFIX@/etc/dhcpd.pid ]; then
-		PID=`cat @PREFIX@/etc/dhcpd.pid`
+	if [ -f @PREFIX@/etc/ub-dhcpd.pid ]; then
+		PID=`cat @PREFIX@/etc/ub-dhcpd.pid`
 		if [ -d /proc/$PID ]; then
 			echo "Stopping the ISC DHCP server"
 			kill $PID

@@ -1,4 +1,4 @@
-.\"	$Id: dhcp-options.5,v 1.50 2011/05/20 13:48:32 tomasz Exp $
+.\"	$Id: ub-dhcp-options.5,v 1.50 2011/05/20 13:48:32 tomasz Exp $
 .\"
 .\" Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
 .\" Copyright (c) 1996-2003 by Internet Software Consortium
@@ -24,9 +24,9 @@
 .\" Support and other services are available for ISC products - see
 .\" https://www.isc.org for more information or to learn more about ISC.
 .\"
-.TH dhcp-options 5
+.TH ub-dhcp-options 5
 .SH NAME
-dhcp-options - Dynamic Host Configuration Protocol options
+ub-dhcp-options - Dynamic Host Configuration Protocol options
 .SH DESCRIPTION
 The Dynamic Host Configuration protocol allows the client to receive
 .B options
@@ -141,7 +141,7 @@ Subnet number   Subnet mask      Destination descriptor
 Sometimes it's helpful to be able to set the value of a DHCP option
 based on some value that the client has sent.  To do this, you can
 use expression evaluation.  The
-.B dhcp-eval(5)
+.B ub-dhcp-eval(5)
 manual page describes how to write expressions.  To assign the result
 of an evaluation to an option, define the option as follows:
 .nf
@@ -339,7 +339,7 @@ the lease time it is willing to offer.
 .PP
 This option is not directly user configurable in the server; refer to the
 \fImax-lease-time\fR and \fIdefault-lease-time\fR server options in
-.B dhcpd.conf(5).
+.B ub-dhcpd.conf(5).
 .RE
 .PP
 .B option \fBdhcp-max-message-size\fR \fIuint16\fR\fB;\fR
@@ -553,7 +553,7 @@ This option specifies the name of the client.  The name may or may
 not be qualified with the local domain name (it is preferable to use
 the domain-name option to specify the domain name).  See RFC 1035 for
 character set restrictions.  This option is only honored by
-.B dhclient-script(8)
+.B ub-dhclient-script(8)
 if the hostname for the client machine is not set.
 .RE
 .PP
@@ -1098,14 +1098,14 @@ popular DHCP clients, for example the Microsoft DHCP client.
 .PP
 NOTE to Fedora dhclient users:
 .br
-dhclient-script interprets trailing 0 octets of the target as indicating
+ub-dhclient-script interprets trailing 0 octets of the target as indicating
 the subnet class of the route, so for the following static-routes value:
 .br
         option static-routes 172.0.0.0 172.16.2.254,
 .br
                              192.168.0.0 192.168.2.254;
 .br
-dhclient-script will create routes:
+ub-dhclient-script will create routes:
 .br
         172/8 via 172.16.2.254 dev $interface
 .br
@@ -1659,7 +1659,7 @@ be configured.
 The Option Request Option ("ORO") is the DHCPv6 equivalent of the
 parameter-request-list.  Clients supply this option to ask servers
 to reply with options relevant to their needs and use.  This option
-must not be directly configured, the request syntax in dhclient.conf (5)
+must not be directly configured, the request syntax in ub-dhclient.conf (5)
 should be used instead.
 .RE
 .PP
@@ -1811,7 +1811,7 @@ the "search" line in /etc/resolv.conf.
 .PP
 The \fBia-pd\fR option is manufactured by clients and servers to create a
 Prefix Delegation binding - to delegate an IPv6 prefix to the client.  It is
-not directly edited in dhcpd.conf(5) or dhclient.conf(5), but rather is
+not directly edited in ub-dhcpd.conf(5) or ub-dhclient.conf(5), but rather is
 manufactured and consumed by the software.
 .RE
 .PP
@@ -1820,7 +1820,7 @@ manufactured and consumed by the software.
 .PP
 The \fBia-prefix\fR option is placed inside \fBia-pd\fR options in order
 to identify the prefix(es) allocated to the client.  It is not directly
-edited in dhcpd.conf(5) or dhclient.conf(5), but rather is
+edited in ub-dhcpd.conf(5) or ub-dhclient.conf(5), but rather is
 manufactured and consumed by the software.
 .RE
 .PP
@@ -2389,7 +2389,7 @@ keyword only controls whether or not transmitted packets are compressed.
 Note that when
 .B domain-list
 formatted options are output as environment variables to
-.B dhclient-script(8),
+.B ub-dhclient-script(8),
 the standard DNS \-escape mechanism is used: they are decimal.  This is
 appropriate for direct use in eg /etc/resolv.conf.
 .nf
@@ -2607,8 +2607,9 @@ option.  This is a limitation of that option - the DHCPv4 VIVSO and the
 DHCPv6 VSIO options can have multiple vendor definitions all at once (even
 transmitted to the same client), so it is not necessary to configure this.
 .SH SEE ALSO
-dhcpd.conf(5), dhcpd.leases(5), dhclient.conf(5), dhcp-eval(5), dhcpd(8),
-dhclient(8), RFC2132, RFC2131, RFC3046, RFC3315.
+ub-dhcpd.conf(5), ub-dhcpd.leases(5), ub-dhclient.conf(5), ub-dhcp-eval(5), ub-dhcpd(8),
+ub-dhclient(8), RFC2132, RFC2131, RFC3046, RFC3315.
 .SH AUTHOR
 Information about Internet Systems Consortium can be found at
 .B https://www.isc.org.
+

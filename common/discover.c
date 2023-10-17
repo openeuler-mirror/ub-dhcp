@@ -3,6 +3,7 @@
    Find and identify the network interfaces. */
 
 /*
+ * Copyright (c) 2023-2023 Hisilicon Limited.
  * Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1995-2003 by Internet Software Consortium
  *
@@ -570,6 +571,7 @@ add_ipv6_addr_to_interface(struct interface_info *iface,
 void
 discover_interfaces(int state) {
 	struct iface_conf_list ifaces;
+	struct interface_info iface;
 	struct iface_info info;
 	int err;
 
@@ -618,27 +620,21 @@ discover_interfaces(int state) {
 
 	/* Cycle through the list of interfaces looking for IP addresses. */
 	while (next_iface(&info, &err, &ifaces)) {
-
+		memset(&iface, 0, sizeof(struct interface_info));
+		memcpy(iface.name, info.name, sizeof(iface.name));
+		get_hw_addr(&iface);
+		if (iface.hw_address.hbuf[0] != HTYPE_UB)
+			continue;
 		/* See if we've seen an interface that matches this one. */
 		for (tmp = interfaces; tmp; tmp = tmp->next) {
 			if (!strcmp(tmp->name, info.name))
 				break;
 		}
 
-		/* Skip non broadcast interfaces (plus loopback and
-		   point-to-point in case an OS incorrectly marks them
-		   as broadcast). Also skip down interfaces unless we're
+		/* Skip loopback interfaces. Also skip down interfaces unless we're
 		   trying to get a list of configurable interfaces. */
-		if ((((local_family == AF_INET &&
-		    !(info.flags & IFF_BROADCAST)) ||
-#ifdef DHCPv6
-		    (local_family == AF_INET6 &&
-		    !(info.flags & IFF_MULTICAST)) ||
-#endif
-		      info.flags & IFF_LOOPBACK ||
-		      info.flags & IFF_POINTOPOINT) && !tmp) ||
-		    (!(info.flags & IFF_UP) &&
-		     state != DISCOVER_UNCONFIGURED))
+		if (((info.flags & IFF_LOOPBACK) && !tmp) ||
+		    (!(info.flags & IFF_UP) && state != DISCOVER_UNCONFIGURED))
 			continue;
 
 		/* If there isn't already an interface by this name,
@@ -842,7 +838,7 @@ discover_interfaces(int state) {
 					   "a subnet6 declaration" :
 #endif
 					   "a subnet declaration");
-				log_info ("   in your dhcpd.conf file %s",
+				log_info ("   in your ub-dhcpd.conf file %s",
 					   "for the network segment");
 				log_info ("   to %s %s %s",
 					   "which interface",
@@ -909,6 +905,10 @@ discover_interfaces(int state) {
 			break;
 #ifdef DHCPv6
 		case AF_INET6:
+			if (if_register_ub6(tmp) > 0) {
+				break;
+			}
+
 			if ((state == DISCOVER_SERVER) ||
 			    (state == DISCOVER_RELAY)) {
 				if_register6(tmp, 1);
@@ -1033,7 +1033,8 @@ discover_interfaces(int state) {
 	if ((local_family == AF_INET) &&
 	    !setup_fallback && !dhcpv4_over_dhcpv6) {
 		setup_fallback = 1;
-		maybe_setup_fallback();
+		if (state == DISCOVER_RELAY)
+			maybe_setup_fallback();
 	}
 
 #if defined (F_SETFD)

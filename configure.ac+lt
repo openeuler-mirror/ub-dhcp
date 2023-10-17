@@ -318,10 +318,10 @@ AC_SUBST(DISTCHECK_ATF_CONFIGURE_FLAG)
 ### the user configures an alternate value).  LOCALSTATEDIR is totally
 ### braindead.  No one uses /usr/local/var/db/ nor /usr/local/var/run, and
 ### they would be insane for suggesting it.  We need to look in /var/for
-### 'db' and 'state/dhcp' for db files, and /var/run for pid files by
+### 'db' and 'state/ub-dhcp' for db files, and /var/run for pid files by
 ### default.
 ###
-AC_PREFIX_PROGRAM(dhcpd)
+AC_PREFIX_PROGRAM(ub-dhcpd)
 
 # XXX - isn't there SOME WAY to default autoconf to /var instead of
 # /usr/local/var/no/one/has/this/please/stop/trying?
@@ -333,160 +333,160 @@ esac
 
 # Default server configuration file.
 AC_ARG_WITH(srv-conf-file,
-	AS_HELP_STRING([--with-srv-conf-file=PATH],[Default file containing dhcpd configuration
-		        (default is typically /etc/dhcpd.conf)]),
+	AS_HELP_STRING([--with-srv-conf-file=PATH],[Default file containing ub-dhcpd configuration
+		        (default is typically /etc/ub-dhcpd.conf)]),
 	AC_DEFINE_UNQUOTED([_PATH_DHCPD_CONF], ["$withval"],
-			   [Default file containing dhcpd configuration.]))
+			   [Default file containing ub-dhcpd configuration.]))
 
 # Allow specification of alternate state files
 AC_ARG_WITH(srv-lease-file,
-	AS_HELP_STRING([--with-srv-lease-file=PATH],[File for dhcpd leases
-		        (default is LOCALSTATEDIR/db/dhcpd.leases)]),
+	AS_HELP_STRING([--with-srv-lease-file=PATH],[File for ub-dhcpd leases
+		        (default is LOCALSTATEDIR/db/ub-dhcpd.leases)]),
 	AC_DEFINE_UNQUOTED([_PATH_DHCPD_DB], ["$withval"],
-			   [File for dhcpd leases.]))
+			   [File for ub-dhcpd leases.]))
 
-AC_MSG_CHECKING([for dhcpd.leases location])
+AC_MSG_CHECKING([for ub-dhcpd.leases location])
 if [[ "x$with_srv_lease_file" = "x" ]] ; then
 	if [[ -d "${localstatedir}/db" ]] ; then
-		with_srv_lease_file="${localstatedir}/db/dhcpd.leases"
+		with_srv_lease_file="${localstatedir}/db/ub-dhcpd.leases"
 	elif [[ -d "${localstatedir}/state" ]] ; then
-		if [[ -d "${localstatedir}/state/dhcp" ]] ; then
-			with_srv_lease_file="${localstatedir}/state/dhcp/dhcpd.leases"
+		if [[ -d "${localstatedir}/state/ub-dhcp" ]] ; then
+			with_srv_lease_file="${localstatedir}/state/ub-dhcp/ub-dhcpd.leases"
 		else
-			with_srv_lease_file="${localstatedir}/state/dhcpd.leases"
+			with_srv_lease_file="${localstatedir}/state/ub-dhcpd.leases"
 		fi
 	elif [[ -d "${localstatedir}/lib" ]] ; then
-		if [[ -d "${localstatedir}/lib/dhcp" ]] ; then
-			with_srv_lease_file="${localstatedir}/lib/dhcp/dhcpd.leases"
+		if [[ -d "${localstatedir}/lib/ub-dhcp" ]] ; then
+			with_srv_lease_file="${localstatedir}/lib/ub-dhcp/ub-dhcpd.leases"
 		else
-			with_srv_lease_file="${localstatedir}/lib/dhcpd.leases"
+			with_srv_lease_file="${localstatedir}/lib/ub-dhcpd.leases"
 		fi
 	elif [[ -d "${localstatedir}/etc" ]] ; then
-		with_srv_lease_file="${localstatedir}/etc/dhcpd.leases"
+		with_srv_lease_file="${localstatedir}/etc/ub-dhcpd.leases"
 	else
-		with_srv_lease_file="/etc/dhcpd.leases"
+		with_srv_lease_file="/etc/ub-dhcpd.leases"
 	fi
 fi
 AC_MSG_RESULT($with_srv_lease_file)
 
 AC_ARG_WITH(srv6-lease-file,
 	AS_HELP_STRING([--with-srv6-lease-file=PATH],[File for dhcpd6 leases
-		        (default is LOCALSTATEDIR/db/dhcpd6.leases)]),
+		        (default is LOCALSTATEDIR/db/ub-dhcpd6.leases)]),
 	AC_DEFINE_UNQUOTED([_PATH_DHCPD6_DB], ["$withval"],
 			   [File for dhcpd6 leases.]))
 
-AC_MSG_CHECKING([for dhcpd6.leases location])
+AC_MSG_CHECKING([for ub-dhcpd6.leases location])
 if [[ "x$with_srv6_lease_file" = "x" ]] ; then
 	if [[ -d "${localstatedir}/db" ]] ; then
-		with_srv6_lease_file="${localstatedir}/db/dhcpd6.leases"
+		with_srv6_lease_file="${localstatedir}/db/ub-dhcpd6.leases"
 	elif [[ -d "${localstatedir}/state" ]] ; then
-		if [[ -d "${localstatedir}/state/dhcp" ]] ; then
-			with_srv6_lease_file="${localstatedir}/state/dhcp/dhcpd6.leases"
+		if [[ -d "${localstatedir}/state/ub-dhcp" ]] ; then
+			with_srv6_lease_file="${localstatedir}/state/ub-dhcp/ub-dhcpd6.leases"
 		else
-			with_srv6_lease_file="${localstatedir}/state/dhcpd6.leases"
+			with_srv6_lease_file="${localstatedir}/state/ub-dhcpd6.leases"
 		fi
 	elif [[ -d "${localstatedir}/lib" ]] ; then
-		if [[ -d "${localstatedir}/lib/dhcp" ]] ; then
-			with_srv6_lease_file="${localstatedir}/lib/dhcp/dhcpd6.leases"
+		if [[ -d "${localstatedir}/lib/ub-dhcp" ]] ; then
+			with_srv6_lease_file="${localstatedir}/lib/ub-dhcp/ub-dhcpd6.leases"
 		else
-			with_srv6_lease_file="${localstatedir}/lib/dhcpd6.leases"
+			with_srv6_lease_file="${localstatedir}/lib/ub-dhcpd6.leases"
 		fi
 	elif [[ -d "${localstatedir}/etc" ]] ; then
-		with_srv6_lease_file="${localstatedir}/etc/dhcpd6.leases"
+		with_srv6_lease_file="${localstatedir}/etc/ub-dhcpd6.leases"
 	else
-		with_srv6_lease_file="/etc/dhcpd6.leases"
+		with_srv6_lease_file="/etc/ub-dhcpd6.leases"
 	fi
 fi
 AC_MSG_RESULT($with_srv6_lease_file)
 
 AC_ARG_WITH(cli-lease-file,
-	AS_HELP_STRING([--with-cli-lease-file=PATH],[File for dhclient leases
-		        (default is LOCALSTATEDIR/db/dhclient.leases)]),
+	AS_HELP_STRING([--with-cli-lease-file=PATH],[File for ub-dhclient leases
+		        (default is LOCALSTATEDIR/db/ub-dhclient.leases)]),
 	AC_DEFINE_UNQUOTED([_PATH_DHCLIENT_DB], ["$withval"],
-			   [File for dhclient leases.]))
+			   [File for ub-dhclient leases.]))
 
-AC_MSG_CHECKING([for dhclient.leases location])
+AC_MSG_CHECKING([for ub-dhclient.leases location])
 if [[ "x$with_cli_lease_file" = "x" ]] ; then
 	if [[ -d "${localstatedir}/db" ]] ; then
-		with_cli_lease_file="${localstatedir}/db/dhclient.leases"
+		with_cli_lease_file="${localstatedir}/db/ub-dhclient.leases"
 	elif [[ -d "${localstatedir}/state" ]] ; then
-		if [[ -d "${localstatedir}/state/dhcp" ]] ; then
-			with_cli_lease_file="${localstatedir}/state/dhcp/dhclient.leases"
+		if [[ -d "${localstatedir}/state/ub-dhcp" ]] ; then
+			with_cli_lease_file="${localstatedir}/state/ub-dhcp/ub-dhclient.leases"
 		else
-			with_cli_lease_file="${localstatedir}/state/dhclient.leases"
+			with_cli_lease_file="${localstatedir}/state/ub-dhclient.leases"
 		fi
 	elif [[ -d "${localstatedir}/lib" ]] ; then
-		if [[ -d "${localstatedir}/lib/dhcp" ]] ; then
-			with_cli_lease_file="${localstatedir}/lib/dhcp/dhclient.leases"
+		if [[ -d "${localstatedir}/lib/ub-dhcp" ]] ; then
+			with_cli_lease_file="${localstatedir}/lib/ub-dhcp/ub-dhclient.leases"
 		else
-			with_cli_lease_file="${localstatedir}/lib/dhclient.leases"
+			with_cli_lease_file="${localstatedir}/lib/ub-dhclient.leases"
 		fi
 	elif [[ -d "${localstatedir}/etc" ]] ; then
-		with_cli_lease_file="${localstatedir}/etc/dhclient.leases"
+		with_cli_lease_file="${localstatedir}/etc/ub-dhclient.leases"
 	else
-		with_cli_lease_file="/etc/dhclient.leases"
+		with_cli_lease_file="/etc/ub-dhclient.leases"
 	fi
 fi
 AC_MSG_RESULT($with_cli_lease_file)
 
 AC_ARG_WITH(cli6-lease-file,
 	AS_HELP_STRING([--with-cli6-lease-file=PATH],[File for dhclient6 leases
-		        (default is LOCALSTATEDIR/db/dhclient6.leases)]),
+		        (default is LOCALSTATEDIR/db/ub-dhclient6.leases)]),
 	AC_DEFINE_UNQUOTED([_PATH_DHCLIENT6_DB], ["$withval"],
 			   [File for dhclient6 leases.]))
 
-AC_MSG_CHECKING([for dhclient6.leases location])
+AC_MSG_CHECKING([for ub-dhclient6.leases location])
 if [[ "x$with_cli6_lease_file" = "x" ]] ; then
 	if [[ -d "${localstatedir}/db" ]] ; then
-		with_cli6_lease_file="${localstatedir}/db/dhclient6.leases"
+		with_cli6_lease_file="${localstatedir}/db/ub-dhclient6.leases"
 	elif [[ -d "${localstatedir}/state" ]] ; then
-		if [[ -d "${localstatedir}/state/dhcp" ]] ; then
-			with_cli6_lease_file="${localstatedir}/state/dhcp/dhclient6.leases"
+		if [[ -d "${localstatedir}/state/ub-dhcp" ]] ; then
+			with_cli6_lease_file="${localstatedir}/state/ub-dhcp/ub-dhclient6.leases"
 		else
-			with_cli6_lease_file="${localstatedir}/state/dhclient6.leases"
+			with_cli6_lease_file="${localstatedir}/state/ub-dhclient6.leases"
 		fi
 	elif [[ -d "${localstatedir}/lib" ]] ; then
-		if [[ -d "${localstatedir}/lib/dhcp" ]] ; then
-			with_cli6_lease_file="${localstatedir}/lib/dhcp/dhclient6.leases"
+		if [[ -d "${localstatedir}/lib/ub-dhcp" ]] ; then
+			with_cli6_lease_file="${localstatedir}/lib/ub-dhcp/ub-dhclient6.leases"
 		else
-			with_cli6_lease_file="${localstatedir}/lib/dhclient6.leases"
+			with_cli6_lease_file="${localstatedir}/lib/ub-dhclient6.leases"
 		fi
 	elif [[ -d "${localstatedir}/etc" ]] ; then
-		with_cli6_lease_file="${localstatedir}/etc/dhclient6.leases"
+		with_cli6_lease_file="${localstatedir}/etc/ub-dhclient6.leases"
 	else
-		with_cli6_lease_file="/etc/dhclient6.leases"
+		with_cli6_lease_file="/etc/ub-dhclient6.leases"
 	fi
 fi
 AC_MSG_RESULT($with_cli6_lease_file)
 
 AC_ARG_WITH(srv-pid-file,
-	AS_HELP_STRING([--with-srv-pid-file=PATH],[File for dhcpd process information
-		        (default is LOCALSTATEDIR/run/dhcpd.pid)]),
+	AS_HELP_STRING([--with-srv-pid-file=PATH],[File for ub-dhcpd process information
+		        (default is LOCALSTATEDIR/run/ub-dhcpd.pid)]),
 	AC_DEFINE_UNQUOTED([_PATH_DHCPD_PID], ["$withval"],
-			   [File for dhcpd process information.]))
+			   [File for ub-dhcpd process information.]))
 AC_ARG_WITH(srv6-pid-file,
 	AS_HELP_STRING([--with-srv6-pid-file=PATH],[File for dhcpd6 process information
-		        (default is LOCALSTATEDIR/run/dhcpd6.pid)]),
+		        (default is LOCALSTATEDIR/run/ub-dhcpd6.pid)]),
 	AC_DEFINE_UNQUOTED([_PATH_DHCPD6_PID], ["$withval"],
 			   [File for dhcpd6 process information.]))
 AC_ARG_WITH(cli-pid-file,
-	AS_HELP_STRING([--with-cli-pid-file=PATH],[File for dhclient process information
-		        (default is LOCALSTATEDIR/run/dhclient.pid)]),
+	AS_HELP_STRING([--with-cli-pid-file=PATH],[File for ub-dhclient process information
+		        (default is LOCALSTATEDIR/run/ub-dhclient.pid)]),
 	AC_DEFINE_UNQUOTED([_PATH_DHCLIENT_PID], ["$withval"],
-			   [File for dhclient process information.]))
+			   [File for ub-dhclient process information.]))
 AC_ARG_WITH(cli6-pid-file,
 	AS_HELP_STRING([--with-cli6-pid-file=PATH],[File for dhclient6 process information
-		        (default is LOCALSTATEDIR/run/dhclient6.pid)]),
+		        (default is LOCALSTATEDIR/run/ub-dhclient6.pid)]),
 	AC_DEFINE_UNQUOTED([_PATH_DHCLIENT6_PID], ["$withval"],
 			   [File for dhclient6 process information.]))
 AC_ARG_WITH(relay-pid-file,
 	AS_HELP_STRING([--with-relay-pid-file=PATH],[File for dhcrelay process information
-		        (default is LOCALSTATEDIR/run/dhcrelay.pid)]),
+		        (default is LOCALSTATEDIR/run/ub-dhcrelay.pid)]),
 	AC_DEFINE_UNQUOTED([_PATH_DHCRELAY_PID], ["$withval"],
 			   [File for dhcrelay process information.]))
 AC_ARG_WITH(relay6-pid-file,
 	AS_HELP_STRING([--with-relay6-pid-file=PATH],[File for dhcrelay6 process information
-		        (default is LOCALSTATEDIR/run/dhcrelay6.pid)]),
+		        (default is LOCALSTATEDIR/run/ub-dhcrelay6.pid)]),
 	AC_DEFINE_UNQUOTED([_PATH_DHCRELAY6_PID], ["$withval"],
 			   [File for dhcrelay6 process information.]))
 
@@ -902,20 +902,20 @@ AM_CONDITIONAL(INSTALL_BIND, test "$want_install_bind" = "yes")
 
 # OpenLDAP support.
 AC_ARG_WITH(ldap,
-    AS_HELP_STRING([--with-ldap],[enable OpenLDAP support in dhcpd (default is no)]),
+    AS_HELP_STRING([--with-ldap],[enable OpenLDAP support in ub-dhcpd (default is no)]),
     [ldap=$withval],
     [ldap=no])
 
 # OpenLDAP with SSL support.
 AC_ARG_WITH(ldapcrypto,
-    AS_HELP_STRING([--with-ldapcrypto],[enable OpenLDAP crypto support in dhcpd (default is no)]),
+    AS_HELP_STRING([--with-ldapcrypto],[enable OpenLDAP crypto support in ub-dhcpd (default is no)]),
     [ldapcrypto=$withval],
     [ldapcrypto=no])
 
 # Gssapi to allow LDAP to authenticate with a keytab
 AC_ARG_WITH(ldap-gssapi,
     AC_HELP_STRING([--with-ldap-gssapi],
-                   [enable krb5/gssapi authentication for OpenLDAP in dhcpd (default is no)]),
+                   [enable krb5/gssapi authentication for OpenLDAP in ub-dhcpd (default is no)]),
     [ldap_gssapi=$withval],
     [ldap_gssapi=no])
 
@@ -923,7 +923,7 @@ AC_ARG_WITH(ldap-gssapi,
 # LDAP CASA auth support.
 AC_ARG_WITH(ldapcasa,
     AC_HELP_STRING([--with-ldapcasa],
-                   [enable LDAP CASA auth support in dhcpd (default is no)]),
+                   [enable LDAP CASA auth support in ub-dhcpd (default is no)]),
     [ldapcasa=$withval],
     [ldapcasa=no])
 

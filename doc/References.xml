@@ -429,7 +429,7 @@
 	reconfigured via dhcp.  The ISC DHCP server implements this option,
 	and the ISC DHCP client is compatible...but does not by default
 	install this option's value.  One would need to make their relevant
-	dhclient-script process this option in a way that is suitable for
+	ub-dhclient-script process this option in a way that is suitable for
 	the system.</t>
 
 	<t><xref target="RFC3004">RFC3004</xref> defines the User-Class
@@ -555,7 +555,7 @@
 	  lease to the state most recently transmitted to its peer,
 	  greatly increasing a server's endurance in
 	  communications-interrupted.  This is supported using a new
-	  'rewind state' record on the dhcpd.leases entry for each
+	  'rewind state' record on the ub-dhcpd.leases entry for each
 	  lease.
 	  </t>
 

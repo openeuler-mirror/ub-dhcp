@@ -3,6 +3,7 @@
    Definitions for address trees... */
 
 /*
+ * Copyright (c) 2023-2023 Hisilicon Limited.
  * Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1996-2003 by Internet Software Consortium
  *
@@ -59,7 +60,7 @@ struct enumeration {
 /* A data buffer with a reference count. */
 struct buffer {
 	int refcnt;
-	unsigned char data [1];
+	unsigned char data [256];   /* 1 is used in DHCPv4 and 256 is used in DHCPv6. */
 };
 
 /* XXX The mechanism by which data strings are returned is currently

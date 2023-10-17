@@ -3,6 +3,7 @@
    Parser for dhcpd config file... */
 
 /*
+ * Copyright (c) 2023-2023 Hisilicon Limited.
  * Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1995-2003 by Internet Software Consortium
  *
@@ -79,7 +80,7 @@ isc_result_t readconf ()
 isc_result_t read_conf_file (const char *filename, struct group *group,
 			     int group_type, int leasep)
 {
-	int file;
+	int file = -1;
 	struct parse *cfile;
 	isc_result_t status;
 #if defined (TRACING)

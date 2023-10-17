@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This script can be installed in /etc/dhclient-enter-hooks to set the client's
+# This script can be installed in /etc/ub-dhclient-enter-hooks to set the client's
 # hostname based either on the hostname that the DHCP server supplied or the
 # hostname in whatever ptr record exists for the assigned IP address.
 

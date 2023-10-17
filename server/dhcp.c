@@ -3,6 +3,7 @@
    DHCP Protocol engine. */
 
 /*
+ * Copyright (c) 2023-2023 Hisilicon Limited.
  * Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1995-2003 by Internet Software Consortium
  *
@@ -649,7 +650,13 @@ void dhcprequest (packet, ms_nulltp, ip_lease)
 		   because the administrator reset it. */
 		if (lease -> binding_state == FTS_RESET &&
 		    !lease_mine_to_reallocate (lease)) {
+#ifdef DEBUG_PACKET
+			dump_raw ((unsigned char *)packet -> raw, packet -> packet_length);
+#endif
 			log_debug ("%s: lease reset by administrator", msgbuf);
+#ifdef DEBUG_PACKET
+			dump_packet (packet);
+#endif
 			nak_lease (packet, &cip, lease->subnet->group);
 			goto out;
 		}
@@ -756,7 +763,13 @@ void dhcprequest (packet, ms_nulltp, ip_lease)
 		   from there. */
 		if (!packet -> shared_network) {
 			if (subnet && subnet -> group -> authoritative) {
+#ifdef DEBUG_PACKET
+				dump_raw ((unsigned char *)packet -> raw, packet -> packet_length);
+#endif
 				log_info ("%s: wrong network.", msgbuf);
+#ifdef DEBUG_PACKET
+				dump_packet (packet);
+#endif
 				nak_lease (packet, &cip, NULL);
 				goto out;
 			}
@@ -775,7 +788,13 @@ void dhcprequest (packet, ms_nulltp, ip_lease)
 					  cip, MDL)) {
 			if (packet -> shared_network -> group -> authoritative)
 			{
+#ifdef DEBUG_PACKET
+				dump_raw ((unsigned char *)packet -> raw, packet -> packet_length);
+#endif
 				log_info ("%s: wrong network.", msgbuf);
+#ifdef DEBUG_PACKET
+				dump_packet (packet);
+#endif
 				nak_lease (packet, &cip, NULL);
 				goto out;
 			}
@@ -787,7 +806,13 @@ void dhcprequest (packet, ms_nulltp, ip_lease)
 	/* If the address the client asked for is ours, but it wasn't
 	   available for the client, NAK it. */
 	if (!lease && ours) {
+#ifdef DEBUG_PACKET
+		dump_raw ((unsigned char *)packet -> raw, packet -> packet_length);
+#endif
 		log_info ("%s: lease %s unavailable.", msgbuf, piaddr (cip));
+#ifdef DEBUG_PACKET
+		dump_packet (packet);
+#endif
 		nak_lease (packet, &cip, (subnet ? subnet->group : NULL));
 		goto out;
 	}
@@ -1642,11 +1667,14 @@ void dhcpinform (packet, ms_nulltp)
 				       &global_scope, oc, MDL);
 
 #ifdef DEBUG_PACKET
-	dump_packet (packet);
 	dump_raw ((unsigned char *)packet -> raw, packet -> packet_length);
 #endif
 
 	log_info ("%s", msgbuf);
+
+#ifdef DEBUG_PACKET
+	dump_packet (packet);
+#endif
 
 	/* Figure out the address of the boot file server. */
 	if ((oc =
@@ -1698,7 +1726,6 @@ void dhcpinform (packet, ms_nulltp)
 	raw.op = BOOTREPLY;
 
 #ifdef DEBUG_PACKET
-	dump_packet (&outgoing);
 	dump_raw ((unsigned char *)&raw, outgoing.packet_length);
 #endif
 
@@ -1713,6 +1740,9 @@ void dhcpinform (packet, ms_nulltp)
 			 "<no client hardware address>");
 		log_info("%s %s", msgbuf, piaddr(packet->client_addr));
 
+#ifdef DEBUG_PACKET
+		dump_packet (&outgoing);
+#endif
 		/* fill dhcp4o6_response */
 		packet->dhcp4o6_response->len = outgoing.packet_length;
 		packet->dhcp4o6_response->buffer = NULL;
@@ -1955,20 +1985,28 @@ void nak_lease (packet, cip, network_group)
 					 packet -> raw -> hlen,
 					 packet -> raw -> chaddr),
 			  piaddr(packet->client_addr));
-	} else
-#endif
-	log_info ("DHCPNAK on %s to %s via %s",
-	      piaddr (*cip),
-	      print_hw_addr_or_client_id(packet),
-	      packet -> raw -> giaddr.s_addr
-	      ? inet_ntoa (packet -> raw -> giaddr)
-	      : packet -> interface -> name);
 
 #ifdef DEBUG_PACKET
-	dump_packet (packet);
-	dump_raw ((unsigned char *)packet -> raw, packet -> packet_length);
+		dump_raw ((unsigned char *)&raw, outgoing.packet_length);
+#endif
+	} else {
+#endif
+#ifdef DEBUG_PACKET
+		dump_raw ((unsigned char *)&raw, outgoing.packet_length);
+#endif
+
+		log_info ("DHCPNAK on %s to %s via %s",
+			piaddr (*cip),
+			print_hw_addr_or_client_id(packet),
+			packet -> raw -> giaddr.s_addr
+			? inet_ntoa (packet -> raw -> giaddr)
+			: packet -> interface -> name);
+#if defined(DHCPv6) && defined(DHCP4o6)
+	}
+#endif
+
+#ifdef DEBUG_PACKET
 	dump_packet (&outgoing);
-	dump_raw ((unsigned char *)&raw, outgoing.packet_length);
 #endif
 
 #if defined(DHCPv6) && defined(DHCP4o6)
@@ -2008,7 +2046,7 @@ void nak_lease (packet, cip, network_group)
 		else
 			to.sin_port = remote_port; /* for testing. */
 
-		if (fallback_interface) {
+		if (raw.htype != HTYPE_UB && fallback_interface) {
 			result = send_packet(fallback_interface, packet, &raw,
 					     outgoing.packet_length, from, &to,
 					     NULL);
@@ -3595,13 +3633,16 @@ void ack_lease (packet, lease, offer, when, msg, ms_nulltp, hp)
 				       &lease -> scope, oc, MDL);
 
 #ifdef DEBUG_PACKET
-	dump_packet (packet);
 	dump_raw ((unsigned char *)packet -> raw, packet -> packet_length);
 #endif
 
 	lease -> state = state;
 
 	log_info ("%s", msg);
+
+#ifdef DEBUG_PACKET
+	dump_packet (packet);
+#endif
 
 	/* Hang the packet off the lease state. */
 	packet_reference (&lease -> state -> packet, packet, MDL);
@@ -4075,6 +4116,10 @@ void dhcp_reply (lease)
 	}
 #endif
 
+#ifdef DEBUG_PACKET
+	dump_raw ((unsigned char *)&raw, packet_length);
+#endif
+
 	/* Say what we're doing... */
 	log_info ("%s on %s to %s %s%s%svia %s",
 		  (state -> offer
@@ -4090,9 +4135,8 @@ void dhcp_reply (lease)
 		  (state -> giaddr.s_addr
 		   ? inet_ntoa (state -> giaddr)
 		   : state -> ip -> name));
-
 #ifdef DEBUG_PACKET
-	dump_raw ((unsigned char *)&raw, packet_length);
+	dump_packet_send (&raw);
 #endif
 
 	/* Set up the hardware address... */
@@ -4121,7 +4165,7 @@ void dhcp_reply (lease)
 		else
 			to.sin_port = remote_port; /* For debugging. */
 
-		if (fallback_interface) {
+		if (raw.htype != HTYPE_UB && fallback_interface) {
 			result = send_packet(fallback_interface, NULL, &raw,
 					     packet_length, raw.siaddr, &to,
 					     NULL);
@@ -4159,7 +4203,7 @@ void dhcp_reply (lease)
 		to.sin_addr = raw.ciaddr;
 		to.sin_port = remote_port;
 
-		if (fallback_interface) {
+		if (raw.htype != HTYPE_UB && fallback_interface) {
 			result = send_packet(fallback_interface, NULL, &raw,
 					     packet_length, raw.siaddr, &to,
 					     NULL);

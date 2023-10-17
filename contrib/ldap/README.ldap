@@ -21,7 +21,7 @@ this document.  There is plenty of documentation out there about this.  Once
 you have OpenLDAP installed, you will have to edit your slapd.conf file.  I
 added the following 2 lines to my configuration file:
 
-include         /etc/ldap/schema/dhcp.schema
+include         /etc/ldap/schema/ub-dhcp.schema
 index           dhcpHWAddress eq
 index           dhcpClassData eq
 
@@ -56,7 +56,7 @@ dhcpd, you will need to perform the following steps:
   * Run 'make' to build ISC dhcp.
 
 Once you have DHCP installed, you will need to setup your initial plaintext
-config file. In my /etc/dhcpd.conf file, I have:
+config file. In my /etc/ub-dhcpd.conf file, I have:
 
 ldap-server "localhost";
 ldap-port 389;
@@ -64,12 +64,12 @@ ldap-username "cn=DHCP User, dc=ntelos, dc=net";
 ldap-password "blah";
 ldap-base-dn "dc=ntelos, dc=net";
 ldap-method dynamic;
-ldap-debug-file "/var/log/dhcp-ldap-startup.log";
+ldap-debug-file "/var/log/ub-dhcp-ldap-startup.log";
 
 If SSL has been enabled at compile time, the dhcp server trys to use TLS if
 possible, but continues without TLS if not.
 
-You can modify this behaviour using following option in /etc/dhcp/dhcpd.conf:
+You can modify this behaviour using following option in /etc/ub-dhcp/ub-dhcpd.conf:
 
 ldap-ssl <off | ldaps | start_tls | on>
    off:       disables TLS/LDAPS.
@@ -105,9 +105,9 @@ The next step is to set up your LDAP tree. Here is an example config that will
 give a 10.100.0.x address to machines that have a host entry in LDAP.
 Otherwise, it will give a 10.200.0.x address to them.  (NOTE: replace
 dc=ntelos, dc=net with your base dn). If you would like to convert your
-existing dhcpd.conf file to LDIF format, there is a script
-dhcpd-conf-to-ldap that will convert it for you.  Type
-dhcpd-conf-to-ldap --help to see the usage information for this script.
+existing ub-dhcpd.conf file to LDIF format, there is a script
+ub-dhcpd-conf-to-ldap that will convert it for you.  Type
+ub-dhcpd-conf-to-ldap --help to see the usage information for this script.
 
 # You must specify the server's host name in LDAP that you are going to run
 # DHCP on and point it to which config tree you want to use.  Whenever DHCP
@@ -204,7 +204,7 @@ and setup LDAP access restrictions in the LDAP server, so that each
 DHCP server only has access to its own data.
 
 You will need to create a separate configuration file,
-call it /etc/dhcpd6.conf.  For example:
+call it /etc/ub-dhcpd6.conf.  For example:
 
 ldap-server "localhost";
 ldap-port 389;
@@ -212,11 +212,11 @@ ldap-username "cn=DHCPv6 User, dc=ntelos, dc=net";
 ldap-password "blahblah";
 ldap-base-dn "dc=ntelos, dc=net";
 ldap-method dynamic;
-ldap-debug-file "/var/log/dhcp-ldap-startup.log";
+ldap-debug-file "/var/log/ub-dhcp-ldap-startup.log";
 
 And use these command line arguments to dhcpd:
 
-dhcpd eth... -6 -cf /etc/dhcpd6.conf -pf /var/run/dhcpd6.pid -lf /var/lib/dhcpd6/dhcpd.leases
+dhcpd eth... -6 -cf /etc/ub-dhcpd6.conf -pf /var/run/ub-dhcpd6.pid -lf /var/lib/ub-dhcpd6/ub-dhcpd.leases
 
 For DHCPv6, the client configuration is the same, but substitute the
 Client ID for the Ethernet hardware address.  Here is an example of a

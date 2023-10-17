@@ -1,6 +1,6 @@
 {
   # -------------------------
-  # dhcpd.conf
+  # ub-dhcpd.conf
   #
   # Sample configuration file for ISC dhcpd
   #

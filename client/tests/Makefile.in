@@ -108,9 +108,9 @@ am__objects_1 = clparse.$(OBJEXT) dhc6.$(OBJEXT) dhclient.$(OBJEXT)
 @HAVE_ATF_TRUE@	duid_unittest.$(OBJEXT)
 duid_unittests_OBJECTS = $(am_duid_unittests_OBJECTS)
 am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 = $(top_builddir)/common/libdhcp.@A@ \
-	$(top_builddir)/omapip/libomapi.@A@ \
-	$(top_builddir)/dhcpctl/libdhcpctl.@A@
+am__DEPENDENCIES_2 = $(top_builddir)/common/libub-dhcp.@A@ \
+	$(top_builddir)/omapip/libub-omapi.@A@ \
+	$(top_builddir)/dhcpctl/libub-dhcpctl.@A@
 @HAVE_ATF_TRUE@duid_unittests_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 @HAVE_ATF_TRUE@	$(am__DEPENDENCIES_2)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -348,9 +348,9 @@ AM_CPPFLAGS = $(ATF_CFLAGS) -DUNIT_TEST -I$(top_srcdir)/includes \
 EXTRA_DIST = Atffile Kyuafile duid0_test.txt duid1_test.txt \
 	duid2_test.txt duid3_test.txt
 DHCPSRC = ../clparse.c ../dhc6.c ../dhclient.c
-DHCPLIBS = $(top_builddir)/common/libdhcp.@A@ \
-	  $(top_builddir)/omapip/libomapi.@A@    \
-          $(top_builddir)/dhcpctl/libdhcpctl.@A@ \
+DHCPLIBS = $(top_builddir)/common/libub-dhcp.@A@ \
+	  $(top_builddir)/omapip/libub-omapi.@A@    \
+          $(top_builddir)/dhcpctl/libub-dhcpctl.@A@ \
 	  @BINDLIBIRSDIR@/libirs.@A@ \
 	  @BINDLIBDNSDIR@/libdns.@A@ \
 	  @BINDLIBISCCFGDIR@/libisccfg.@A@ \

@@ -3,6 +3,7 @@
    Protocol structures... */
 
 /*
+ * Copyright (c) 2023-2023 Hisilicon Limited.
  * Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1995-2003 by Internet Software Consortium
  *
@@ -79,7 +80,8 @@ struct dhcp_packet {
 #define HTYPE_IPMP       255            /* IPMP - random hw address - there
 					 * is no standard for this so we
 					 * just steal a type            */
-
+#define HTYPE_UB					38
+#define DHCPV6_PORT	546
 #define HTYPE_RESERVED	0		/* RFC 5494 */
 
 /* Magic cookie validating dhcp options field (and bootp vendor
@@ -182,6 +184,20 @@ struct dhcp_packet {
 #define DHCPLEASEUNKNOWN	12
 #define DHCPLEASEACTIVE		13
 
+/* DHCPV6 message types. */
+#define dhcpv6_advertise   2
+#define dhcpv6_reply       7
+#define dhcpv6_reconfigure   10
+enum message_type {
+	DHCP_DISCOVER_IDX = 0,
+	DHCP_OFFER_IDX,
+	DHCP_REQUEST_IDX,
+	DHCP_DECLINE_IDX,
+	DHCP_ACK_IDX,
+	DHCP_NAK_IDX,
+	DHCP_RELEASE_IDX,
+	DHCP_INFORM_IDX
+};
 
 /* Relay Agent Information option subtypes: */
 #define RAI_CIRCUIT_ID	1

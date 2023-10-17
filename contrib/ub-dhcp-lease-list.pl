@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use POSIX qw(strftime);
 
-my @LEASES = ('/var/db/dhcpd.leases', '/var/lib/dhcp/dhcpd.leases', '/var/lib/dhcp3/dhcpd.leases');
+my @LEASES = ('/var/db/ub-dhcpd.leases', '/var/lib/ub-dhcp/ub-dhcpd.leases', '/var/lib/ub-dhcp3/ub-dhcpd.leases');
 my @all_leases;
 my @leases;
 
@@ -191,9 +191,9 @@ sub cli_processing() {
 		" --last      prints the last (even if end<now) entry for every MAC\n".
 		" --all       prints all entries i.e. more than one per MAC\n".
 		" --lease     uses the next argument as the name of the lease file\n".
-		"             the default is to try /var/db/dhcpd.leases then\n".
-		"             /var/lib/dhcp/dhcpd.leases then\n".
-		"             /var/lib/dhcp3/dhcpd.leases\n".
+		"             the default is to try /var/db/ub-dhcpd.leases then\n".
+		"             /var/lib/ub-dhcp/ub-dhcpd.leases then\n".
+		"             /var/lib/ub-dhcp3/ub-dhcpd.leases\n".
 		"\n");
 	    exit(0);
 	} elsif ($arg eq '--parsable') {
@@ -218,3 +218,4 @@ check_oui_file();
 read_dhcpd_leases();
 process_leases();
 output_leases();
+

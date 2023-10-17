@@ -89,7 +89,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-sbin_PROGRAMS = dhcpd$(EXEEXT)
+sbin_PROGRAMS = ub-dhcpd$(EXEEXT)
 subdir = server
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -116,8 +116,8 @@ am_dhcpd_OBJECTS = dhcpd-dhcpd.$(OBJEXT) dhcpd-dhcp.$(OBJEXT) \
 	dhcpd-ldap_krb_helper.$(OBJEXT)
 dhcpd_OBJECTS = $(am_dhcpd_OBJECTS)
 am__DEPENDENCIES_1 =
-dhcpd_DEPENDENCIES = ../common/libdhcp.@A@ ../omapip/libomapi.@A@ \
-	../dhcpctl/libdhcpctl.@A@ $(BINDLIBIRSDIR)/libirs.@A@ \
+dhcpd_DEPENDENCIES = ../common/libub-dhcp.@A@ ../omapip/libub-omapi.@A@ \
+	../dhcpctl/libub-dhcpctl.@A@ $(BINDLIBIRSDIR)/libirs.@A@ \
 	$(BINDLIBDNSDIR)/libdns.@A@ $(BINDLIBISCCFGDIR)/libisccfg.@A@ \
 	$(BINDLIBISCDIR)/libisc.@A@ $(am__DEPENDENCIES_1)
 dhcpd_LINK = $(CCLD) $(dhcpd_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
@@ -398,20 +398,20 @@ top_srcdir = @top_srcdir@
 # production code. Sadly, we are not there yet.
 SUBDIRS = . tests
 AM_CPPFLAGS = -I.. -DLOCALSTATEDIR='"@localstatedir@"'
-dist_sysconf_DATA = dhcpd.conf.example
+dist_sysconf_DATA = ub-dhcpd.conf.example
 dhcpd_SOURCES = dhcpd.c dhcp.c bootp.c confpars.c db.c class.c failover.c \
 		omapi.c mdb.c stables.c salloc.c ddns.c dhcpleasequery.c \
 		dhcpv6.c mdb6.c ldap.c ldap_casa.c leasechain.c ldap_krb_helper.c
 
 dhcpd_CFLAGS = $(LDAP_CFLAGS)
-dhcpd_LDADD = ../common/libdhcp.@A@ ../omapip/libomapi.@A@ \
-	      ../dhcpctl/libdhcpctl.@A@ \
+dhcpd_LDADD = ../common/libub-dhcp.@A@ ../omapip/libub-omapi.@A@ \
+	      ../dhcpctl/libub-dhcpctl.@A@ \
 	      $(BINDLIBIRSDIR)/libirs.@A@ \
 	      $(BINDLIBDNSDIR)/libdns.@A@ \
 	      $(BINDLIBISCCFGDIR)/libisccfg.@A@ \
 	      $(BINDLIBISCDIR)/libisc.@A@ $(LDAP_LIBS)
 
-man_MANS = dhcpd.8 dhcpd.conf.5 dhcpd.leases.5
+man_MANS = ub-dhcpd.8 ub-dhcpd.conf.5 ub-dhcpd.leases.5
 EXTRA_DIST = $(man_MANS)
 all: all-recursive
 
@@ -489,8 +489,8 @@ uninstall-sbinPROGRAMS:
 clean-sbinPROGRAMS:
 	-test -z "$(sbin_PROGRAMS)" || rm -f $(sbin_PROGRAMS)
 
-dhcpd$(EXEEXT): $(dhcpd_OBJECTS) $(dhcpd_DEPENDENCIES) $(EXTRA_dhcpd_DEPENDENCIES) 
-	@rm -f dhcpd$(EXEEXT)
+ub-dhcpd$(EXEEXT): $(dhcpd_OBJECTS) $(dhcpd_DEPENDENCIES) $(EXTRA_dhcpd_DEPENDENCIES)
+	@rm -f ub-dhcpd$(EXEEXT)
 	$(AM_V_CCLD)$(dhcpd_LINK) $(dhcpd_OBJECTS) $(dhcpd_LDADD) $(LIBS)
 
 mostlyclean-compile:

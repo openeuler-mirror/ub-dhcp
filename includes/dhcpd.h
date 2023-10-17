@@ -275,6 +275,72 @@ enum dhcp_shutdown_state {
 	shutdown_done
 };
 
+enum dhcp_ub_addr {
+	UB_ADDR0 = 0,
+	UB_ADDR1,
+	UB_ADDR2,
+	UB_ADDR3,
+	UB_ADDR4,
+	UB_ADDR5,
+	UB_ADDR6,
+	UB_ADDR7,
+	UB_ADDR8,
+	UB_ADDR9,
+	UB_ADDR10,
+	UB_ADDR11,
+	UB_ADDR12,
+	UB_ADDR13,
+	UB_ADDR14,
+	UB_ADDR15
+};
+
+enum dhcp_ub_guid {
+	UB_GUID0 = 0,
+	UB_GUID1,
+	UB_GUID2,
+	UB_GUID3,
+	UB_GUID4,
+	UB_GUID5,
+	UB_GUID6,
+	UB_GUID7,
+	UB_GUID8,
+	UB_GUID9,
+	UB_GUID10,
+	UB_GUID11,
+	UB_GUID12,
+	UB_GUID13,
+	UB_GUID14,
+	UB_GUID15
+};
+
+enum dhcp_transaction_index {
+	T_INDEX0 = 0,
+	T_INDEX1,
+	T_INDEX2,
+	T_INDEX3
+};
+
+enum dhcp_transaction_delocalize {
+	DELOCALIZE8 = 8,
+	DELOCALIZE16 = 16
+};
+
+enum dhcp_buffer_index {
+	B_INDEX0 = 0,
+	B_INDEX1,
+	B_INDEX2,
+	B_INDEX3
+};
+
+enum dhcp_byte_alignment {
+	ALIGN4 = 4
+};
+
+enum dhcp_ip_addr_type {
+	IPV4 = 4,
+	IPV6 = 6
+};
+
 /* Client FQDN option, failover FQDN option, etc. */
 typedef struct {
 	u_int8_t codes [2];
@@ -1264,7 +1330,7 @@ struct client_config {
 	TIME backoff_cutoff;		/* When doing exponential backoff,
 					   never back off to an interval
 					   longer than this amount. */
-	u_int32_t requested_lease;	/* Requested lease time, if user
+	TIME requested_lease;	/* Requested lease time, if user
 					   doesn't configure one. */
 	struct string_list *media;	/* Possible network media values. */
 	char *script_name;		/* Name of config script. */
@@ -1431,11 +1497,6 @@ struct interface_info {
 
 	/* Only used by DHCP client code. */
 	struct client_state *client;
-# if defined(USE_DLPI_SEND) || defined(USE_DLPI_RECEIVE) || \
-     defined(USE_DLPI_HWADDR)
-	int dlpi_sap_length;
-	struct hardware dlpi_broadcast_addr;
-# endif /* DLPI_SEND || DLPI_RECEIVE */
 	struct hardware anycast_mac_addr;
 };
 
@@ -1538,9 +1599,6 @@ struct icmp_state {
 
 #include "ctrace.h"
 
-/* Bitmask of dhcp option codes. */
-typedef unsigned char option_mask [16];
-
 /* DHCP Option mask manipulation macros... */
 #define OPTION_ZERO(mask)	(memset (mask, 0, 16))
 #define OPTION_SET(mask, bit)	(mask [bit >> 8] |= (1 << (bit & 7)))
@@ -1555,61 +1613,61 @@ typedef unsigned char option_mask [16];
 /* Default path to dhcpd config file. */
 #ifdef DEBUG
 #undef _PATH_DHCPD_CONF
-#define _PATH_DHCPD_CONF	"dhcpd.conf"
+#define _PATH_DHCPD_CONF	"ub-dhcpd.conf"
 #undef _PATH_DHCPD_DB
-#define _PATH_DHCPD_DB		"dhcpd.leases"
+#define _PATH_DHCPD_DB		"ub-dhcpd.leases"
 #undef _PATH_DHCPD6_DB
-#define _PATH_DHCPD6_DB		"dhcpd6.leases"
+#define _PATH_DHCPD6_DB		"ub-dhcpd6.leases"
 #undef _PATH_DHCPD_PID
-#define _PATH_DHCPD_PID		"dhcpd.pid"
+#define _PATH_DHCPD_PID		"ub-dhcpd.pid"
 #undef _PATH_DHCPD6_PID
-#define _PATH_DHCPD6_PID	"dhcpd6.pid"
+#define _PATH_DHCPD6_PID	"ub-dhcpd6.pid"
 #else /* !DEBUG */
 
 #ifndef _PATH_DHCPD_CONF
-#define _PATH_DHCPD_CONF	"/etc/dhcp/dhcpd.conf"
+#define _PATH_DHCPD_CONF	"/etc/ub-dhcp/ub-dhcpd.conf"
 #endif /* DEBUG */
 
 #ifndef _PATH_DHCPD_DB
-#define _PATH_DHCPD_DB		LOCALSTATEDIR"/db/dhcpd.leases"
+#define _PATH_DHCPD_DB		LOCALSTATEDIR"/db/ub-dhcpd.leases"
 #endif
 
 #ifndef _PATH_DHCPD6_DB
-#define _PATH_DHCPD6_DB		LOCALSTATEDIR"/db/dhcpd6.leases"
+#define _PATH_DHCPD6_DB		LOCALSTATEDIR"/db/ub-dhcpd6.leases"
 #endif
 
 #ifndef _PATH_DHCPD_PID
-#define _PATH_DHCPD_PID		LOCALSTATEDIR"/run/dhcpd.pid"
+#define _PATH_DHCPD_PID		LOCALSTATEDIR"/run/ub-dhcpd.pid"
 #endif
 
 #ifndef _PATH_DHCPD6_PID
-#define _PATH_DHCPD6_PID	LOCALSTATEDIR"/run/dhcpd6.pid"
+#define _PATH_DHCPD6_PID	LOCALSTATEDIR"/run/ub-dhcpd6.pid"
 #endif
 
 #endif /* DEBUG */
 
 #ifndef _PATH_DHCLIENT_CONF
-#define _PATH_DHCLIENT_CONF	"/etc/dhcp/dhclient.conf"
+#define _PATH_DHCLIENT_CONF	"/etc/ub-dhcp/ub-dhclient.conf"
 #endif
 
 #ifndef _PATH_DHCLIENT_SCRIPT
-#define _PATH_DHCLIENT_SCRIPT	"/usr/sbin/dhclient-script"
+#define _PATH_DHCLIENT_SCRIPT	"/usr/sbin/ub-dhclient-script"
 #endif
 
 #ifndef _PATH_DHCLIENT_PID
-#define _PATH_DHCLIENT_PID	LOCALSTATEDIR"/run/dhclient.pid"
+#define _PATH_DHCLIENT_PID	LOCALSTATEDIR"/run/ub-dhclient.pid"
 #endif
 
 #ifndef _PATH_DHCLIENT6_PID
-#define _PATH_DHCLIENT6_PID	LOCALSTATEDIR"/run/dhclient6.pid"
+#define _PATH_DHCLIENT6_PID	LOCALSTATEDIR"/run/ub-dhclient6.pid"
 #endif
 
 #ifndef _PATH_DHCLIENT_DB
-#define _PATH_DHCLIENT_DB	LOCALSTATEDIR"/db/dhclient.leases"
+#define _PATH_DHCLIENT_DB	LOCALSTATEDIR"/db/ub-dhclient.leases"
 #endif
 
 #ifndef _PATH_DHCLIENT6_DB
-#define _PATH_DHCLIENT6_DB	LOCALSTATEDIR"/db/dhclient6.leases"
+#define _PATH_DHCLIENT6_DB	LOCALSTATEDIR"/db/ub-dhclient6.leases"
 #endif
 
 #ifndef _PATH_RESOLV_CONF
@@ -1617,11 +1675,11 @@ typedef unsigned char option_mask [16];
 #endif
 
 #ifndef _PATH_DHCRELAY_PID
-#define _PATH_DHCRELAY_PID	LOCALSTATEDIR"/run/dhcrelay.pid"
+#define _PATH_DHCRELAY_PID	LOCALSTATEDIR"/run/ub-dhcrelay.pid"
 #endif
 
 #ifndef _PATH_DHCRELAY6_PID
-#define _PATH_DHCRELAY6_PID	LOCALSTATEDIR"/run/dhcrelay6.pid"
+#define _PATH_DHCRELAY6_PID	LOCALSTATEDIR"/run/ub-dhcrelay6.pid"
 #endif
 
 #ifndef DHCPD_LOG_FACILITY
@@ -1688,10 +1746,11 @@ struct ia_xx {
 	time_t cltt;			/* client last transaction time */
 	struct iasubopt **iasubopt;	/* pointers to the IAADDR/IAPREFIXs */
 };
-
+#define DHCPV6_MSG_TYPE_NUM_MAX 22
 extern ia_hash_t *ia_na_active;
 extern ia_hash_t *ia_ta_active;
 extern ia_hash_t *ia_pd_active;
+extern struct enumeration_value dhcpv6_message_values[DHCPV6_MSG_TYPE_NUM_MAX];
 
 /*!
  *
@@ -2619,7 +2678,33 @@ int dns_zone_reference (struct dns_zone **,
 /* print.c */
 #define DEFAULT_TIME_FORMAT 0
 #define LOCAL_TIME_FORMAT   1
+#define PRINT_TXPKTS		1
+#define PRINT_UBPKT_INFO	2
 extern int db_time_format;
+
+/** ub_print start */
+#define PACKET_TYPE_NUM		25
+/* DHCPv4 */
+#define PACKET_TYPE_NUM4	8
+/* DHCPv6 */
+#define PACKET_TYPE_NUM6	13
+struct send_receive_counter {
+	u_int8_t packet_type;
+	u_int32_t total_sent_count;
+	u_int32_t last_sent_xid;
+	u_int32_t total_recv_count;
+	u_int32_t new_recv_xid;
+};
+
+struct packet_record {
+	u_int32_t new_recv_pkt_xid;
+	u_int32_t new_recv_pkt_type;
+	u_int32_t last_sent_request_xid;
+	u_int32_t last_sent_request_type;
+	struct send_receive_counter *pkt_record_list[PACKET_TYPE_NUM];
+};
+/** ub_print end */
+
 char *quotify_string (const char *, const char *, int);
 char *quotify_buf (const unsigned char *, unsigned, const char,
 		   const char *, int);
@@ -2632,6 +2717,26 @@ void dump_packet_option (struct option_cache *, struct packet *,
 			 struct option_state *, struct option_state *,
 			 struct binding_scope **, struct universe *, void *);
 void dump_packet (struct packet *);
+void dump_packet_send (struct dhcp_packet *);
+void dump_addr (struct dhcp_packet *);
+unsigned int get_option1_msg(unsigned char *option_start,
+			     unsigned int option_len,
+			     unsigned char *option1_data_start);
+void print_ub_packet (unsigned char *buff, u_int32_t buf_len,
+		      unsigned char print_level);
+void print_ub_packet6 (unsigned char *buff, u_int32_t buf_len,
+		       unsigned char print_level);
+void show_raw_ub_pdu (struct dhcp_packet *);
+
+void log_show(const char *, ...);
+unsigned char get_message_type (struct dhcp_packet *packet);
+void record_packet_info (struct packet_record *pkt_record_info,
+			 struct dhcp_packet *packet);
+void record_packet_info6 (struct packet_record *pkt_records,
+			  unsigned char *pkt);
+void print_packet_type (u_int32_t pkt_type);
+void print_record_info (struct packet_record *pkt_record_info, unsigned char print_level);
+void print_record_info6(struct packet_record *pkt_record_info, unsigned char print_level);
 void hash_dump (struct hash_table *);
 char *print_hex (unsigned, const u_int8_t *, unsigned, unsigned);
 void print_hex_only (unsigned, const u_int8_t *, unsigned, char *);
@@ -2721,6 +2826,7 @@ void maybe_setup_fallback (void);
 
 void if_register6(struct interface_info *info, int do_multicast);
 void if_register_linklocal6(struct interface_info *info);
+int if_register_ub6(struct interface_info *info);
 ssize_t receive_packet6(struct interface_info *interface,
 			unsigned char *buf, size_t len,
 			struct sockaddr_in6 *from, struct in6_addr *to_addr,
@@ -2728,35 +2834,9 @@ ssize_t receive_packet6(struct interface_info *interface,
 void if_deregister6(struct interface_info *info);
 
 
-/* bpf.c */
-#if defined (USE_BPF_SEND) || defined (USE_BPF_RECEIVE)
-int if_register_bpf (struct interface_info *);
-#endif
-#ifdef USE_BPF_SEND
-void if_reinitialize_send (struct interface_info *);
-void if_register_send (struct interface_info *);
-void if_deregister_send (struct interface_info *);
-ssize_t send_packet (struct interface_info *,
-		     struct packet *, struct dhcp_packet *, size_t,
-		     struct in_addr,
-		     struct sockaddr_in *, struct hardware *);
-#endif
-#ifdef USE_BPF_RECEIVE
-void if_reinitialize_receive (struct interface_info *);
-void if_register_receive (struct interface_info *);
-void if_deregister_receive (struct interface_info *);
-ssize_t receive_packet (struct interface_info *,
-			unsigned char *, size_t,
-			struct sockaddr_in *, struct hardware *);
-#endif
-#if defined (USE_BPF_SEND)
-int can_unicast_without_arp (struct interface_info *);
-int can_receive_unicast_unconfigured (struct interface_info *);
-int supports_multiple_interfaces (struct interface_info *);
-void maybe_setup_fallback (void);
-#endif
-
 /* lpf.c */
+#define ETH_P_UB 0x0100
+extern unsigned char print_level;
 #if defined (USE_LPF_SEND) || defined (USE_LPF_RECEIVE)
 int if_register_lpf (struct interface_info *);
 #endif
@@ -2776,68 +2856,13 @@ void if_deregister_receive (struct interface_info *);
 ssize_t receive_packet (struct interface_info *,
 			unsigned char *, size_t,
 			struct sockaddr_in *, struct hardware *);
+void setup_ub_filter (struct interface_info * info);
 #endif
 #if defined (USE_LPF_SEND)
 int can_unicast_without_arp (struct interface_info *);
 int can_receive_unicast_unconfigured (struct interface_info *);
 int supports_multiple_interfaces (struct interface_info *);
 void maybe_setup_fallback (void);
-#endif
-
-/* nit.c */
-#if defined (USE_NIT_SEND) || defined (USE_NIT_RECEIVE)
-int if_register_nit (struct interface_info *);
-#endif
-
-#ifdef USE_NIT_SEND
-void if_reinitialize_send (struct interface_info *);
-void if_register_send (struct interface_info *);
-void if_deregister_send (struct interface_info *);
-ssize_t send_packet (struct interface_info *,
-		     struct packet *, struct dhcp_packet *, size_t,
-		     struct in_addr,
-		     struct sockaddr_in *, struct hardware *);
-#endif
-#ifdef USE_NIT_RECEIVE
-void if_reinitialize_receive (struct interface_info *);
-void if_register_receive (struct interface_info *);
-void if_deregister_receive (struct interface_info *);
-ssize_t receive_packet (struct interface_info *,
-			unsigned char *, size_t,
-			struct sockaddr_in *, struct hardware *);
-#endif
-#if defined (USE_NIT_SEND)
-int can_unicast_without_arp (struct interface_info *);
-int can_receive_unicast_unconfigured (struct interface_info *);
-int supports_multiple_interfaces (struct interface_info *);
-void maybe_setup_fallback (void);
-#endif
-
-/* dlpi.c */
-#if defined (USE_DLPI_SEND) || defined (USE_DLPI_RECEIVE)
-int if_register_dlpi (struct interface_info *);
-#endif
-
-#ifdef USE_DLPI_SEND
-int can_unicast_without_arp (struct interface_info *);
-int can_receive_unicast_unconfigured (struct interface_info *);
-void if_reinitialize_send (struct interface_info *);
-void if_register_send (struct interface_info *);
-void if_deregister_send (struct interface_info *);
-ssize_t send_packet (struct interface_info *,
-		     struct packet *, struct dhcp_packet *, size_t,
-		     struct in_addr,
-		     struct sockaddr_in *, struct hardware *);
-int supports_multiple_interfaces (struct interface_info *);
-void maybe_setup_fallback (void);
-#endif
-#ifdef USE_DLPI_RECEIVE
-void if_reinitialize_receive (struct interface_info *);
-void if_register_receive (struct interface_info *);
-void if_deregister_receive (struct interface_info *);
-ssize_t receive_packet (struct interface_info *,
-			unsigned char *, size_t,
-			struct sockaddr_in *, struct hardware *);
 #endif
 
 
@@ -3007,6 +3032,7 @@ extern int duid_type;
 extern const char *path_dhclient_duid;
 
 extern struct client_config top_level_config;
+extern struct packet_record dhcp_pkt_rcd;
 
 void dhcpoffer (struct packet *);
 void dhcpack (struct packet *);
@@ -3125,18 +3151,18 @@ void assemble_hw_header (struct interface_info *, unsigned char *,
 void assemble_udp_ip_header (struct interface_info *, unsigned char *,
 			     unsigned *, u_int32_t, u_int32_t,
 			     u_int32_t, unsigned char *, unsigned);
+void assemble_udp_ipv6_header (struct interface_info *, unsigned char *,
+			     unsigned *, u_int8_t *, u_int8_t *,
+			     u_int32_t, unsigned char *, unsigned);
+
 ssize_t decode_hw_header (struct interface_info *, unsigned char *,
 			  unsigned, struct hardware *);
 ssize_t decode_udp_ip_header (struct interface_info *, unsigned char *,
 			      unsigned, struct sockaddr_in *,
 			      unsigned, unsigned *, int);
-
-/* ethernet.c */
-void assemble_ethernet_header (struct interface_info *, unsigned char *,
-			       unsigned *, struct hardware *);
-ssize_t decode_ethernet_header (struct interface_info *,
-				unsigned char *,
-				unsigned, struct hardware *);
+ssize_t decode_udp_ipv6_header(struct interface_info *, unsigned char *,
+			       unsigned, unsigned, unsigned *, struct sockaddr_in6 *,
+			       struct in6_addr *);
 
 /* tr.c */
 void assemble_tr_header (struct interface_info *, unsigned char *,
@@ -3144,6 +3170,22 @@ void assemble_tr_header (struct interface_info *, unsigned char *,
 ssize_t decode_tr_header (struct interface_info *,
 			  unsigned char *,
 			  unsigned, struct hardware *);
+
+/* ub.c */
+void assemble_ub_header (struct interface_info *interface,
+			 unsigned char *buf,
+			 unsigned *bufix,
+			 struct hardware *to);
+void assemble_ub_header6 (struct interface_info *interface,
+			  unsigned char *buf,
+			  unsigned *bufix);
+ssize_t decode_ub_header (struct interface_info *interface,
+			  unsigned char *buf,
+			  unsigned bufix,
+			  struct hardware *from);
+ssize_t decode_ub_header6 (struct interface_info *interface,
+			   unsigned char *buf,
+			   unsigned bufix);
 
 /* dhxpxlt.c */
 void convert_statement (struct parse *);
@@ -3550,6 +3592,9 @@ extern lease_id_hash_t *lease_hw_addr_hash;
 
 extern omapi_object_type_t *dhcp_type_host;
 
+extern isc_boolean_t use_fake_gw;
+extern struct in_addr gw;
+
 extern int numclasseswritten;
 
 
@@ -3588,10 +3633,6 @@ void make_binding_state_transition (struct lease *);
 int lease_copy (struct lease **, struct lease *, const char *, int);
 void release_lease (struct lease *, struct packet *);
 void abandon_lease (struct lease *, const char *);
-#if 0
-/* this appears to be unused and I plan to remove it SAR */
-void dissociate_lease (struct lease *);
-#endif
 void pool_timer (void *);
 int find_lease_by_uid (struct lease **, const unsigned char *,
 		       unsigned, const char *, int);

@@ -105,7 +105,7 @@ by Eric Young (eay@cryptsoft.com).
 		Changes since 4.4.2b1 (Bug Fixes)
 
 - Added a clarification on DHCPINFORMs and server authority to
-  dhcpd.conf.5
+  ub-dhcpd.conf.5
   [Gitlab #37]
 
 - Only emit lease scrubbing log messages when DEBUG_FAILOVER_MESSAGES
@@ -187,7 +187,7 @@ by Eric Young (eay@cryptsoft.com).
   spotted by Coverity, CIDs: 1448191, 1448193, 1448194, 1448195
   [Gitlab #30]
 
-- Updated URL of IEEE oui.txt in contrib/dhcp-lease-list.pl. Thanks
+- Updated URL of IEEE oui.txt in contrib/ub-dhcp-lease-list.pl. Thanks
   to Tommy Smith for contributing the patch.
   [Gitlab #26]
 
@@ -304,7 +304,7 @@ by Eric Young (eay@cryptsoft.com).
 
 		Changes since 4.4.0b1 (Bug Fixes)
 
-- Added clarifying text to dhcpd.conf.5 explaining the class match expressions
+- Added clarifying text to ub-dhcpd.conf.5 explaining the class match expressions
   cannot rely on the results of executable statements.
   [ISC-Bugs #45451]
 
@@ -539,7 +539,7 @@ by Eric Young (eay@cryptsoft.com).
   [ISC-Bugs #42621]
   [ISC-Bugs #44753]
 
-- A "key-algorithm <algorithm>" statement has been added to omshell to
+- A "key-algorithm <algorithm>" statement has been added to ub-omshell to
   allow the specification of the key algorithm to use during transaction
   authentication.  Prior to this it was hard-coded to be hmac-md5. It now
   supports all of the same algorithms as the dhcpd server: hmac-md5 (the
@@ -656,7 +656,7 @@ by Eric Young (eay@cryptsoft.com).
   [ISC-Bugs #31940]
   [ISC-Bugs #32935]
 
-- Fixed a bug in OMAPI that causes omshell to crash when a name-value
+- Fixed a bug in OMAPI that causes ub-omshell to crash when a name-value
   pair with a zero length value is shipped in an object. Thanks to
   Fernando Soto at BlueCat Networks for reporting the issue and
   supplying the patch.
@@ -840,7 +840,7 @@ by Eric Young (eay@cryptsoft.com).
   of dhcpd, dhclient, and dhcrelay.
   [ISC-Bugs #42226]
 
-- Updates to contrib/dhcp-lease-list.pl to make it more friendly.
+- Updates to contrib/ub-dhcp-lease-list.pl to make it more friendly.
   The updates are: looking for the lease file in more places and skipping
   the "processing complete" output when creating machine readable
   output.  Thanks to Cameron Paine (cbp at null dot net) for the
@@ -992,7 +992,7 @@ by Eric Young (eay@cryptsoft.com).
   Thanks to Bill Parker (wp02855 at gmail dot com) who identified this issue.
   [ISC-Bugs #41485]
 
-- Updated contrib/dhcp-lease-list.pl to handle garbage in the oui file better
+- Updated contrib/ub-dhcp-lease-list.pl to handle garbage in the oui file better
   and to print out the hostnames a bit better.
   Thanks to Antoine Beaupré from Debian for the suggested patch.
   [ISC-Bugs #41288]
@@ -1667,7 +1667,7 @@ by Eric Young (eay@cryptsoft.com).
   server code no longer use MAX_PATH constant that is not defined on
   GNU/Hurd systems. [ISC-Bugs #25979]
 
-- Add a perl script in the contrib directory, dhcp-lease-list.pl, which
+- Add a perl script in the contrib directory, ub-dhcp-lease-list.pl, which
   can parse v4 lease files and output the lease information in a more
   human friendly manner.  This was written by Christian Hammers with
   some updates by vom and ISC.  This is contributed code and is not
@@ -1710,7 +1710,7 @@ by Eric Young (eay@cryptsoft.com).
   statement allows the administrator to choose which relay to
   use when searching for an option, see the dhcp-options man page
   for a description.  The host-identifier option has also been
-  updated to support the use of relay options, see the dhcpd.conf
+  updated to support the use of relay options, see the ub-dhcpd.conf
   man page for a description.
   [ISC-Bugs #19598]
 
@@ -1766,7 +1766,7 @@ by Eric Young (eay@cryptsoft.com).
   which permits a DHCP server operating in communications-interrupted state
   to 'rewind' a lease to the state most recently transmitted to its peer,
   greatly increasing a server's endurance in communications-interrupted.
-  This is supported using a new 'rewind state' record on the dhcpd.leases
+  This is supported using a new 'rewind state' record on the ub-dhcpd.leases
   entry for each lease.
 
 - Fix the trace code which was broken by the changes to the DDNS code.
@@ -1908,7 +1908,7 @@ by Eric Young (eay@cryptsoft.com).
   strftime, paste together the same string using mktime instead.
   [ISC-Bugs #19596] - When parsing iaid values accept printable
   characters.
-  [ISC-Bugs #21585] - Always print time values in omshell as hex
+  [ISC-Bugs #21585] - Always print time values in ub-omshell as hex
   instead of ascii if the values happen to be printable characters.
 
 - Minor changes for scripts, configure.ac and Makefiles
@@ -1940,7 +1940,7 @@ by Eric Young (eay@cryptsoft.com).
   a setsockopt() call.  The signal is already being ignored as part
   of the ISC library.  [ISC-Bugs #22269]
 
-- Restore printing of values in omshell to the style pre 21585.  For
+- Restore printing of values in ub-omshell to the style pre 21585.  For
   21585 we changed the print routines to always display time values
   as a hex list.  This had a side effect of printing all data strings
   as a hex list.  We shall investigate other ways of displaying time
@@ -1954,7 +1954,7 @@ by Eric Young (eay@cryptsoft.com).
   CERT: VU#159528 CVE: CVE-2010-3616
 
 - Don't pass the ISC_R_INPROGRESS status to the omapi signal handlers.
-  Passing it through to the handlers caused the omshell program to fail
+  Passing it through to the handlers caused the ub-omshell program to fail
   to connect to the server.  [ISC-Bugs #21839]
 
 - Fix the parenthesis in the code to process configuration statements
@@ -2057,7 +2057,7 @@ by Eric Young (eay@cryptsoft.com).
   forever). [ISC-Bugs #19660]
 
 - Parameters configured to evaluate from user defined function calls can
-  now be correctly written to dhcpd.leases (as on 'on events' or dynamic
+  now be correctly written to ub-dhcpd.leases (as on 'on events' or dynamic
   host records inserted via OMAPI).  [ISC-Bugs #22266]
 
 - If a 'next-server' parameter is configured in a dynamic host record via
@@ -2074,8 +2074,8 @@ by Eric Young (eay@cryptsoft.com).
 - Documentation fixes
   [ISC-Bugs #17959] add text to AIX section describing how to have it send
   responses to the all-ones address.
-  [ISC-Bugs #19615] update the includes in dhcpctl/dhcpctl.3 to be more correct
-  [ISC-Bugs #20676] update dhcpd.conf.5 to include the RFC numbers for DDNS
+  [ISC-Bugs #19615] update the includes in dhcpctl/ub-dhcpctl.3 to be more correct
+  [ISC-Bugs #20676] update ub-dhcpd.conf.5 to include the RFC numbers for DDNS
 
 - Relay no longer crashes, when DHCP packet is received over interface without
   any IPv4 address assigned. Also extended logging message about discarding
@@ -2104,7 +2104,7 @@ by Eric Young (eay@cryptsoft.com).
 - Code cleanup: remove obsolete PROTO, KandR, INLINE and ANSI_DECL macros
   [ISC-Bugs #13151]
 
-- Compilation problem with gcc4.5 and omshell.c resolved. [ISC-Bugs #23831]
+- Compilation problem with gcc4.5 and ub-omshell.c resolved. [ISC-Bugs #23831]
 
 - Client Script fixes
   [ISC-Bugs #23045] Typos in client/scripts/openbsd
@@ -2121,7 +2121,7 @@ by Eric Young (eay@cryptsoft.com).
   server-identifier expression fails to evaluate. [ISC-Bugs #24547]
 
 - Convert ISC_R_INPROGRESS status to ISC_R_SUCCESS when called from other
-  than the dispatch handler.  This fixes an issue where omshell, when
+  than the dispatch handler.  This fixes an issue where ub-omshell, when
   run from the same platform as the server, would appear to fail to
   connect.  This is a companion to #21839.  [ISC-Bugs #23592]
 
@@ -2383,10 +2383,10 @@ by Eric Young (eay@cryptsoft.com).
 - Tidy up some compiler issues in the debug code.
   [ISC-Bugs #26460]
 
-- Move the dhcpd.conf example file to dhcpd.conf.example to avoid
-  overwriting the dhcpd.conf file when installing a new version of
+- Move the ub-dhcpd.conf example file to ub-dhcpd.conf.example to avoid
+  overwriting the ub-dhcpd.conf file when installing a new version of
   ISC DHCP.  The user will now need to manual copy and edit the
-  dhcpd.conf file as desired.
+  ub-dhcpd.conf file as desired.
   [ISC-Bugs #19337]
 
 - Check the status value when trying to read from a connection to
@@ -2476,7 +2476,7 @@ by Eric Young (eay@cryptsoft.com).
   "down" when the failover TCP socket is severed, "auto-partner-down".
   This parameter is not generally safe, and by default is disabled, so
   please carefully review the documentation of this parameter in the
-  dhcpd.conf(5) manpage before determining to use it yourself.
+  ub-dhcpd.conf(5) manpage before determining to use it yourself.
 
 - Added a configuration function, 'gethostname()', which calls the system
   function of the same name and presents the results as a data expression.
@@ -2675,7 +2675,7 @@ by Eric Young (eay@cryptsoft.com).
 - The !inet_pton() call in res_mkupdrec was adjusted to '<= 0' as
   inet_pton returns either 1, 0, or -1.
 
-- A dhclient-script for MacOS X has been included, which enables
+- A ub-dhclient-script for MacOS X has been included, which enables
   'dhclient -6' support.
 
 - DDNS removal routines were updated so that the DHCID is not removed until
@@ -2818,7 +2818,7 @@ by Eric Young (eay@cryptsoft.com).
 
 - Timer granularity is now 1/100s in the DHCPv6 client.
 
-- The dhclient-script was updated to create a host route for the default
+- The ub-dhclient-script was updated to create a host route for the default
   gateway if the supplied subnet mask for an IPv4 address was a /32.  This
   allows the client to work in 'captive' network environments, where the
   operator does not want clients to crosstalk directly.
@@ -2945,7 +2945,7 @@ by Eric Young (eay@cryptsoft.com).
 
 - The DHCPv6 server now replies to Information-Request messages.
 
-- A bug was fixed in the dhclient-script for BSDs to correctly carry error
+- A bug was fixed in the ub-dhclient-script for BSDs to correctly carry error
   codes through some conditions.
 
 - The parsing of some options in the dhclient lease file, in particular
@@ -2957,7 +2957,7 @@ by Eric Young (eay@cryptsoft.com).
 - A reference overleak in DHCPv6 shared network processing was repaired.
 
 - ./configure now autodetects local database locations rather than trying
-  to put dhcpd.leases and dhclient.leases in /usr/local/var/db, which no
+  to put ub-dhcpd.leases and ub-dhclient.leases in /usr/local/var/db, which no
   one ever has.
 
 - Regression fix for bug where server advertised a IPv6 address in
@@ -2975,7 +2975,7 @@ by Eric Young (eay@cryptsoft.com).
 - Relative time may now be used as a qualifier for 'allow' and 'deny' access
   control lists.  These directives may be used to assist in re-addressing
   address pools without having to constantly reconfigure the server.  Please
-  see 'man dhcpd.conf' for more information on allow/deny 'after time' syntax.
+  see 'man ub-dhcpd.conf' for more information on allow/deny 'after time' syntax.
   Thanks to a patch from Christof Chen.
 
 - The server will now include multiple IA_NA's and multiple IAADDRs within
@@ -3040,7 +3040,7 @@ by Eric Young (eay@cryptsoft.com).
 - DDNS updates state information are now stored in 'binding scopes' that
   follow the leases through their lifecycles.  This enables DDNS teardowns
   on leases that are assigned and expired inbetween a server restart (the
-  state is recovered from dhcpd.leases).  Arbitrary user-specified binding
+  state is recovered from ub-dhcpd.leases).  Arbitrary user-specified binding
   scopes ('set var = "value";') are not yet supported.
 
 - Additional compilation problems on HP/UX have been repaired.
@@ -3134,7 +3134,7 @@ by Eric Young (eay@cryptsoft.com).
 - Include the more standard sys/uio.h rather than rely upon other
   header files to include it (fixes a BSD 4.2 compile failure).
 
-- Duplicate dhclient-script updates for DHCPv6 to all provided scripts.
+- Duplicate ub-dhclient-script updates for DHCPv6 to all provided scripts.
 
 - DHCPv4 I/O methods that failed to sense hardware address were corrected.
 
@@ -3186,7 +3186,7 @@ by Eric Young (eay@cryptsoft.com).
   (although the DHCPv4 FQDN and DHCPv6 FQDN options are formatted
   differently, they both use the same code here).
 
-- The Linux dhclient-script attempts to set and remove assigned addresses,
+- The Linux ub-dhclient-script attempts to set and remove assigned addresses,
   and to configure /etc/resolv.conf from nameserver and domain name
   configurations.  It can be extended to configure other parameters.
 
@@ -3253,7 +3253,7 @@ by Eric Young (eay@cryptsoft.com).
   crashing dhcpd if the file already exists
 
 - A bug was fixed that caused dhcpd to segfault if a pool was declared
-  outside the scope of a subnet in dhcpd.conf.
+  outside the scope of a subnet in ub-dhcpd.conf.
 
 - Some uninitialized values were repaired in dhcpleasequery.c that
   caused the server to abort.
@@ -3338,7 +3338,7 @@ by Eric Young (eay@cryptsoft.com).
 - The failover implementation was updated to comply with revision 12 of
   the protocol draft.
 
-- 'make install' now creates the initial zero-length dhcpd.leases file if
+- 'make install' now creates the initial zero-length ub-dhcpd.leases file if
   one does not already exist on the system.
 
 - RFC3942 compliance, site-local option spaces start at 224 now, not 128.
@@ -3369,7 +3369,7 @@ by Eric Young (eay@cryptsoft.com).
   DHCPv6 support.
 
 - A new common (server or client) option, 'db-time-format local;', has
-  been added which prints the local time in /var/db/dhcpd.leases rather
+  been added which prints the local time in /var/db/ub-dhcpd.leases rather
   than UTC.  Thanks to a patch from Ken Lalonde.
 
 - Some patches to improve DHCP Server startup speed from Andrew Matheson
@@ -3382,10 +3382,10 @@ by Eric Young (eay@cryptsoft.com).
   that belong to the peer in need.
 
 - The server no longer sends POOLREQ messages unless the pool is severely
-  misbalanced in the peer's favor (see 'man dhcpd.conf' for more details).
+  misbalanced in the peer's favor (see 'man ub-dhcpd.conf' for more details).
 
 - Pool rebalance events no longer happen upon successfully allocating a
-  lease.  Instead, they happen on a schedule.  See 'man dhcpd.conf' for the
+  lease.  Instead, they happen on a schedule.  See 'man ub-dhcpd.conf' for the
   min-balance and max-balance statements for more information.
 
 - The DHCP Relay Agent Information Option / Link Selection Sub-Option
@@ -3496,8 +3496,8 @@ by Eric Young (eay@cryptsoft.com).
   relay agent options were not echoed from the server, even when giaddr
   was set.
 
-- dhclient now closes its descriptor to dhclient.leases prior to executing
-  dhclient-script.  Thanks to a patch from Tomas Pospisek.
+- dhclient now closes its descriptor to ub-dhclient.leases prior to executing
+  ub-dhclient-script.  Thanks to a patch from Tomas Pospisek.
 
 - The server's "by client-id" and "by hardware address" hash table lists
   are now sorted according to the preference to re-allocate that lease to
@@ -3508,7 +3508,7 @@ by Eric Young (eay@cryptsoft.com).
 			Changes since 3.0.5rc1
 
 - A bug was repaired in fixes to the dhclient, which sought to run the
-  dhclient-script with the 'EXPIRE' state should it receive a NAK in
+  ub-dhclient-script with the 'EXPIRE' state should it receive a NAK in
   response to a REQUEST.  The client now iterates the PREINIT state
   after the EXPIRE state, so that interfaces that might be configured
   'down' can be brought back 'up' and initialized.
@@ -3537,7 +3537,7 @@ by Eric Young (eay@cryptsoft.com).
   (classes with lease limitations) was fixed.  Non-active leases OFFERed
   to clients are no longer billed (but billing is checked before offering).
 
-- The dhcpd.conf.5 manpage was updated in regard to the ddns-domainname
+- The ub-dhcpd.conf.5 manpage was updated in regard to the ddns-domainname
   configuration option - the default configuration and results should be
   more clear now.
 
@@ -3556,7 +3556,7 @@ by Eric Young (eay@cryptsoft.com).
   made possible.
 
 - The log message emitted when the 'leased-address' value was not available
-  in dhcpd.conf "executable statements" has been updated to be more helpful.
+  in ub-dhcpd.conf "executable statements" has been updated to be more helpful.
   Manpage information for this value has also been updated.
 
 - Abandoned or dissociated (err condition) leases now remove any related
@@ -3576,7 +3576,7 @@ by Eric Young (eay@cryptsoft.com).
 
 - Option names of the form "unknown-123" have been removed from the in-
   memory hash tables.  In order to support options of these names that
-  may appear in dhclient.leases or similar in previous versions, the
+  may appear in ub-dhclient.leases or similar in previous versions, the
   parser will now find the new option code definition, or mock up a
   generic option code definition.  This should result in a smooth
   transition from one name to the other, as the new name is used to
@@ -3617,7 +3617,7 @@ by Eric Young (eay@cryptsoft.com).
 
 			Changes since 3.0.4b1
 
-- Command line parsing in omshell was repaired - it no longer closes
+- Command line parsing in ub-omshell was repaired - it no longer closes
   STDIN after reading one line.
 
 - The resolver library no longer closes the /etc/resolv.conf file
@@ -3681,8 +3681,8 @@ by Eric Young (eay@cryptsoft.com).
   is either nonsensical or (in the case of IEEE1394) is not known to support
   these interfaces.  Thanks to Marius Gedminas and Andrew Pollock of Debian.
 
-- Some previously undocumented reasons for dhclient-script invoking has
-  been documented in the dhclient-script.8 manpage.
+- Some previously undocumented reasons for ub-dhclient-script invoking has
+  been documented in the ub-dhclient-script.8 manpage.
 
 - Failover potential expiry calculations (TSTP) have been corrected.  Results
   should be substantially more consistent, and proper given the constraints.
@@ -3740,7 +3740,7 @@ by Eric Young (eay@cryptsoft.com).
 
 			Changes since 3.0.3b3
 
-- dhclient.conf documentation for interface {} was updated to reflect recent
+- ub-dhclient.conf documentation for interface {} was updated to reflect recent
   discussion on the dhcp-hackers mailing list.
 
 - In response to reports that the software does not compile on GCC 4.0.0,
@@ -3759,7 +3759,7 @@ by Eric Young (eay@cryptsoft.com).
   host records would be left behind on leases that were not allocated to the
   client currently booting (eg in the case where the host was denied booting).
 
-- The dhcpd.conf.5 manpage was updated to be more clear in regards to
+- The ub-dhcpd.conf.5 manpage was updated to be more clear in regards to
   multiple host declarations (thanks to Vincent McIntyre).  'Interim' style
   dynamic updates were also retouched.
 
@@ -3818,7 +3818,7 @@ by Eric Young (eay@cryptsoft.com).
 - A small memory leak was closed involving client identifiers larger than
   7 bytes, and failover.
 
-- Configuring a subnet in dhcpd.conf with a subnet mask of 32 bits might
+- Configuring a subnet in ub-dhcpd.conf with a subnet mask of 32 bits might
   cause an internal function to overflow heap.  Thanks to Jason Vas Dias
   at Red Hat.
 
@@ -3837,7 +3837,7 @@ by Eric Young (eay@cryptsoft.com).
 			Changes since 3.0.2rc3
 
 - A previously undocumented configuration directive, 'local-address',
-  was documented in the dhcpd.conf manpage.
+  was documented in the ub-dhcpd.conf manpage.
 
 			Changes since 3.0.2rc2
 
@@ -3876,7 +3876,7 @@ by Eric Young (eay@cryptsoft.com).
 - The FreeBSD client script was changed to support the case where a domain
   name was not provided by the server.
 
-- A memory leak in 'omshell' per each command line parsed was
+- A memory leak in 'ub-omshell' per each command line parsed was
   repaired, thanks to a patch from Jarkko Torppa.
 
 - Log functions writing to stderr were adjusted to use the STDERR_FILENO
@@ -3983,7 +3983,7 @@ by Eric Young (eay@cryptsoft.com).
   server was unable to find a lease to assign to any BOOTP client.
   Thanks to Daniel Baker.
 
-- A minor dhcpd.conf.5 manpage error was fixed.
+- A minor ub-dhcpd.conf.5 manpage error was fixed.
 
 			Changes since 3.0.1rc14
 
@@ -4051,7 +4051,7 @@ by Eric Young (eay@cryptsoft.com).
 - A patch was applied which fixes a case where leases read from the
   leases database do not properly over-ride previously read leases.
 
-- dhcpctl.3 manpage was tweaked.
+- ub-dhcpctl.3 manpage was tweaked.
 
 			Changes since 3.0.1rc11
 
@@ -4081,7 +4081,7 @@ by Eric Young (eay@cryptsoft.com).
   itself, it sends the signal directly.  Thanks to a patch from Martin
   Blapp.
 
-- The FreeBSD dhclient-script was changed so that a failure to write to
+- The FreeBSD ub-dhclient-script was changed so that a failure to write to
   /etc/resolv.conf does not prematurely end the script.  This keeps dhclient
   from looping infinitely when this is the case.  Thanks to a patch from
   Martin Blapp.
@@ -4135,7 +4135,7 @@ by Eric Young (eay@cryptsoft.com).
 
 - A number of spelling corrections were made in the man pages.
 
-- The dhclient.conf.5 man page was changed to refer to do-forward-updates
+- The ub-dhclient.conf.5 man page was changed to refer to do-forward-updates
   rather than a configuration option that doesn't exist.
 
 - A FreeBSD-specific bug in the interface removal handling was fixed.
@@ -4318,7 +4318,7 @@ by Eric Young (eay@cryptsoft.com).
 			Changes since 3.0.1rc3
 
 - A minor bug fix in the arguments to a logging function call.
-- Documentation update for dhcpd.conf.
+- Documentation update for ub-dhcpd.conf.
 
 			Changes since 3.0.1rc2
 
@@ -4368,7 +4368,7 @@ by Eric Young (eay@cryptsoft.com).
 - Make allocators for hash tables.   As a side effect, this fixes a memory
   smash in the subclass allocation code.
 
-- Fix a small bug in omshell where if you try to close an object when
+- Fix a small bug in ub-omshell where if you try to close an object when
   no object is open, it dumps core.
 
 - Fix an obscure coredump that could occur on shutdown.
@@ -4420,9 +4420,9 @@ by Eric Young (eay@cryptsoft.com).
   declarations).
 
 - Finish fixing a bug where bogus data would sometimes get logged to
-  the dhclient.leases file because it was opened as descriptor 2.
+  the ub-dhclient.leases file because it was opened as descriptor 2.
 
-- Fix the Linux dhclient-script according to suggestions made by
+- Fix the Linux ub-dhclient-script according to suggestions made by
   several people on the dhcp-client mailing list.
 
 - Log successful DNS updates at LOG_INFO, not LOG_ERROR.
@@ -4456,7 +4456,7 @@ by Eric Young (eay@cryptsoft.com).
   that nonexistant record would time out because the name was the null
   string.
 
-- Clean up the omshell, dhcpctl and omapi man pages a bit.
+- Clean up the ub-omshell, ub-dhcpctl and ub-omapi man pages a bit.
 
 		Changes since 3.0 Release Candidate 8
 
@@ -4491,7 +4491,7 @@ by Eric Young (eay@cryptsoft.com).
 
 - Add some configurability to the build system.
 
-- Install omshell manual page in man1, not man8.
+- Install ub-omshell manual page in man1, not man8.
 
 - Craig Gwydir sent in a patch that fixes a long-standing bug in the
   DHCP client that could cause core dumps, but that for some reason
@@ -4529,7 +4529,7 @@ by Eric Young (eay@cryptsoft.com).
 
 - Add support for Darwin/MacOS X
 
-- Install omshell (including new documentation).
+- Install ub-omshell (including new documentation).
 
 - Support DNS updates in the client (this is a very obscure feature
   that most DHCP client users probably will not be able to use).
@@ -4547,7 +4547,7 @@ by Eric Young (eay@cryptsoft.com).
 - Don't send updates for attributes on an object when the attributes
   haven't changed.   Support deleting attributes on remote objects.
 
-- Fix a number of bugs in omshell, and add the unset and refresh
+- Fix a number of bugs in ub-omshell, and add the unset and refresh
   statements.
 
 - Handle disconnects in OMAPI a little bit more intelligently (so that
@@ -4567,7 +4567,7 @@ by Eric Young (eay@cryptsoft.com).
 - Fix a memory leak that could happen in certain obscure cases when
   using omapi to manipulate leases.
 
-- Fix some bugs and omissions in omshell.
+- Fix some bugs and omissions in ub-omshell.
 
 		Changes since 3.0 Release Candidate 5
 
@@ -4585,7 +4585,7 @@ by Eric Young (eay@cryptsoft.com).
 - Clean up the memory allocation/reference history printer.
 
 - Support input of dotted quads and colon-separated hex lists as
-  attribute values in omshell.
+  attribute values in ub-omshell.
 
 - Fix a typo in the Linux interface discovery code.
 
@@ -4628,7 +4628,7 @@ by Eric Young (eay@cryptsoft.com).
 - Different SIOCGIFCONF probe code, may "fix" problem on some Linux
   systems with the probe not working correctly.
 
-- Don't allow user to type omapi key on command line of omshell.
+- Don't allow user to type omapi key on command line of ub-omshell.
 
 		Changes since 3.0 Release Candidate 3
 
@@ -4726,7 +4726,7 @@ by Eric Young (eay@cryptsoft.com).
 - Went over problematic failover state transitions and made them all
   work, so that failover should now much less fragile.
 
-- Add some dhcpctl and omapi documentation
+- Add some ub-dhcpctl and omapi documentation
 
 - Fix compile errors when compiling with unusual predefines.
 
@@ -4818,7 +4818,7 @@ by Eric Young (eay@cryptsoft.com).
 - Allow the server to be placed in partner-down state using OMAPI.
   (Damien Neil)
 
-- Implement omshell, which can be used to do arbitrary things to the
+- Implement ub-omshell, which can be used to do arbitrary things to the
   server (in theory). (Damien Neil)
 
 - Fix a case where if a client had two different leases the server could
@@ -5036,7 +5036,7 @@ by Eric Young (eay@cryptsoft.com).
 
 - Allow administrator to disable ping checking.
 
-- Clean up dhcpd.conf documentation and add more information about how
+- Clean up ub-dhcpd.conf documentation and add more information about how
   it works.
 
 		Changes since 3.0 Beta 2 Patchlevel 10
@@ -5132,10 +5132,10 @@ by Eric Young (eay@cryptsoft.com).
 
 - Fix NetWare/IP option parsing.
 
-- Better error/status checking in dhcpctl initialization and omapi
+- Better error/status checking in ub-dhcpctl initialization and omapi
   connection code.
 
-- Fix a potential memory smash in dhcpctl code.
+- Fix a potential memory smash in ub-dhcpctl code.
 
 - Fix SunOS4 and (maybe) Ultrix builds.
 

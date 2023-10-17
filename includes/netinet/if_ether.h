@@ -1,6 +1,7 @@
 /*	$NetBSD: if_ether.h,v 1.20 1995/06/12 00:47:27 mycroft Exp $	*/
 
 /*
+ * Copyright (c) 2023-2023 Hisilicon Limited.
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -59,4 +60,18 @@ struct	isc_ether_header {
 
 #define ETHER_HEADER_SIZE (ETHER_ADDR_LEN * 2 + sizeof (u_int16_t))
 
+#define GUID_LEN		16
+#define UB_ADDR_LEN		16
+#define PROTOBYTES		2
+#define PROTO_OFFSET	(GUID_LEN - PROTOBYTES)
+#define DHCPV4_PROTO	0x100
+#define DHCPV6_PROTO	0x101
+#define DHCP_CFG		5
+
+struct ub_link_header {
+	u_int8_t ub_cfg;
+	u_int16_t ub_protocol;
+	u_int8_t ub_dguid[GUID_LEN];
+	u_int8_t ub_sguid[GUID_LEN];
+} __attribute__((packed));
 #endif

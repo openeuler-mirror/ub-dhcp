@@ -1,4 +1,4 @@
-.\"	dhcpd.conf.5
+.\"	ub-dhcpd.conf.5
 .\"
 .\" Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
 .\" Copyright (c) 1996-2003 by Internet Software Consortium
@@ -27,18 +27,18 @@
 .\" Support and other services are available for ISC products - see
 .\" https://www.isc.org for more information or to learn more about ISC.
 .\"
-.\" $Id: dhcpd.conf.5,v 1.114 2012/04/02 22:47:35 sar Exp $
+.\" $Id: ub-dhcpd.conf.5,v 1.114 2012/04/02 22:47:35 sar Exp $
 .\"
-.TH dhcpd.conf 5
+.TH ub-dhcpd.conf 5
 .SH NAME
-dhcpd.conf - dhcpd configuration file
+ub-dhcpd.conf - ub-dhcpd configuration file
 .SH DESCRIPTION
-The dhcpd.conf file contains configuration information for
-.IR dhcpd,
+The ub-dhcpd.conf file contains configuration information for
+.IR ub-dhcpd,
 the Internet Systems Consortium DHCP Server.
 .PP
-The dhcpd.conf file is a free-form ASCII text file.  It is parsed by
-the recursive-descent parser built into dhcpd.  The file may contain
+The ub-dhcpd.conf file is a free-form ASCII text file.  It is parsed by
+the recursive-descent parser built into ub-dhcpd.  The file may contain
 extra tabs and newlines for formatting purposes.  Keywords in the file
 are case-insensitive.  Comments may be placed anywhere within the
 file (except within quotes).  Comments begin with the # character and
@@ -48,7 +48,7 @@ The file essentially consists of a list of statements.  Statements
 fall into two broad categories - parameters and declarations.
 .PP
 Parameter statements either say how to do something (e.g., how long a
-lease to offer), whether to do something (e.g., should dhcpd provide
+lease to offer), whether to do something (e.g., should ub-dhcpd provide
 addresses to unknown clients), or what parameters to provide to the
 client (e.g., use gateway 220.177.244.7).
 .PP
@@ -72,7 +72,7 @@ can be used.
 .PP
 For every subnet which will be served, and for every subnet
 to which the dhcp server is connected, there must be one \fIsubnet\fR
-declaration, which tells dhcpd how to recognize that an address is on
+declaration, which tells ub-dhcpd how to recognize that an address is on
 that subnet.  A \fIsubnet\fR declaration is required for each subnet
 even if no addresses will be dynamically allocated on that subnet.
 .PP
@@ -114,7 +114,7 @@ twice, and if parameters are declared in more than one scope, the
 parameter declared in the most specific scope is the one that is
 used.
 .PP
-When dhcpd tries to find a \fIhost\fR declaration for a client, it
+When ub-dhcpd tries to find a \fIhost\fR declaration for a client, it
 first looks for a \fIhost\fR declaration which has a
 \fIfixed-address\fR declaration that lists an IP address that is valid
 for the subnet or shared network on which the client is booting.  If
@@ -122,7 +122,7 @@ it doesn't find any such entry, it tries to find an entry which has
 no \fIfixed-address\fR declaration.
 .SH EXAMPLES
 .PP
-A typical dhcpd.conf file will look something like this:
+A typical ub-dhcpd.conf file will look something like this:
 .nf
 
 .I global parameters...
@@ -218,7 +218,7 @@ You may have noticed that while some parameters start with the
 \fIoption\fR keyword, some do not.  Parameters starting with the
 \fIoption\fR keyword correspond to actual DHCP options, while
 parameters that do not start with the option keyword either control
-the behavior of the DHCP server (e.g., how long a lease dhcpd will
+the behavior of the DHCP server (e.g., how long a lease ub-dhcpd will
 give out), or specify client parameters that are not optional in the
 DHCP protocol (for example, server-name and filename).
 .PP
@@ -443,7 +443,7 @@ for allocation, and begin to reuse them.  This is called putting the
 server into the PARTNER-DOWN state.
 .PP
 You can put the server into the PARTNER-DOWN state either by using the
-.B omshell (1)
+.B ub-omshell (1)
 command or by stopping the server, editing the last failover state
 declaration in the lease file, and restarting the server.  If you use
 this last method, change the "my state" line to:
@@ -537,7 +537,7 @@ do any mixed pools.  Also,  use the same master configuration file for
 both  servers,  and  have  a  separate file  that  contains  the  peer
 declaration and includes the master file.  This will help you to avoid
 configuration  mismatches.  As our  implementation evolves,  this will
-become  less of  a  problem.  A  basic  sample dhcpd.conf  file for  a
+become  less of  a  problem.  A  basic  sample ub-dhcpd.conf  file for  a
 primary server might look like this:
 .PP
 .nf
@@ -554,7 +554,7 @@ failover peer "foo" {
   load balance max seconds 3;
 }
 
-include "/etc/dhcpd.master";
+include "/etc/ub-dhcpd.master";
 .fi
 .PP
 The statements in the peer declaration are as follows:
@@ -1058,7 +1058,7 @@ option will be checked against the class\'s hash table.  If a subclass
 is found that matches the circuit ID, the client will be classified in
 that subclass and treated accordingly.  If no subclass is found
 matching the circuit ID, a new one will be created and logged in the
-.B dhcpd.leases
+.B ub-dhcpd.leases
 file, and the client will be classified in this new class.  Once the
 client has been classified, it will be treated according to the rules
 of the class, including, in this case, being subject to the per-site
@@ -1345,7 +1345,7 @@ zone "17.10.10.in-addr.arpa" {
 .PP
 You will also have to configure your DHCP server to do updates to
 these zones.  To do so, you need to add something like this to your
-dhcpd.conf file:
+ub-dhcpd.conf file:
 .PP
 .nf
 key DHCP_UPDATER {
@@ -1503,7 +1503,7 @@ name, enclosed in quotes.
  \fB}\fR
 .fi
 .PP
-The \fIsubnet\fR statement is used to provide dhcpd with enough
+The \fIsubnet\fR statement is used to provide ub-dhcpd with enough
 information to tell whether or not an IP address is on that subnet.
 It may also be used to provide subnet-specific parameters and to
 specify what addresses may be dynamically allocated to clients booting
@@ -1537,7 +1537,7 @@ override the subnet mask declared in the subnet statement.
  \fB}\fR
 .fi
 .PP
-The \fIsubnet6\fR statement is used to provide dhcpd with enough
+The \fIsubnet6\fR statement is used to provide ub-dhcpd with enough
 information to tell whether or not an IPv6 address is on that subnet6.
 It may also be used to provide subnet-specific parameters and to
 specify what addresses may be dynamically allocated to clients booting
@@ -1735,7 +1735,7 @@ declarations.
  \fBdeny unknown-clients;\fR
  \fBignore unknown-clients;\fR
 .PP
-The \fBunknown-clients\fR flag is used to tell dhcpd whether
+The \fBunknown-clients\fR flag is used to tell ub-dhcpd whether
 or not to dynamically assign addresses to unknown clients.  Dynamic
 address assignment to unknown clients is \fBallow\fRed by default.
 An unknown client is simply a client that has no host declaration.
@@ -1753,7 +1753,7 @@ heading ALLOW AND DENY WITHIN POOL DECLARATIONS.
  \fBdeny bootp;\fR
  \fBignore bootp;\fR
 .PP
-The \fBbootp\fR flag is used to tell dhcpd whether
+The \fBbootp\fR flag is used to tell ub-dhcpd whether
 or not to respond to bootp queries.  Bootp queries are \fBallow\fRed
 by default.
 .PP
@@ -1765,7 +1765,7 @@ by default.
  \fBdeny booting;\fR
  \fBignore booting;\fR
 .PP
-The \fBbooting\fR flag is used to tell dhcpd whether or not to respond
+The \fBbooting\fR flag is used to tell ub-dhcpd whether or not to respond
 to queries from a particular client.  This keyword only has meaning
 when it appears in a host declaration.  By default, booting is
 \fBallow\fRed, but if it is disabled for a particular client, then
@@ -2131,7 +2131,7 @@ persistent storage.  This configuration parameter selects one of two output
 formats.  The \fIdefault\fR format prints the day, date, and time in UTC,
 while the \fIlocal\fR format prints the system seconds-since-epoch, and
 helpfully provides the day and time in the system timezone in a comment.
-The time formats are described in detail in the dhcpd.leases(5) manpage.
+The time formats are described in detail in the ub-dhcpd.leases(5) manpage.
 .RE
 .PP
 The \fIddns-hostname\fR statement
@@ -2237,7 +2237,7 @@ The
 .I style
 parameter must be one of \fBstandard\fR, \fBinterim\fR or \fBnone\fR.
 The \fIddns-update-style\fR statement is only meaningful in the outer
-scope - it is evaluated once after reading the dhcpd.conf file, rather
+scope - it is evaluated once after reading the ub-dhcpd.conf file, rather
 than each time a client is assigned an IP address, so there is no way
 to use different DNS update styles for different clients. The default
 is \fBnone\fR.
@@ -2416,7 +2416,7 @@ statement
 The \fIdynamic-bootp-lease-cutoff\fR statement sets the ending time
 for all leases assigned dynamically to BOOTP clients.  Because BOOTP
 clients do not have any way of renewing leases, and don't know that
-their leases could expire, by default dhcpd assigns infinite leases
+their leases could expire, by default ub-dhcpd assigns infinite leases
 to all BOOTP clients.  However, it may make sense in some situations
 to set a cutoff date for all BOOTP leases - for example, the end of a
 school term, or the time at night when a facility is closed and all
@@ -2554,7 +2554,7 @@ statement
 .PP
 .B get-lease-hostnames\fR \fIflag\fR\fB;\fR
 .PP
-The \fIget-lease-hostnames\fR statement is used to tell dhcpd whether
+The \fIget-lease-hostnames\fR statement is used to tell ub-dhcpd whether
 or not to look up the domain name corresponding to the IP address of
 each address in the lease pool and use that address for the DHCP
 \fIhostname\fR option.  If \fIflag\fR is true, then this lookup is
@@ -2652,7 +2652,7 @@ statement
 .PP
 .I Name
 Where \fIname\fR is the name of the DHCP server's lease file. By default,
-this is DBDIR/dhcpd.leases.  This statement \fBmust\fR appear in the outer
+this is DBDIR/ub-dhcpd.leases.  This statement \fBmust\fR appear in the outer
 scope of the configuration file - if it appears in some other scope, it will
 have no effect.  The value must be the absolute path of the file to use.
 The order of precedence the server uses for the lease file name
@@ -2671,7 +2671,7 @@ statement
 .B dhcpv6-lease-file-name \fIname\fB;\fR
 .PP
 Where \fIname\fR is the name of the DHCP server's lease file when the server
-is running DHCPv6. By default, this is DBDIR/dhcpd6.leases. This statement
+is running DHCPv6. By default, this is DBDIR/ub-dhcpd6.leases. This statement
 \fBmust\fR appear in the outer scope of the configuration file - if it appears
 in some other scope, it will have no effect.  The value must be the absolute
 path of the file to use.  The order of precedence the server uses
@@ -2788,7 +2788,7 @@ statement
 .B log-facility \fIfacility\fB;\fR
 .PP
 This statement causes the DHCP server to do all of its logging on the
-specified log facility once the dhcpd.conf file has been read.  By
+specified log facility once the ub-dhcpd.conf file has been read.  By
 default the DHCP server logs to the daemon facility.  Possible log
 facilities include auth, authpriv, cron, daemon, ftp, kern, lpr, mail,
 mark, news, ntp, security, syslog, user, uucp, and local0 through
@@ -2801,7 +2801,7 @@ file to configure logging of the DHCP server.  For example, you might
 add a line like this:
 .PP
 .nf
-	local7.debug /var/log/dhcpd.log
+	local7.debug /var/log/ub-dhcpd.log
 .fi
 .PP
 The syntax of the \fIsyslog.conf\fR file may be different on some
@@ -2814,8 +2814,8 @@ Some systems support log rollover using a shell script or program
 called newsyslog or logrotate, and you may be able to configure this
 as well so that your log file doesn't grow uncontrollably.
 .PP
-Because the \fIlog-facility\fR setting is controlled by the dhcpd.conf
-file, log messages printed while parsing the dhcpd.conf file or before
+Because the \fIlog-facility\fR setting is controlled by the ub-dhcpd.conf
+file, log messages printed while parsing the ub-dhcpd.conf file or before
 parsing it are logged to the default log facility.  To prevent this,
 see the README file included with this distribution, which describes
 BUG: where is that mentioned in README?
@@ -2985,7 +2985,7 @@ statement
 .I Name
 should be the name of the DHCP server's process ID file.  This is the
 file in which the DHCP server's process ID is stored when the server
-starts.  By default, this is RUNDIR/dhcpd.pid.  Like the \fIlease-file-name\fR
+starts.  By default, this is RUNDIR/ub-dhcpd.pid.  Like the \fIlease-file-name\fR
 statement, this statement must appear in the outer scope of the configuration
 file. The order of precedence used by the server is:
 .PP
@@ -3002,7 +3002,7 @@ statement
 .PP
 .I Name
 is the name of the pid file to use if and only if the server is running
-in DHCPv6 mode.  By default, this is DBDIR/dhcpd6.pid.  This statement,
+in DHCPv6 mode.  By default, this is DBDIR/ub-dhcpd6.pid.  This statement,
 like \fIpid-file-name\fr, \fBmust\fR appear in the outer scope of the
 configuration file.  The order of precedence used by the server is:
 .PP
@@ -3198,7 +3198,7 @@ statement
 .PP
 .B release-on-roam \fIflag\fB;\fR
 .PP
-When enabled and the dhcpd server detects that a DHCPv6 client (IAID+DUID)
+When enabled and the ub-dhcpd server detects that a DHCPv6 client (IAID+DUID)
 has roamed to a new network, it will release the pre-existing leases on the
 old network and emit a log statement similiar to the following:
 
@@ -3669,9 +3669,10 @@ documented in the
 .B dhcp-eval(5)
 manual page.
 .SH SEE ALSO
-dhcpd(8), dhcpd.leases(5), dhcp-options(5), dhcp-eval(5), RFC2132, RFC2131.
+ub-dhcpd(8), ub-dhcpd.leases(5), ub-dhcp-options(5), ub-dhcp-eval(5), RFC2132, RFC2131.
 .SH AUTHOR
-.B dhcpd.conf(5)
+.B ub-dhcpd.conf(5)
 is maintained by ISC.
 Information about Internet Systems Consortium can be found at
 .B https://www.isc.org.
+

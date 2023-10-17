@@ -13,7 +13,7 @@ ATF_TESTS += alloc_unittest dns_unittest misc_unittest ns_name_unittest \
 
 alloc_unittest_SOURCES = test_alloc.c $(top_srcdir)/tests/t_api_dhcp.c
 alloc_unittest_LDADD = $(ATF_LDFLAGS)
-alloc_unittest_LDADD += ../libdhcp.@A@ ../../omapip/libomapi.@A@ \
+alloc_unittest_LDADD += ../libub-dhcp.@A@ ../../omapip/libub-omapi.@A@ \
 	@BINDLIBIRSDIR@/libirs.@A@ \
 	@BINDLIBDNSDIR@/libdns.@A@ \
 	@BINDLIBISCCFGDIR@/libisccfg.@A@  \
@@ -21,7 +21,7 @@ alloc_unittest_LDADD += ../libdhcp.@A@ ../../omapip/libomapi.@A@ \
 
 dns_unittest_SOURCES = dns_unittest.c $(top_srcdir)/tests/t_api_dhcp.c
 dns_unittest_LDADD = $(ATF_LDFLAGS)
-dns_unittest_LDADD += ../libdhcp.@A@ ../../omapip/libomapi.@A@ \
+dns_unittest_LDADD += ../libub-dhcp.@A@ ../../omapip/libub-omapi.@A@ \
 	@BINDLIBIRSDIR@/libirs.@A@ \
 	@BINDLIBDNSDIR@/libdns.@A@ \
 	@BINDLIBISCCFGDIR@/libisccfg.@A@  \
@@ -29,7 +29,7 @@ dns_unittest_LDADD += ../libdhcp.@A@ ../../omapip/libomapi.@A@ \
 
 misc_unittest_SOURCES = misc_unittest.c $(top_srcdir)/tests/t_api_dhcp.c
 misc_unittest_LDADD = $(ATF_LDFLAGS)
-misc_unittest_LDADD += ../libdhcp.@A@ ../../omapip/libomapi.@A@ \
+misc_unittest_LDADD += ../libub-dhcp.@A@ ../../omapip/libub-omapi.@A@ \
 	@BINDLIBIRSDIR@/libirs.@A@ \
 	@BINDLIBDNSDIR@/libdns.@A@ \
 	@BINDLIBISCCFGDIR@/libisccfg.@A@  \
@@ -37,7 +37,7 @@ misc_unittest_LDADD += ../libdhcp.@A@ ../../omapip/libomapi.@A@ \
 
 ns_name_unittest_SOURCES = ns_name_test.c $(top_srcdir)/tests/t_api_dhcp.c
 ns_name_unittest_LDADD = $(ATF_LDFLAGS)
-ns_name_unittest_LDADD += ../libdhcp.@A@ ../../omapip/libomapi.@A@ \
+ns_name_unittest_LDADD += ../libub-dhcp.@A@ ../../omapip/libub-omapi.@A@ \
 	@BINDLIBIRSDIR@/libirs.@A@ \
 	@BINDLIBDNSDIR@/libdns.@A@ \
 	@BINDLIBISCCFGDIR@/libisccfg.@A@  \
@@ -45,7 +45,7 @@ ns_name_unittest_LDADD += ../libdhcp.@A@ ../../omapip/libomapi.@A@ \
 
 option_unittest_SOURCES = option_unittest.c $(top_srcdir)/tests/t_api_dhcp.c
 option_unittest_LDADD = $(ATF_LDFLAGS)
-option_unittest_LDADD += ../libdhcp.@A@ ../../omapip/libomapi.@A@ \
+option_unittest_LDADD += ../libub-dhcp.@A@ ../../omapip/libub-omapi.@A@ \
 	@BINDLIBIRSDIR@/libirs.@A@ \
 	@BINDLIBDNSDIR@/libdns.@A@ \
 	@BINDLIBISCCFGDIR@/libisccfg.@A@  \
@@ -54,7 +54,7 @@ option_unittest_LDADD += ../libdhcp.@A@ ../../omapip/libomapi.@A@ \
 domain_name_unittest_SOURCES = domain_name_test.c \
 	$(top_srcdir)/tests/t_api_dhcp.c
 domain_name_unittest_LDADD = $(ATF_LDFLAGS)
-domain_name_unittest_LDADD += ../libdhcp.@A@ ../../omapip/libomapi.@A@ \
+domain_name_unittest_LDADD += ../libub-dhcp.@A@ ../../omapip/libub-omapi.@A@ \
 	@BINDLIBIRSDIR@/libirs.@A@ \
 	@BINDLIBDNSDIR@/libdns.@A@ \
 	@BINDLIBISCCFGDIR@/libisccfg.@A@  \

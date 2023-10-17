@@ -1,4 +1,4 @@
-.\"	omapi.3
+.\"	ub-omapi.3
 .\"
 .\" Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
 .\" Copyright (c) 2000-2003 by Internet Software Consortium
@@ -220,8 +220,8 @@ the connection the user must call dhcpctl_new_authenticator.
 .fi
 .PP
 The keyname, algorithm and must all match what is specified in the server's
-dhcpd.conf file, excepting that the secret should appear in \'raw\' form, not
-in base64 as it would in dhcpd.conf:
+ub-dhcpd.conf file, excepting that the secret should appear in \'raw\' form, not
+in base64 as it would in ub-dhcpd.conf:
 .PP
 .nf
 		key "a-key-name" {
@@ -239,9 +239,10 @@ dhcpctl_new_authenticator must be given as the last (the 4th) argument
 to the call to dhcpctl_connect(). All messages will then be signed
 with the given secret string using the specified algorithm.
 .SH SEE ALSO
-dhcpctl(3), omshell(1), dhcpd(8), dhclient(8), dhcpd.conf(5), dhclient.conf(5).
+ub-dhcpctl(3), ub-omshell(1), ub-dhcpd(8), ub-dhclient(8), ub-dhcpd.conf(5), ub-dhclient.conf(5).
 .SH AUTHOR
 .B omapi
 is maintained by ISC.  To learn more about Internet Systems Consortium,
 see
 .B https://www.isc.org
+

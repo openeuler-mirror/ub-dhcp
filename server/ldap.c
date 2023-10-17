@@ -1461,7 +1461,7 @@ ldap_start (void)
   if (ldap_use_ssl == -1)
     {
       /*
-      ** There was no "ldap-ssl" option in dhcpd.conf (also not "off").
+      ** There was no "ldap-ssl" option in ub-dhcpd.conf (also not "off").
       ** Let's try, if we can use an anonymous TLS session without to
       ** verify the server certificate -- if not continue without TLS.
       */

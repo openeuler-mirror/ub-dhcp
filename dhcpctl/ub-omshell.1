@@ -21,21 +21,21 @@
 .\"   <info@isc.org>
 .\"   https://www.isc.org/
 .\"
-.TH omshell 1
+.TH ub-omshell 1
 .SH NAME
-omshell - OMAPI Command Shell
+ub-omshell - OMAPI Command Shell
 .SH SYNOPSIS
-.B omshell
+.B ub-omshell
 .SH DESCRIPTION
-The OMAPI Command Shell, omshell, provides an interactive way to connect to,
+The OMAPI Command Shell, ub-omshell, provides an interactive way to connect to,
 query, and possibly change, the ISC DHCP Server's state via OMAPI, the Object
-Management API.  By using OMAPI and omshell, you do not have to stop, make
+Management API.  By using OMAPI and ub-omshell, you do not have to stop, make
 changes, and then restart the DHCP server, but can make the changes
 while the server is running.  Omshell provides a way of accessing
 OMAPI.
 .PP
 OMAPI is simply a communications mechanism that allows you to
-manipulate objects.  In order to actually \fIuse\fR omshell, you
+manipulate objects.  In order to actually \fIuse\fR ub-omshell, you
 .I must
 understand what objects are available and how to use them.
 Documentation for OMAPI objects can be found in the documentation for
@@ -54,14 +54,14 @@ consider implementing them.
 .SH LOCAL AND REMOTE OBJECTS
 .PP
 Throughout this document, there are references to local and remote objects.
-Local objects are ones created in omshell with the \fBnew\fR command.  Remote
+Local objects are ones created in ub-omshell with the \fBnew\fR command.  Remote
 objects are ones on the server: leases, hosts, and groups that the DHCP
 server knows about.  Local and remote objects are associated together to
 enable viewing and modification of object attributes.  Also, new remote
 objects can be created to match local objects.
 .SH OPENING A CONNECTION
 .PP
-omshell is started from the command line.  Once omshell is started, there are
+ub-omshell is started from the command line.  Once ub-omshell is started, there are
 several commands that can be issued:
 .PP
 .B server \fIaddress\fR
@@ -78,10 +78,10 @@ where number is the port that OMAPI listens on.  By default, this is 7911.
 .B key \fIname secret\fR
 .RS 0.5i
 This specifies the TSIG key to use to authenticate the OMAPI transactions.
-\fIname\fR is the name of a key defined in \fIdhcpd.conf\fR with the
+\fIname\fR is the name of a key defined in \fIub-dhcpd.conf\fR with the
 \fBomapi-key\fR statement.  The \fIsecret\fR is the secret key generated from
 \fBdnssec-keygen\fR or another key generation program.  The key algorithm is
-assumed to be HMAC-MD5 key. If a different algorithm was specified in dhcpd.conf
+assumed to be HMAC-MD5 key. If a different algorithm was specified in ub-dhcpd.conf
 file for the key, then it must be specified via the \fIkey-algorithm\fR statement.
 .RE
 .PP
@@ -108,7 +108,7 @@ statement.
 .PP
 Any object defined in OMAPI can be created, queried, and/or modified.  The
 object types available to OMAPI are defined in \fBdhcpd(8)\fR and
-\fBdhclient(8)\fR.  When using omshell, objects are first defined locally,
+\fBdhclient(8)\fR.  When using ub-omshell, objects are first defined locally,
 manipulated as desired, and then associated with an object on the server.
 Only one object can be manipulated at a time.  To create a local object, use
 .PP
@@ -136,7 +136,7 @@ At this point, you can query the server for information about this lease, by
 Now, the local lease object you created and set the IP address for is associated
 with the corresponding lease object on the DHCP server.  All of the lease
 attributes from the DHCP server are now also the attributes on the local
-object, and will be shown in omshell.
+object, and will be shown in ub-omshell.
 .SH VIEWING A REMOTE OBJECT
 .PP
 To query a lease of address 192.168.4.50, and find out its attributes, after
@@ -237,7 +237,7 @@ the same properties by using
 .PP
 Now a new object exists on the DHCP server which matches the properties that
 you gave your local object.  Objects created via OMAPI are saved into the
-dhcpd.leases file.
+ub-hcpd.leases file.
 .PP
 For example, if a new host with the IP address of 192.168.4.40 needs to be
 created it would be done as follows:
@@ -272,7 +272,7 @@ ip-address = c0:a8:04:28
 >
 .fi
 .PP
-Your dhcpd.leases file would then have an entry like this in it:
+Your ub-dhcpd.leases file would then have an entry like this in it:
 .nf
 .sp 1
 host some-host {
@@ -283,14 +283,14 @@ host some-host {
 .fi
 .PP
 The \fIdynamic;\fR line is to denote that this host entry did not come from
-dhcpd.conf, but was created dynamically via OMAPI.
+ub-dhcpd.conf, but was created dynamically via OMAPI.
 .SH RESETTING ATTRIBUTES
 .PP
 If you want to remove an attribute from an object, you can do this with the
 \fBunset\fR command.  Once you have unset an attribute, you must use the
 \fBupdate\fR command to update the remote object.  So, if the host "some-host"
 from the previous example will not have a static IP address anymore, the
-commands in omshell would look like this:
+commands in ub-omshell would look like this:
 .nf
 .sp 1
 obj: host
@@ -333,11 +333,12 @@ obj: <null>
 .SH HELP
 .PP
 The \fBhelp\fR command will print out all of the commands available in
-omshell, with some syntax pointers.
+ub-omshell, with some syntax pointers.
 .SH SEE ALSO
-dhcpctl(3), omapi(3), dhcpd(8), dhclient(8), dhcpd.conf(5), dhclient.conf(5).
+ub-dhcpctl(3), ub-omapi(3), ub-dhcpd(8), ub-dhclient(8), ub-dhcpd.conf(5), ub-dhclient.conf(5).
 .SH AUTHOR
-.B omshell
+.B ub-omshell
 is maintained by ISC.  To learn more about Internet Systems Consortium,
 see
 .B https://www.isc.org
+

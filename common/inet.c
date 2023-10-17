@@ -4,6 +4,7 @@
    way... */
 
 /*
+ * Copyright (c) 2023-2023 Hisilicon Limited.
  * Copyright (C) 2004-2022 Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1995-2003 by Internet Software Consortium
  *
@@ -522,7 +523,7 @@ free_iaddrcidrnetlist(struct iaddrcidrnetlist **result) {
 static const char *
 inet_ntopdd(const unsigned char *src, unsigned srclen, char *dst, size_t size)
 {
-	char tmp[sizeof("32.255.255.255.255")];
+	char tmp[sizeof("255.255.255.255.255")];
 	int len;
 
 	switch (srclen) {

@@ -552,6 +552,9 @@ main(int argc, char **argv) {
 					   "record interface", argv [i],
 					   isc_result_totext (result));
 			strcpy (tmp -> name, argv [i]);
+			get_hw_addr(tmp);
+			if (tmp->hw_address.hbuf[0] != HTYPE_UB)
+				log_fatal("Unsupported non-ub device for \"%s\"", tmp->name);
 			if (interfaces) {
 				interface_reference (&tmp -> next,
 						     interfaces, MDL);
@@ -827,7 +830,7 @@ main(int argc, char **argv) {
 	}
 #endif /* DHCPv6 */
 
-	/* Read the dhcpd.conf file... */
+	/* Read the ub-dhcpd.conf file... */
 	if (readconf () != ISC_R_SUCCESS)
 		log_fatal ("Configuration file errors encountered -- exiting");
 

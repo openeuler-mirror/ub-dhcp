@@ -114,43 +114,43 @@ am__alloc_unittest_SOURCES_DIST = test_alloc.c \
 alloc_unittest_OBJECTS = $(am_alloc_unittest_OBJECTS)
 am__DEPENDENCIES_1 =
 @HAVE_ATF_TRUE@alloc_unittest_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-@HAVE_ATF_TRUE@	../libdhcp.@A@ ../../omapip/libomapi.@A@
+@HAVE_ATF_TRUE@	../libub-dhcp.@A@ ../../omapip/libub-omapi.@A@
 am__dns_unittest_SOURCES_DIST = dns_unittest.c \
 	$(top_srcdir)/tests/t_api_dhcp.c
 @HAVE_ATF_TRUE@am_dns_unittest_OBJECTS = dns_unittest.$(OBJEXT) \
 @HAVE_ATF_TRUE@	t_api_dhcp.$(OBJEXT)
 dns_unittest_OBJECTS = $(am_dns_unittest_OBJECTS)
 @HAVE_ATF_TRUE@dns_unittest_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-@HAVE_ATF_TRUE@	../libdhcp.@A@ ../../omapip/libomapi.@A@
+@HAVE_ATF_TRUE@	../libub-dhcp.@A@ ../../omapip/libub-omapi.@A@
 am__domain_name_unittest_SOURCES_DIST = domain_name_test.c \
 	$(top_srcdir)/tests/t_api_dhcp.c
 @HAVE_ATF_TRUE@am_domain_name_unittest_OBJECTS =  \
 @HAVE_ATF_TRUE@	domain_name_test.$(OBJEXT) t_api_dhcp.$(OBJEXT)
 domain_name_unittest_OBJECTS = $(am_domain_name_unittest_OBJECTS)
 @HAVE_ATF_TRUE@domain_name_unittest_DEPENDENCIES =  \
-@HAVE_ATF_TRUE@	$(am__DEPENDENCIES_1) ../libdhcp.@A@ \
-@HAVE_ATF_TRUE@	../../omapip/libomapi.@A@
+@HAVE_ATF_TRUE@	$(am__DEPENDENCIES_1) ../libub-dhcp.@A@ \
+@HAVE_ATF_TRUE@	../../omapip/libub-omapi.@A@
 am__misc_unittest_SOURCES_DIST = misc_unittest.c \
 	$(top_srcdir)/tests/t_api_dhcp.c
 @HAVE_ATF_TRUE@am_misc_unittest_OBJECTS = misc_unittest.$(OBJEXT) \
 @HAVE_ATF_TRUE@	t_api_dhcp.$(OBJEXT)
 misc_unittest_OBJECTS = $(am_misc_unittest_OBJECTS)
 @HAVE_ATF_TRUE@misc_unittest_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-@HAVE_ATF_TRUE@	../libdhcp.@A@ ../../omapip/libomapi.@A@
+@HAVE_ATF_TRUE@	../libub-dhcp.@A@ ../../omapip/libub-omapi.@A@
 am__ns_name_unittest_SOURCES_DIST = ns_name_test.c \
 	$(top_srcdir)/tests/t_api_dhcp.c
 @HAVE_ATF_TRUE@am_ns_name_unittest_OBJECTS = ns_name_test.$(OBJEXT) \
 @HAVE_ATF_TRUE@	t_api_dhcp.$(OBJEXT)
 ns_name_unittest_OBJECTS = $(am_ns_name_unittest_OBJECTS)
 @HAVE_ATF_TRUE@ns_name_unittest_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-@HAVE_ATF_TRUE@	../libdhcp.@A@ ../../omapip/libomapi.@A@
+@HAVE_ATF_TRUE@	../libub-dhcp.@A@ ../../omapip/libub-omapi.@A@
 am__option_unittest_SOURCES_DIST = option_unittest.c \
 	$(top_srcdir)/tests/t_api_dhcp.c
 @HAVE_ATF_TRUE@am_option_unittest_OBJECTS = option_unittest.$(OBJEXT) \
 @HAVE_ATF_TRUE@	t_api_dhcp.$(OBJEXT)
 option_unittest_OBJECTS = $(am_option_unittest_OBJECTS)
 @HAVE_ATF_TRUE@option_unittest_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-@HAVE_ATF_TRUE@	../libdhcp.@A@ ../../omapip/libomapi.@A@
+@HAVE_ATF_TRUE@	../libub-dhcp.@A@ ../../omapip/libub-omapi.@A@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -393,36 +393,36 @@ AM_CPPFLAGS = $(ATF_CFLAGS) -I$(top_srcdir)/includes
 EXTRA_DIST = Atffile Kyuafile
 ATF_TESTS = $(am__append_1)
 @HAVE_ATF_TRUE@alloc_unittest_SOURCES = test_alloc.c $(top_srcdir)/tests/t_api_dhcp.c
-@HAVE_ATF_TRUE@alloc_unittest_LDADD = $(ATF_LDFLAGS) ../libdhcp.@A@ \
-@HAVE_ATF_TRUE@	../../omapip/libomapi.@A@ \
+@HAVE_ATF_TRUE@alloc_unittest_LDADD = $(ATF_LDFLAGS) ../libub-dhcp.@A@ \
+@HAVE_ATF_TRUE@	../../omapip/libub-omapi.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBIRSDIR@/libirs.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBDNSDIR@/libdns.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBISCCFGDIR@/libisccfg.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBISCDIR@/libisc.@A@
 @HAVE_ATF_TRUE@dns_unittest_SOURCES = dns_unittest.c $(top_srcdir)/tests/t_api_dhcp.c
-@HAVE_ATF_TRUE@dns_unittest_LDADD = $(ATF_LDFLAGS) ../libdhcp.@A@ \
-@HAVE_ATF_TRUE@	../../omapip/libomapi.@A@ \
+@HAVE_ATF_TRUE@dns_unittest_LDADD = $(ATF_LDFLAGS) ../libub-dhcp.@A@ \
+@HAVE_ATF_TRUE@	../../omapip/libub-omapi.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBIRSDIR@/libirs.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBDNSDIR@/libdns.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBISCCFGDIR@/libisccfg.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBISCDIR@/libisc.@A@
 @HAVE_ATF_TRUE@misc_unittest_SOURCES = misc_unittest.c $(top_srcdir)/tests/t_api_dhcp.c
-@HAVE_ATF_TRUE@misc_unittest_LDADD = $(ATF_LDFLAGS) ../libdhcp.@A@ \
-@HAVE_ATF_TRUE@	../../omapip/libomapi.@A@ \
+@HAVE_ATF_TRUE@misc_unittest_LDADD = $(ATF_LDFLAGS) ../libub-dhcp.@A@ \
+@HAVE_ATF_TRUE@	../../omapip/libub-omapi.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBIRSDIR@/libirs.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBDNSDIR@/libdns.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBISCCFGDIR@/libisccfg.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBISCDIR@/libisc.@A@
 @HAVE_ATF_TRUE@ns_name_unittest_SOURCES = ns_name_test.c $(top_srcdir)/tests/t_api_dhcp.c
-@HAVE_ATF_TRUE@ns_name_unittest_LDADD = $(ATF_LDFLAGS) ../libdhcp.@A@ \
-@HAVE_ATF_TRUE@	../../omapip/libomapi.@A@ \
+@HAVE_ATF_TRUE@ns_name_unittest_LDADD = $(ATF_LDFLAGS) ../libub-dhcp.@A@ \
+@HAVE_ATF_TRUE@	../../omapip/libub-omapi.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBIRSDIR@/libirs.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBDNSDIR@/libdns.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBISCCFGDIR@/libisccfg.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBISCDIR@/libisc.@A@
 @HAVE_ATF_TRUE@option_unittest_SOURCES = option_unittest.c $(top_srcdir)/tests/t_api_dhcp.c
-@HAVE_ATF_TRUE@option_unittest_LDADD = $(ATF_LDFLAGS) ../libdhcp.@A@ \
-@HAVE_ATF_TRUE@	../../omapip/libomapi.@A@ \
+@HAVE_ATF_TRUE@option_unittest_LDADD = $(ATF_LDFLAGS) ../libub-dhcp.@A@ \
+@HAVE_ATF_TRUE@	../../omapip/libub-omapi.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBIRSDIR@/libirs.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBDNSDIR@/libdns.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBISCCFGDIR@/libisccfg.@A@ \
@@ -431,7 +431,7 @@ ATF_TESTS = $(am__append_1)
 @HAVE_ATF_TRUE@	$(top_srcdir)/tests/t_api_dhcp.c
 
 @HAVE_ATF_TRUE@domain_name_unittest_LDADD = $(ATF_LDFLAGS) \
-@HAVE_ATF_TRUE@	../libdhcp.@A@ ../../omapip/libomapi.@A@ \
+@HAVE_ATF_TRUE@	../libub-dhcp.@A@ ../../omapip/libub-omapi.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBIRSDIR@/libirs.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBDNSDIR@/libdns.@A@ \
 @HAVE_ATF_TRUE@	@BINDLIBISCCFGDIR@/libisccfg.@A@ \
