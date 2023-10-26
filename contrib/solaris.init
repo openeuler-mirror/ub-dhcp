@@ -1,0 +1,28 @@
+#!/bin/sh
+# Contributed by Brian Murrell
+ 
+state=$1
+ 
+set `who -r`
+case $state in
+ 
+'start')
+	if [ $9 = "2" -o $9 = "3" ]
+	then
+		exit
+	fi
+	if [ -f @PREFIX@/sbin/ub-dhcpd ]; then
+		echo "Starting the ISC DHCP server"
+		@PREFIX@/sbin/ub-dhcpd
+	fi
+	;;
+'stop')
+	if [ -f @PREFIX@/etc/ub-dhcpd.pid ]; then
+		PID=`cat @PREFIX@/etc/ub-dhcpd.pid`
+		if [ -d /proc/$PID ]; then
+			echo "Stopping the ISC DHCP server"
+			kill $PID
+		fi
+	fi
+	;;
+esac
