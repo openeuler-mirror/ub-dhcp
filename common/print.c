@@ -755,20 +755,23 @@ void print_ub_packet6 (unsigned char *buff, u_int32_t buf_len, unsigned char pri
 
 unsigned char get_message_type (struct dhcp_packet *packet)
 {
+	unsigned char ret = 0;
 	unsigned char option_header_len = 4;
 	int dhcp_packet_len = sizeof(struct dhcp_packet);
 	int option_start = dhcp_packet_len - DHCP_MAX_OPTION_LEN;
 	unsigned char *buf = (unsigned char *)malloc(dhcp_packet_len);
+	unsigned char *src_buf;
 
 	if (buf == NULL) {
 		log_fatal("%s:%d failed to alloc memory.\n", MDL);
-		return 0;
+		return ret;
 	}
 
+	src_buf = buf;
 	if (packet == NULL) {
 		log_info("DHCP packet is NULL.\n");
-		free(buf);
-		return 0;
+		free(src_buf);
+		return ret;
 	}
 
 	memcpy(buf, packet, dhcp_packet_len);
@@ -791,16 +794,18 @@ unsigned char get_message_type (struct dhcp_packet *packet)
 			/* check option53 message len */
 			buf_index++;
 			if (buf[buf_index] == 1) {
-				return buf[buf_index + 1];
+				ret = buf[buf_index + 1];
+				free(src_buf);
+				return ret;
 			} else {
 				log_info("Wrong message type len : [%u]\n", buf[buf_index]);
-				free(buf);
-				return 0;
+				free(src_buf);
+				return ret;
 			}
 		}
 	}
-	free(buf);
-	return 0;
+	free(src_buf);
+	return ret;
 }
 
 void record_packet_info (struct packet_record *pkt_record_info,
