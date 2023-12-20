@@ -347,6 +347,7 @@ static void lpf_gen_filter_setup (info)
 
 #endif /* USE_LPF_RECEIVE */
 
+#define PACKET_LEN 1536
 #ifdef USE_LPF_SEND
 ssize_t send_packet (interface, packet, raw, len, from, to, hto)
 	struct interface_info *interface;
@@ -380,6 +381,10 @@ ssize_t send_packet (interface, packet, raw, len, from, to, hto)
 	assemble_udp_ip_header (interface, buf, &ibufp, from.s_addr,
 				to -> sin_addr.s_addr, to -> sin_port,
 				(unsigned char *)raw, len);
+	if (len > sizeof(struct dhcp_packet) || len > PACKET_LEN - ibufp) {
+		log_error("Length [%lu] out of range\n", len);
+		return -1;
+	}
 	memcpy (buf + ibufp, raw, len);
 	/* ubh + iph + udph + dhcpPDU */
 	print_ub_packet((unsigned char *)(buf + fudge), ibufp - fudge + len, print_level);
