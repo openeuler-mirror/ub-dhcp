@@ -595,7 +595,7 @@ void show_duid_ll_msg(unsigned char *client_id_start)
 	show_client_id(index);
 }
 
-#define DUID_TYPE_OFFSET	5
+#define DUID_TYPE_OFFSET	4
 #define DUID_LLT_BYTES		24
 #define DUID_LL_BYTES		20
 void show_raw_ub_pdu6(struct dhcpv6_packet *tdp6, int len)
@@ -607,8 +607,8 @@ void show_raw_ub_pdu6(struct dhcpv6_packet *tdp6, int len)
 	int duid_type = 0;
 
 	p = (unsigned char *)&duid_type;
-	*p = tdp6->options[DUID_TYPE_OFFSET];
-	*(p + 1) = tdp6->options[DUID_TYPE_OFFSET + 1];
+	*p = tdp6->options[DUID_TYPE_OFFSET + 1];
+	*(p + 1) = tdp6->options[DUID_TYPE_OFFSET];
 
 	if (duid_type == DUID_LLT) {
 		duid_bytes = DUID_LLT_BYTES;
