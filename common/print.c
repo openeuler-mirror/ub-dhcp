@@ -327,6 +327,11 @@ void dump_addr (tdp)
 void dump_packet_send (tp_send)
 	struct dhcp_packet *tp_send;
 {
+	if (tp_send == NULL) {
+		log_debug("the send packet is null!");
+		return;
+	}
+
 	log_debug ("\nStart to parse packets:");
 	log_debug ("op \t= %u", tp_send -> op);
 	log_debug ("htype \t= %u", tp_send -> htype);
