@@ -41,6 +41,16 @@
 #endif /* PACKET_ASSEMBLY || PACKET_DECODING */
 
 #define IPV6_BASEHD_LEN 40
+u_int8_t ub_dguid_v4[GUID_LEN] = {0xFF, 0xFF, 0xFF, 0xFF,
+				  0xFF, 0xFF, 0xFF, 0xFF,
+				  0xFF, 0xFF, 0xFF, 0xFF,
+				  0xFF, 0xFF, 0x01, 0x00};
+
+u_int8_t ub_dguid_v6[GUID_LEN] = {0xFF, 0xFF, 0xFF, 0xFF,
+				  0xFF, 0xFF, 0xFF, 0xFF,
+				  0xFF, 0xFF, 0xFF, 0xFF,
+				  0xFF, 0xFF, 0x01, 0x01};
+
 /* Compute the easy part of the checksum on a range of bytes. */
 
 u_int32_t checksum (buf, nbytes, sum)
@@ -480,7 +490,7 @@ void assemble_ub_header (struct interface_info *interface,
 	memset(&ub_header, 0x0, sizeof(struct ub_link_header));
 	ub_header.ub_cfg = DHCP_CFG;
 	ub_header.ub_protocol = proto;
-	memset(ub_header.ub_dguid, 0xff, GUID_LEN);
+	memcpy(ub_header.ub_dguid, ub_dguid_v4, GUID_LEN);
 	if (interface->hw_address.hlen - 1 == sizeof(ub_header.ub_sguid)) {
 		memcpy(ub_header.ub_sguid, &interface->hw_address.hbuf[1],
 			interface->hw_address.hlen - 1);
@@ -500,7 +510,7 @@ void assemble_ub_header6 (struct interface_info *interface,
 	memset(&ub_header, 0x0, sizeof(struct ub_link_header));
 	ub_header.ub_cfg = DHCP_CFG;
 	ub_header.ub_protocol = proto;
-	memset(ub_header.ub_dguid, 0xff, GUID_LEN);
+	memcpy(ub_header.ub_dguid, ub_dguid_v6, GUID_LEN);
 	if (interface->hw_address.hlen - 1 == sizeof(ub_header.ub_sguid)) {
 		memcpy(ub_header.ub_sguid, &interface->hw_address.hbuf[1],
 			interface->hw_address.hlen - 1);
