@@ -1190,6 +1190,11 @@ int receive_ub_packet6(struct interface_info *interface,
 	/* Decode the IP and UDP headers... */
 	offset = decode_udp_ipv6_header(interface, buf, bufix,
 				       (unsigned)length, &paylen, from, to);
+	if (offset == -1) {
+		log_error("Failed to decode udp ipv6 header.");
+		return -1;
+	}
+
 	bufix += offset;
 	length -= offset;
 	if (length < paylen)

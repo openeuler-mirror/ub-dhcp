@@ -248,7 +248,7 @@ static void init_packet_record(struct packet_record *pkt_rcd)
 		pkt_rcd->pkt_record_list[i] =
 			(struct send_receive_counter *)malloc(sizeof(struct send_receive_counter));
 		if (pkt_rcd->pkt_record_list[i] == NULL) {
-			log_fatal("%s:%d failed to alloc pkt_record_list[%d]'s memory.\n", MDL, i);
+			log_error("failed to alloc pkt_record_list memory.\n");
 			goto alloc_mem_err;
 		}
 		memset(pkt_rcd->pkt_record_list[i], 0, sizeof(struct send_receive_counter));
@@ -258,6 +258,16 @@ alloc_mem_err:
 	for (j = i - 1; j >= 0; j--) {
 		free(pkt_rcd->pkt_record_list[j]);
 		pkt_rcd->pkt_record_list[j] = NULL;
+	}
+}
+
+static void uninit_packet_record(struct packet_record *pkt_rcd)
+{
+	int i;
+
+	for (i = 0; i < PACKET_TYPE_NUM; i++) {
+		free(pkt_rcd->pkt_record_list[i]);
+		pkt_rcd->pkt_record_list[i] = NULL;
 	}
 }
 
@@ -403,8 +413,7 @@ main(int argc, char **argv) {
 	/* Set up the OMAPI. */
 	status = omapi_init();
 	if (status != ISC_R_SUCCESS)
-		log_fatal("Can't initialize OMAPI: %s",
-			  isc_result_totext(status));
+		log_fatal("Can't initialize OMAPI: %s", isc_result_totext(status));
 
 	/* Set up the OMAPI wrappers for various server database internal
 	   objects. */
@@ -874,15 +883,15 @@ main(int argc, char **argv) {
 			/* find append point: beginning of any trailing '.pid'
 			 * or '-$IF.pid' */
 			for (pfx=pdp_len; (pfx >= 0) && (path_dhclient_pid[pfx] != '.') && (path_dhclient_pid[pfx] != '/'); pfx--);
-				if (pfx == -1)
-					pfx = pdp_len;
+			if (pfx == -1)
+				pfx = pdp_len;
 
 			if (path_dhclient_pid[pfx] == '/')
 				pfx += 1;
 
 			for (dpfx=pfx; (dpfx >= 0) && (path_dhclient_pid[dpfx] != '-') && (path_dhclient_pid[dpfx] != '/'); dpfx--);
-				if ((dpfx > -1) && (path_dhclient_pid[dpfx] != '/'))
-					pfx = dpfx;
+			if ((dpfx > -1) && (path_dhclient_pid[dpfx] != '/'))
+				pfx = dpfx;
 
 			for (ip = interfaces; ip; ip = ip->next) {
 				if (interfaces_requested && (ip->flags & (INTERFACE_REQUESTED))) {
@@ -1454,6 +1463,7 @@ main(int argc, char **argv) {
 	dispatch();
 
 	/* In fact dispatch() never returns. */
+	uninit_packet_record(&dhcp_pkt_rcd);
 	return 0;
 }
 
