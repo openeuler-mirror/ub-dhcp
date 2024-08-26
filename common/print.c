@@ -408,9 +408,9 @@ void show_ipv4_hdr(struct ip *iph)
 {
 	log_show("ip_fvhl \t= 0x%x", iph->ip_fvhl);
 	log_show("ip_tos \t= 0x%x", iph->ip_tos);
-	log_show("ip_len \t= 0x%x", ntohs(iph->ip_len));
+	log_show("ip_len \t= %d", ntohs(iph->ip_len));
 	log_show("ip_id \t= 0x%x", ntohs(iph->ip_id));
-	log_show("ip_off \t= 0x%x", ntohs(iph->ip_off));
+	log_show("ip_off \t= %d", ntohs(iph->ip_off));
 	log_show("ip_ttl \t= 0x%x", iph->ip_ttl);
 	log_show("ip_p \t= 0x%x", iph->ip_p);
 	log_show("ip_sum \t= 0x%x", ntohs(iph->ip_sum));
@@ -626,7 +626,7 @@ void show_raw_ub_pdu6(struct dhcpv6_packet *tdp6, int len)
 
 	client_id_start = (unsigned char *)malloc(sizeof(unsigned char) * (duid_bytes + 1));
 	if (client_id_start == NULL) {
-		log_fatal("%s:%d failed to alloc memory.", MDL);
+		log_fatal("malloc failed");
 		return;
 	}
 
@@ -768,7 +768,7 @@ unsigned char get_message_type (struct dhcp_packet *packet)
 	unsigned char *src_buf;
 
 	if (buf == NULL) {
-		log_fatal("%s:%d failed to alloc memory.\n", MDL);
+		log_fatal("buf malloc failed.\n");
 		return ret;
 	}
 

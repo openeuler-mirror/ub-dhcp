@@ -804,7 +804,8 @@ get_hw_addr3(struct interface_info *info, struct ifaddrs *ifaddrs_start)
 	struct ifaddrs *ifa = NULL;
 	struct sockaddr_ll *sll = NULL;
 	int sll_allocated = 0;
-        isc_result_t result = ISC_R_SUCCESS;
+    isc_result_t result = ISC_R_SUCCESS;
+	int get_addr_res;
         
 	if (ifaddrs == NULL)
 		log_fatal("Failed to get interfaces");
@@ -827,7 +828,9 @@ get_hw_addr3(struct interface_info *info, struct ifaddrs *ifaddrs_start)
 	else {
 		hw->hlen = GUID_LEN + 1;
 		hw->hbuf[0] = HTYPE_UB;
-		get_addr(name, &hw->hbuf[1]);
+		get_addr_res = get_addr(name, &hw->hbuf[1]);
+		if (get_addr_res == -1)
+			log_fatal("Failed to get addr");
 	}
 
 	if (sll_allocated)
@@ -862,7 +865,8 @@ get_hw_addr2(struct interface_info *info)
 	struct ifaddrs *ifa = NULL;
 	struct sockaddr_ll *sll = NULL;
 	int sll_allocated = 0;
-        isc_result_t result = ISC_R_SUCCESS;
+    isc_result_t result = ISC_R_SUCCESS;
+	int get_addr_res;
         
 	if (getifaddrs(&ifaddrs) == -1)
 		log_fatal("Failed to get interfaces");
@@ -885,7 +889,9 @@ get_hw_addr2(struct interface_info *info)
 	else {
 		hw->hlen = GUID_LEN + 1;
 		hw->hbuf[0] = HTYPE_UB;
-		get_addr(name, &hw->hbuf[1]);
+		get_addr_res = get_addr(name, &hw->hbuf[1]);
+		if (get_addr_res == -1)
+			log_fatal("Failed to get addr");
 	}
 
 	if (sll_allocated)

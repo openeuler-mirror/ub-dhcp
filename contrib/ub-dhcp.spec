@@ -155,4 +155,3 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Fri Oct  1 1999 Brian J. Murrell <brian@interlinx.bc.ca>
 - write a spec file for ub-dhcpd
-
