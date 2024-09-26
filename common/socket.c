@@ -604,26 +604,26 @@ int if_register_ub6(struct interface_info *info) {
 
 	ret = if_register_lpf (info);
 	if (ret > 0) {
-		info -> rfdesc = ret;
+		info->rfdesc = ret;
 		setup_ub_filter (info);
 		info->wfdesc = info->rfdesc;
 		if (!quiet_interface_discovery) {
 			log_info ("Listening on LPF/%s/%s%s%s",
-				info -> name,
-				print_hw_addr (info -> hw_address.hbuf [0],
-					info -> hw_address.hlen - 1,
-					&info -> hw_address.hbuf [1]),
-				(info -> shared_network ? "/" : ""),
-				(info -> shared_network ?
-				info -> shared_network -> name : ""));
+				info->name,
+				print_hw_addr (info->hw_address.hbuf [0],
+					info->hw_address.hlen - 1,
+					&info->hw_address.hbuf [1]),
+				(info->shared_network ? "/" : ""),
+				(info->shared_network ?
+				info->shared_network->name : ""));
 			log_info ("Sending on LPF/%s/%s%s%s",
-				info -> name,
-				print_hw_addr (info -> hw_address.hbuf [0],
-					info -> hw_address.hlen - 1,
-					&info -> hw_address.hbuf [1]),
-				(info -> shared_network ? "/" : ""),
-				(info -> shared_network ?
-				info -> shared_network -> name : ""));
+				info->name,
+				print_hw_addr (info->hw_address.hbuf [0],
+					info->hw_address.hlen - 1,
+					&info->hw_address.hbuf [1]),
+				(info->shared_network ? "/" : ""),
+				(info->shared_network ?
+				info->shared_network->name : ""));
 		}
 	}
 	return ret;
@@ -915,7 +915,7 @@ int send_ub_packet(struct interface_info *interface,
 	memcpy (buf + fudge, (unsigned char *)header, hbufp);
 	ibufp = hbufp + fudge;
 	assemble_udp_ipv6_header (interface, buf, &ibufp, from.sin6_addr.s6_addr,
-		to -> sin6_addr.s6_addr, to -> sin6_port, (unsigned char *)raw, len);
+		to->sin6_addr.s6_addr, to->sin6_port, (unsigned char *)raw, len);
 
 	memcpy (buf + ibufp, raw, len);
 	result = write(interface->wfdesc, buf + fudge, ibufp + len - fudge);
